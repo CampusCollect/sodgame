@@ -1,0 +1,3464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top-Down 2D Survival Prototype</title>
+    <!-- 
+      - This is a single-file prototype for a complex survival game.
+      - It includes:
+      - Procedural Chunk-Based World (Biomes, Difficulty Rings)
+      - Procedural Building/POI Generation
+      - Player Survival Stats (Health, Hunger, Thirst, Stamina, Morale)
+      - Zombie AI (FSM, Sight/Sound Sensors, State Icons)
+      - Drivable Vehicles with Fuel and Durability
+      - Base Building System with Power Grid
+      - Tiered Item & Loot System (T1-T4)
+      - Day/Night Cycle
+      - Complex UI Panels (Inventory, Crafting, Storage)
+    -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-size: 14px;
+        }
+        #game-container {
+            border: 2px solid #555;
+            overflow: hidden;
+            position: relative;
+            background-color: #2a2a2a;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        canvas {
+            display: block;
+            background-color: #333; /* Fallback */
+        }
+        #start-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        #start-menu h1 {
+            font-size: 3.5rem;
+            color: #e62e2e;
+            text-shadow: 0 0 10px #e62e2e;
+            margin-bottom: 10px;
+        }
+        #start-menu p {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+        #start-button {
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            background-color: #c02626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(220, 50, 50, 0.4);
+        }
+        #start-button:hover {
+            background-color: #e62e2e;
+            box-shadow: 0 8px 20px rgba(220, 50, 50, 0.6);
+            transform: translateY(-2px);
+        }
+        #seed-input {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 1rem;
+            width: 250px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #f0f0f0;
+            text-align: center;
+        }
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- HUD --- */
+        #hud-stats {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        #hud-time {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: right;
+        }
+        .stat-bar-container {
+            width: 200px;
+            height: 20px;
+            background-color: #555;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #222;
+        }
+        .stat-bar {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .stat-label {
+            position: absolute;
+            left: 10px;
+            line-height: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+        #health-bar { background-color: #c00; }
+        #hunger-bar { background-color: #e69500; }
+        #thirst-bar { background-color: #0073e6; }
+        #stamina-bar { background-color: #00c000; }
+        #morale-bar { background-color: #e62ee6; }
+
+        #hotbar {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 5px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        .hotbar-slot {
+            width: 50px;
+            height: 50px;
+            background-color: #444;
+            border: 2px solid #777;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            position: relative;
+            padding: 5px;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            text-align: center;
+        }
+        .hotbar-slot-key {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ccc;
+        }
+        .hotbar-item-stack {
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 1px #000;
+        }
+
+        /* --- MODAL PANELS --- */
+        .modal-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2a2a2a;
+            border: 2px solid #555;
+            border-radius: 10px;
+            z-index: 500;
+            display: none; /* Hidden by default */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            color: #f0f0f0;
+            font-size: 14px;
+        }
+        .modal-panel h2 {
+            margin: 0;
+            padding: 15px 20px;
+            background: #3a3a3a;
+            border-bottom: 2px solid #555;
+            border-radius: 8px 8px 0 0;
+            font-size: 1.2rem;
+            cursor: move;
+        }
+        .modal-panel-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-panel-close:hover {
+            color: #fff;
+        }
+
+        /* --- BUILD MENU PANEL --- */
+        #build-menu {
+            width: 400px;
+        }
+        #build-menu-content {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .build-category {
+            margin-bottom: 10px;
+        }
+        .build-category h3 {
+            margin: 0 0 8px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #444;
+            color: #e69500;
+        }
+        .build-item-button {
+            background: #444;
+            border: 1px solid #666;
+            color: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 5px;
+            transition: background 0.2s;
+        }
+        .build-item-button:hover {
+            background: #555;
+        }
+        .build-item-button.disabled {
+            background: #333;
+            color: #777;
+            cursor: not-allowed;
+        }
+        .build-item-cost {
+            font-size: 0.8rem;
+            color: #aaa;
+            display: block;
+        }
+
+        /* --- INVENTORY PANEL --- */
+        #inventory-panel {
+            width: 600px;
+        }
+        #inventory-content {
+            display: flex;
+            padding: 15px;
+        }
+        #inventory-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-right: 15px;
+        }
+        .inventory-tab {
+            padding: 10px 15px;
+            background: #444;
+            border: 1px solid #666;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .inventory-tab.active {
+            background: #e69500;
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+        #inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-gap: 8px;
+            flex-grow: 1;
+        }
+        .inventory-slot {
+            width: 60px;
+            height: 60px;
+            background-color: #444;
+            border: 2px solid #777;
+            border-radius: 5px;
+            position: relative;
+            box-sizing: border-box;
+            padding: 5px;
+            font-size: 10px;
+            color: white;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-wrap: break-word;
+        }
+        /* First 9 slots are hotbar */
+        .inventory-slot:nth-child(-n+9) {
+            border-color: #e69500;
+        }
+        .inventory-item {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            user-select: none;
+            background: #555;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        .inventory-item.dragging {
+            opacity: 0.5;
+            background: #999;
+        }
+        .inventory-item-stack {
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 1px #000;
+        }
+
+        /* --- CRAFTING PANEL --- */
+        #crafting-panel {
+            width: 700px;
+        }
+        #crafting-content {
+            display: flex;
+            padding: 15px;
+            gap: 15px;
+        }
+        #crafting-recipe-list {
+            width: 250px;
+            height: 350px;
+            overflow-y: auto;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 5px;
+        }
+        .crafting-recipe {
+            padding: 10px;
+            border-bottom: 1px solid #444;
+            cursor: pointer;
+        }
+        .crafting-recipe:hover {
+            background: #4a4a4a;
+        }
+        .crafting-recipe.selected {
+            background: #e69500;
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+        .crafting-recipe.locked {
+            color: #777;
+            cursor: not-allowed;
+        }
+        #crafting-recipe-details {
+            width: 400px;
+        }
+        #crafting-recipe-details h3 {
+            margin-top: 0;
+            color: #e69500;
+        }
+        #crafting-materials-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        #crafting-materials-list li {
+            margin-bottom: 5px;
+        }
+        .material-needed { color: #ff6b6b; }
+        .material-available { color: #6bff6b; }
+        #craft-button {
+            font-size: 1.2rem;
+            padding: 12px 20px;
+            background-color: #0073e6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+        #craft-button:hover {
+            background-color: #008cff;
+        }
+        #craft-button:disabled {
+            background-color: #555;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        /* --- VEHICLE STORAGE PANEL --- */
+        #vehicle-storage-panel {
+            width: 850px;
+        }
+        #vehicle-storage-content {
+            display: flex;
+            padding: 15px;
+            gap: 15px;
+        }
+        .storage-container {
+            width: 400px;
+        }
+        .storage-container h3 {
+            margin: 0 0 10px 0;
+            text-align: center;
+        }
+        .storage-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 60px);
+            grid-gap: 8px;
+            height: 400px;
+            overflow-y: auto;
+            background: #333;
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 5px;
+        }
+        #vehicle-storage-details {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            font-size: 14px;
+        }
+        
+        /* --- MISC --- */
+        #minimap {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            border: 2px solid #555;
+            border-radius: 8px;
+        }
+        #game-message {
+            position: absolute;
+            bottom: 100px; /* Above hotbar */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            z-index: 200;
+            display: none; /* Hidden by default */
+        }
+        #night-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000030; /* Dark blue for night */
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+            transition: opacity 1.5s linear;
+        }
+        #build-preview {
+            position: absolute;
+            border: 2px dashed #0f0;
+            background: rgba(0, 255, 0, 0.2);
+            z-index: 100;
+            pointer-events: none;
+            display: none;
+        }
+        #build-preview.invalid {
+            border-color: #f00;
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="night-overlay"></div>
+        
+        <!-- HUD -->
+        <div id="hud">
+            <div id="hud-stats">
+                <div class="stat-container">
+                    <div class="stat-bar-container">
+                        <div id="health-bar" class="stat-bar"></div>
+                    </div>
+                    <span class="stat-label">HEALTH</span>
+                </div>
+                <div class="stat-container">
+                    <div class="stat-bar-container">
+                        <div id="hunger-bar" class="stat-bar"></div>
+                    </div>
+                    <span class="stat-label">HUNGER</span>
+                </div>
+                <div class="stat-container">
+                    <div class="stat-bar-container">
+                        <div id="thirst-bar" class="stat-bar"></div>
+                    </div>
+                    <span class="stat-label">THIRST</span>
+                </div>
+                <div class="stat-container">
+                    <div class="stat-bar-container">
+                        <div id="stamina-bar" class="stat-bar"></div>
+                    </div>
+                    <span class="stat-label">STAMINA</span>
+                </div>
+                <div class="stat-container">
+                    <div class="stat-bar-container">
+                        <div id="morale-bar" class="stat-bar"></div>
+                    </div>
+                    <span class="stat-label">MORALE</span>
+                </div>
+            </div>
+            
+            <div id="hud-time">
+                <div id="time-display">Day 1, 07:00</div>
+                <div id="weather-display">Clear</div>
+            </div>
+            
+            <div id="hotbar">
+                <!-- Slots will be generated by JS -->
+            </div>
+
+            <canvas id="minimap" width="200" height="200"></canvas>
+        </div>
+
+        <!-- Build placement preview -->
+        <div id="build-preview"></div>
+
+        <!-- Game Message -->
+        <div id="game-message"></div>
+
+        <!-- Start Menu -->
+        <div id="start-menu">
+            <h1>SURVIVAL PROTOTYPE</h1>
+            <p>Enter a seed (or leave blank) and start.</p>
+            <input type="text" id="seed-input" placeholder="Enter world seed...">
+            <button id="start-button">Start Game</button>
+        </div>
+
+        <!-- Build Menu Panel -->
+        <div id="build-menu" class="modal-panel">
+            <h2>Build Menu (B)</h2>
+            <span class="modal-panel-close">&times;</span>
+            <div id="build-menu-content">
+                <!-- Content generated by JS -->
+            </div>
+        </div>
+
+        <!-- Inventory Panel -->
+        <div id="inventory-panel" class="modal-panel">
+            <h2>Inventory (I)</h2>
+            <span class="modal-panel-close">&times;</span>
+            <div id="inventory-content">
+                <div id="inventory-tabs">
+                    <div class="inventory-tab active" data-tab="ALL">All</div>
+                    <div class="inventory-tab" data-tab="CLOTHING">Clothing</div>
+                    <div class="inventory-tab" data-tab="WEAPON">Weapons</div>
+                    <div class="inventory-tab" data-tab="TOOL">Tools</div>
+                    <div class="inventory-tab" data-tab="MATERIAL">Materials</div>
+                    <div class="inventory-tab" data-tab="FOOD">Food</div>
+                    <div class="inventory-tab" data-tab="MEDICINE">Medicine</div>
+                </div>
+                <div id="inventory-grid">
+                    <!-- 40 slots generated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Crafting Panel -->
+        <div id="crafting-panel" class="modal-panel">
+            <h2>Crafting (C)</h2>
+            <span class="modal-panel-close">&times;</span>
+            <div id="crafting-content">
+                <div id="crafting-recipe-list">
+                    <!-- Recipes populated by JS -->
+                </div>
+                <div id="crafting-recipe-details">
+                    <h3 id="crafting-details-name">Select a Recipe</h3>
+                    <p id="crafting-details-desc"></p>
+                    <strong>Requires:</strong>
+                    <ul id="crafting-materials-list">
+                        <!-- Materials populated by JS -->
+                    </ul>
+                    <button id="craft-button" disabled>Craft</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Storage Panel -->
+        <div id="vehicle-storage-panel" class="modal-panel">
+            <h2>Vehicle Storage (V)</h2>
+            <span class="modal-panel-close">&times;</span>
+            <div id="vehicle-storage-content">
+                <div class="storage-container">
+                    <h3>Your Inventory</h3>
+                    <div class="storage-grid" id="vehicle-player-grid">
+                        <!-- Player slots (read-only view) -->
+                    </div>
+                </div>
+                <div class="storage-container">
+                    <h3 id="vehicle-storage-name">Vehicle Trunk</h3>
+                    <div class="storage-grid" id="vehicle-storage-grid">
+                        <!-- Vehicle slots -->
+                    </div>
+                </div>
+            </div>
+            <div id="vehicle-storage-details">
+                Vehicle Fuel: <span id="vehicle-fuel-display">0</span> / <span id="vehicle-fuel-cap-display">0</span> L<br>
+                Vehicle Health: <span id="vehicle-health-display">0</span> / <span id="vehicle-health-cap-display">0</span> HP
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+    ====================================================================================
+    GAME SCRIPT
+    ====================================================================================
+    -->
+    <script type="module">
+
+        //================================================
+        // GAME DATA (Simulated JSON)
+        //================================================
+        
+        const GAME_DATA = {
+            // TIER 1: Common
+            // TIER 2: Uncommon
+            // TIER 3: Rare
+            // TIER 4: Military / Ultra-Rare
+            ITEMS: {
+                // T1 Materials
+                "SCRAP_METAL": { name: "Scrap Metal", stack: 50, type: "MATERIAL" },
+                "WOOD": { name: "Wood", stack: 50, type: "MATERIAL" },
+                "CLOTH": { name: "Cloth", stack: 50, type: "MATERIAL" },
+                "NAILS": { name: "Nails", stack: 100, type: "MATERIAL" },
+                "STONE": { name: "Stone", stack: 50, type: "MATERIAL" },
+                "EMPTY_BOTTLE": { name: "Empty Bottle", stack: 10, type: "MATERIAL" },
+                
+                // T2 Materials
+                "STEEL_PIPE": { name: "Steel Pipe", stack: 20, type: "MATERIAL" },
+                "PLANKS": { name: "Planks", stack: 30, type: "MATERIAL" },
+                "LEATHER": { name: "Leather", stack: 20, type: "MATERIAL" },
+                "SCREWS": { name: "Screws", stack: 100, type: "MATERIAL" },
+                "GAS_CAN": { name: "Gas Can", stack: 1, type: "MATERIAL", use: (player) => {
+                    if (player.vehicle) {
+                        const amount = 20;
+                        const needed = player.vehicle.maxFuel - player.vehicle.fuel;
+                        const added = Math.min(amount, needed);
+                        player.vehicle.fuel += added;
+                        game.showMessage(`Refueled vehicle for ${added}L.`);
+                        if (added === amount) return true; // Consume item
+                        else return false; // Don't consume, can is not empty
+                    } else {
+                        game.showMessage("No vehicle to refuel.");
+                        return false;
+                    }
+                }},
+                "HOTWIRE_KIT": { name: "Hotwire Kit", stack: 5, type: "TOOL" },
+                "VEHICLE_KEY": { name: "Vehicle Key", stack: 1, type: "TOOL" },
+
+                // T3 Materials
+                "STEEL_PLATE": { name: "Steel Plate", stack: 10, type: "MATERIAL" },
+                "CONCRETE_MIX": { name: "Concrete Mix", stack: 10, type: "MATERIAL" },
+                "KEVLAR": { name: "Kevlar", stack: 10, type: "MATERIAL" },
+                "ELECTRONICS": { name: "Electronics", stack: 20, type: "MATERIAL" },
+                
+                // T4 Materials
+                "TITANIUM_PLATE": { name: "Titanium Plate", stack: 5, type: "MATERIAL" },
+                "CARBON_FIBER": { name: "Carbon Fiber", stack: 10, type: "MATERIAL" },
+                "ADV_CIRCUIT": { name: "Adv. Circuitry", stack: 10, type: "MATERIAL" },
+                
+                // T1 Food
+                "CANNED_FOOD": { name: "Canned Food", stack: 10, type: "FOOD", use: (p) => { p.hunger += 30; return true; }},
+                "WATER_BOTTLE": { name: "Water Bottle", stack: 10, type: "FOOD", use: (p) => { p.thirst += 40; return true; }},
+                "CHIPS": { name: "Chips", stack: 10, type: "FOOD", use: (p) => { p.hunger += 10; return true; }},
+                
+                // T2 Food
+                "MRE": { name: "MRE", stack: 5, type: "FOOD", use: (p) => { p.hunger += 80; p.thirst += 20; return true; }},
+                "ENERGY_DRINK": { name: "Energy Drink", stack: 10, type: "FOOD", use: (p) => { p.stamina += 50; p.thirst += 10; return true; }},
+                "COOKED_MEAT": { name: "Cooked Meat", stack: 10, type: "FOOD", use: (p) => { p.hunger += 50; return true; }},
+                
+                // T1 Medicine
+                "BANDAGE": { name: "Bandage", stack: 20, type: "MEDICINE", use: (p) => { p.health += 10; return true; }},
+                
+                // T2 Medicine
+                "FIRST_AID_KIT": { name: "First Aid Kit", stack: 5, type: "MEDICINE", use: (p) => { p.health += 50; return true; }},
+                "PAINKILLERS": { name: "Painkillers", stack: 10, type: "MEDICINE", use: (p) => { p.health += 5; p.morale += 10; return true; }},
+                
+                // T3 Medicine
+                "SURGICAL_KIT": { name: "Surgical Kit", stack: 1, type: "MEDICINE", use: (p) => { p.health += 100; return true; }},
+                
+                // T1 Clothing
+                "TORN_SHIRT": { name: "Torn Shirt", stack: 1, type: "CLOTHING" },
+                "JEANS": { name: "Jeans", stack: 1, type: "CLOTHING" },
+                "SNEAKERS": { name: "Sneakers", stack: 1, type: "CLOTHING" },
+                
+                // T2 Clothing
+                "JACKET": { name: "Jacket", stack: 1, type: "CLOTHING" },
+                "CARGO_PANTS": { name: "Cargo Pants", stack: 1, type: "CLOTHING" },
+                "BOOTS": { name: "Boots", stack: 1, type: "CLOTHING" },
+                
+                // T3 Clothing
+                "TACTICAL_VEST": { name: "Tactical Vest", stack: 1, type: "CLOTHING" },
+                "MILITARY_FATIGUES": { name: "Military Fatigues", stack: 1, type: "CLOTHING" },
+                "COMBAT_BOOTS": { name: "Combat Boots", stack: 1, type: "CLOTHING" },
+                
+                // T4 Clothing
+                "BODY_ARMOR": { name: "Body Armor", stack: 1, type: "CLOTHING" },
+                "GHILLIE_SUIT": { name: "Ghillie Suit", stack: 1, type: "CLOTHING" },
+                "REINFORCED_HELMET": { name: "Reinforced Helmet", stack: 1, type: "CLOTHING" },
+                
+                // T1 Weapons
+                "KNIFE": { name: "Knife", stack: 1, type: "WEAPON" },
+                "BASEBALL_BAT": { name: "Baseball Bat", stack: 1, type: "WEAPON" },
+                "PISTOL": { name: "Pistol", stack: 1, type: "WEAPON" },
+                
+                // T2 Weapons
+                "SHOTGUN": { name: "Shotgun", stack: 1, type: "WEAPON" },
+                "RIFLE": { name: "Rifle", stack: 1, type: "WEAPON" },
+                "MACHETE": { name: "Machete", stack: 1, type: "WEAPON" },
+                
+                // T3 Weapons
+                "ASSAULT_RIFLE": { name: "Assault Rifle", stack: 1, type: "WEAPON" },
+                "SNIPER_RIFLE": { name: "Sniper Rifle", stack: 1, type: "WEAPON" },
+                "COMPOUND_BOW": { name: "Compound Bow", stack: 1, type: "WEAPON" },
+                
+                // T4 Weapons
+                "GRENADE_LAUNCHER": { name: "Grenade Launcher", stack: 1, type: "WEAPON" },
+                "FLAMETHROWER": { name: "Flamethrower", stack: 1, type: "WEAPON" },
+                "HEAVY_MG": { name: "Heavy MG", stack: 1, type: "WEAPON" },
+                
+                // T1 Tools
+                "SCREWDRIVER": { name: "Screwdriver", stack: 1, type: "TOOL" },
+                "WRENCH": { name: "Wrench", stack: 1, type: "TOOL" },
+                "HAMMER": { name: "Hammer", stack: 1, type: "TOOL" },
+                
+                // T2 Tools
+                "CROWBAR": { name: "Crowbar", stack: 1, type: "TOOL" },
+                "BOLT_CUTTERS": { name: "Bolt Cutters", stack: 1, type: "TOOL" },
+                "LOCKPICK_SET": { name: "Lockpick Set", stack: 1, type: "TOOL" },
+                
+                // T3 Tools
+                "WELDING_TORCH": { name: "Welding Torch", stack: 1, type: "TOOL" },
+                "POWER_DRILL": { name: "Power Drill", stack: 1, type: "TOOL" },
+                "CHAINSAW": { name: "Chainsaw", stack: 1, type: "TOOL" },
+                
+                // T4 Tools
+                "PLASMA_CUTTER": { name: "Plasma Cutter", stack: 1, type: "TOOL" },
+                "INDUSTRIAL_SAW": { name: "Industrial Saw", stack: 1, type: "TOOL" },
+            },
+            
+            STRUCTURES: {
+                "WALL": { name: "Wooden Wall", cost: { "WOOD": 5 }, hp: 200, blocksView: true, blocksMove: true, category: "BASE" },
+                "DOOR": { name: "Wooden Door", cost: { "WOOD": 3, "SCRAP_METAL": 1 }, hp: 100, blocksView: true, blocksMove: true, isDoor: true, category: "BASE" },
+                "VEHICLE_GATE": { name: "Vehicle Gate", cost: { "PLANKS": 10, "STEEL_PIPE": 4 }, hp: 500, blocksView: false, blocksMove: true, isDoor: true, category: "BASE" },
+                "SPIKE_TRAP": { name: "Spike Trap", cost: { "WOOD": 5, "NAILS": 10 }, hp: 10, isTrap: true, damage: 50, category: "DEFENSE" },
+                "STORAGE_CHEST": { name: "Storage Chest", cost: { "WOOD": 8 }, hp: 50, blocksView: false, blocksMove: true, isContainer: true, storageSlots: 12, category: "UTILITY" },
+                "WORKBENCH": { name: "Workbench", cost: { "WOOD": 10, "SCRAP_METAL": 5 }, hp: 100, blocksView: false, blocksMove: true, category: "UTILITY" },
+                "GENERATOR": { name: "Generator", cost: { "STEEL_PIPE": 5, "ELECTRONICS": 2 }, hp: 150, blocksView: false, blocksMove: true, powerGen: 500, requiresFuel: true, category: "POWER" },
+                "SOLAR_PANEL": { name: "Solar Panel", cost: { "STEEL_PIPE": 2, "ELECTRONICS": 5 }, hp: 80, blocksView: false, blocksMove: true, powerGen: 50, category: "POWER" },
+                "REFRIGERATOR": { name: "Refrigerator", cost: { "STEEL_PLATE": 2, "ELECTRONICS": 3 }, hp: 80, blocksView: false, blocksMove: true, powerDraw: 50, isContainer: true, storageSlots: 8, category: "UTILITY" },
+            },
+            
+            RECIPES: {
+                "BANDAGE": {
+                    name: "Bandage",
+                    desc: "Stops bleeding, heals a small amount.",
+                    cost: { "CLOTH": 2 },
+                    unlocked: true,
+                    category: "MEDICINE"
+                },
+                "PLANKS": {
+                    name: "Planks",
+                    desc: "Refined wood for building.",
+                    cost: { "WOOD": 1 },
+                    unlocked: true,
+                    produces: 2,
+                    category: "MATERIAL"
+                },
+                "SPIKE_TRAP": {
+                    name: "Spike Trap",
+                    desc: "A simple trap to hurt enemies.",
+                    cost: { "WOOD": 5, "NAILS": 10 },
+                    unlocked: true,
+                    category: "DEFENSE"
+                },
+                "KNIFE": {
+                    name: "Knife",
+                    desc: "A basic shiv.",
+                    cost: { "SCRAP_METAL": 2 },
+                    unlocked: true,
+                    category: "WEAPON"
+                },
+                "LOCKPICK_SET": {
+                    name: "Lockpick Set",
+                    desc: "Unlocks simple doors.",
+                    cost: { "SCRAP_METAL": 1, "SCREWS": 5 },
+                    unlocked: false, // Requires blueprint
+                    category: "TOOL"
+                },
+                "HOTWIRE_KIT": {
+                    name: "Hotwire Kit",
+                    desc: "Steal a car.",
+                    cost: { "ELECTRONICS": 1, "SCREWS": 3 },
+                    unlocked: false, // Requires blueprint
+                    category: "TOOL"
+                },
+            },
+            
+            BIOMES: {
+                "URBAN": { name: "Urban", color: "#5a5a5a", treeChance: 0.001, poiChance: 0.6, poiList: ["APARTMENT", "STORE", "PHARMACY", "OFFICE", "POLICE_STATION", "HOSPITAL"] },
+                "INDUSTRIAL": { name: "Industrial", color: "#4a4a52", treeChance: 0.0, poiChance: 0.7, poiList: ["WAREHOUSE", "FACTORY", "TRUCK_DEPOT", "GARAGE", "FUEL_STATION"] },
+                "RESIDENTIAL": { name: "Residential", color: "#6a7a6a", treeChance: 0.05, poiChance: 0.5, poiList: ["HOUSE", "CLINIC", "SCHOOL", "RESTAURANT", "PARK"] },
+                "RURAL": { name: "Rural", color: "#7a8a6a", treeChance: 0.1, poiChance: 0.3, poiList: ["FARM", "BARN", "GAS_STATION", "DINER", "TRAILER_PARK"] },
+                "HIGHWAY": { name: "Highway", color: "#404040", treeChance: 0.0, poiChance: 0.8, poiList: ["TRUCK_STOP", "REST_AREA", "TOLL_BOOTH", "ROADBLOCK", "STRANDED_CONVOY"] },
+                "WASTELAND": { name: "Wasteland", color: "#8a7a6a", treeChance: 0.005, poiChance: 0.1, poiList: ["MILITARY_CHECKPOINT", "BUNKER", "CRASHED_HELICOPTER", "RESEARCH_LAB"] }
+            },
+            
+            ROAD_TYPES: {
+                "HIGHWAY": { color: "#2f2f2f", width: 4 },
+                "SURFACE_ROAD": { color: "#3f3f3f", width: 2 },
+                "DIRT_ROAD": { color: "#5a4a3a", width: 1 }
+            },
+            
+            DIFFICULTY_RINGS: [
+                { name: "Ring 0 (Safe Zone)", maxDist: 500, enemyTypes: ["SHAMBLER"], lootTier: 1 },
+                { name: "Ring 1 (Normal)", maxDist: 1500, enemyTypes: ["SHAMBLER", "RUNNER"], lootTier: 1 },
+                { name: "Ring 2 (Dangerous)", maxDist: 3000, enemyTypes: ["SHAMBLER", "RUNNER", "BRUTE"], lootTier: 2 },
+                { name: "Ring 3 (High-Tier)", maxDist: 5000, enemyTypes: ["RUNNER", "BRUTE"], lootTier: 3 },
+                { name: "Ring 4 (Endgame)", maxDist: Infinity, enemyTypes: ["BRUTE"], lootTier: 4 }
+            ],
+            
+            POIS: {
+                // T1 POIs
+                "HOUSE": { name: "Abandoned House", minTier: 1, maxTier: 1, template: "SMALL_HOUSE_1" },
+                "STRANDED_CONVOY": { name: "Stranded Convoy", minTier: 1, maxTier: 3, vehicleSpawns: [{type: "SEDAN", chance: 0.5}, {type: "PICKUP", chance: 0.3}] },
+                "GAS_STATION": { name: "Gas Station", minTier: 1, maxTier: 2, template: "GAS_STATION_1", vehicleSpawns: [{type: "SEDAN", chance: 0.2}] },
+                "FARM": { name: "Farm", minTier: 1, maxTier: 2 },
+                
+                // T2 POIs
+                "STORE": { name: "Store", minTier: 1, maxTier: 2 },
+                "RESTAURANT": { name: "Restaurant", minTier: 1, maxTier: 2 },
+                "DINER": { name: "Diner", minTier: 1, maxTier: 2 },
+                "CLINIC": { name: "Clinic", minTier: 2, maxTier: 3 },
+                "PHARMACY": { name: "Pharmacy", minTier: 2, maxTier: 3 },
+                "GARAGE": { name: "Garage", minTier: 2, maxTier: 3, vehicleSpawns: [{type: "PICKUP", chance: 0.5}, {type: "VAN", chance: 0.2}] },
+                "TRAILER_PARK": { name: "Trailer Park", minTier: 1, maxTier: 2 },
+                "PARK": { name: "Park", minTier: 1, maxTier: 1 },
+                "BARN": { name: "Barn", minTier: 1, maxTier: 2 },
+
+                // T3 POIs
+                "WAREHOUSE": { name: "Warehouse", minTier: 2, maxTier: 4, vehicleSpawns: [{type: "VAN", chance: 0.3}, {type: "SEMI_TRACTOR", chance: 0.1}] },
+                "FACTORY": { name: "Factory", minTier: 3, maxTier: 4 },
+                "TRUCK_DEPOT": { name: "Truck Depot", minTier: 3, maxTier: 4, vehicleSpawns: [{type: "SEMI_TRACTOR", chance: 0.5}, {type: "VAN", chance: 0.3}] },
+                "POLICE_STATION": { name: "Police Station", minTier: 3, maxTier: 4 },
+                "SCHOOL": { name: "School", minTier: 2, maxTier: 3 },
+                "APARTMENT": { name: "Apartment Building", minTier: 2, maxTier: 3 },
+                "OFFICE": { name: "Office Building", minTier: 2, maxTier: 3 },
+                
+                // T4 POIs
+                "HOSPITAL": { name: "Hospital", minTier: 4, maxTier: 5 },
+                "MILITARY_CHECKPOINT": { name: "Military Checkpoint", minTier: 4, maxTier: 5 },
+                "BUNKER": { name: "Bunker", minTier: 4, maxTier: 5 },
+                "RESEARCH_LAB": { name: "Research Lab", minTier: 4, maxTier: 5 },
+                
+                // Highway POIs
+                "TRUCK_STOP": { name: "Truck Stop", minTier: 2, maxTier: 4, vehicleSpawns: [{type: "SEMI_TRACTOR", chance: 0.4}, {type: "PICKUP", chance: 0.2}] },
+                "REST_AREA": { name: "Rest Area", minTier: 1, maxTier: 2 },
+                "TOLL_BOOTH": { name: "Toll Booth", minTier: 1, maxTier: 3 },
+                "ROADBLOCK": { name: "Roadblock", minTier: 2, maxTier: 4 },
+                "CRASHED_HELICOPTER": { name: "Crashed Helicopter", minTier: 4, maxTier: 5 },
+            },
+            
+            BUILDING_TEMPLATES: {
+                // W = Wall, D = Door, G = Window (just a wall for now), C = Container, . = Empty
+                "SMALL_HOUSE_1": {
+                    size: {w: 12, h: 10},
+                    map: [
+                        "WWWWWWWWWWWW",
+                        "W....C.....W",
+                        "W....WWWWW.W",
+                        "W.C..W...C.W",
+                        "W....D.....W",
+                        "WWWWWDWWWWWW",
+                        "W.C..D..C..W",
+                        "W....W.....W",
+                        "W....W.C...W",
+                        "WWWWWWWWWWWW"
+                    ],
+                    lootTable: "T_RESIDENTIAL_LOOT"
+                },
+                "GAS_STATION_1": {
+                    size: {w: 15, h: 10},
+                    map: [
+                        "WWWWWWWWWWWWWWW",
+                        "WD..C....C....W",
+                        "W.............W",
+                        "W...WWWWWWWWW.W",
+                        "W...W.........W",
+                        "W...W..C......W",
+                        "W...D.........W",
+                        "W...WWWWWWWWW.W",
+                        "W.C...........W",
+                        "WWWWWWWWWWWWWWW"
+                    ],
+                    lootTable: "T_GAS_STATION_LOOT"
+                }
+            },
+            
+            LOOT_TABLES: {
+                // T1 Loot
+                "T_GENERIC_T1": {
+                    minItems: 1, maxItems: 3,
+                    items: [
+                        { id: "CANNED_FOOD", chance: 0.3 },
+                        { id: "WATER_BOTTLE", chance: 0.3 },
+                        { id: "BANDAGE", chance: 0.2 },
+                        { id: "SCRAP_METAL", chance: 0.4 },
+                        { id: "WOOD", chance: 0.4 },
+                        { id: "CLOTH", chance: 0.4 },
+                        { id: "NAILS", chance: 0.2 },
+                        { id: "STONE", chance: 0.2 },
+                        { id: "TORN_SHIRT", chance: 0.1 },
+                        { id: "JEANS", chance: 0.1 },
+                        "KNIFE", // 100% chance shorthand
+                    ]
+                },
+                "T_RESIDENTIAL_LOOT": {
+                    minItems: 2, maxItems: 4,
+                    items: [
+                        { id: "CANNED_FOOD", chance: 0.5 },
+                        { id: "WATER_BOTTLE", chance: 0.5 },
+                        { id: "CHIPS", chance: 0.3 },
+                        { id: "CLOTH", chance: 0.4 },
+                        { id: "BANDAGE", chance: 0.2 },
+                        { id: "KNIFE", chance: 0.1 },
+                        { id: "BASEBALL_BAT", chance: 0.1 },
+                        { id: "PISTOL", chance: 0.05 },
+                        { id: "HAMMER", chance: 0.2 },
+                    ]
+                },
+                "T_GAS_STATION_LOOT": {
+                    minItems: 2, maxItems: 5,
+                    items: [
+                        { id: "CANNED_FOOD", chance: 0.2 },
+                        { id: "WATER_BOTTLE", chance: 0.3 },
+                        { id: "CHIPS", chance: 0.5 },
+                        { id: "ENERGY_DRINK", chance: 0.4 },
+                        { id: "GAS_CAN", chance: 0.3 },
+                        { id: "WRENCH", chance: 0.2 },
+                        { id: "SCRAP_METAL", chance: 0.3 },
+                    ]
+                },
+                "T_ZOMBIE_LOOT": { // Base zombie loot
+                    minItems: 0, maxItems: 2,
+                    items: [
+                        { id: "SCRAP_METAL", chance: 0.1 },
+                        { id: "CLOTH", chance: 0.15 },
+                        { id: "CANNED_FOOD", chance: 0.05 },
+                    ]
+                },
+
+                // T2 Loot
+                "T_GENERIC_T2": {
+                    minItems: 2, maxItems: 4,
+                    items: [
+                        { id: "MRE", chance: 0.2 },
+                        { id: "FIRST_AID_KIT", chance: 0.15 },
+                        { id: "STEEL_PIPE", chance: 0.3 },
+                        { id: "PLANKS", chance: 0.3 },
+                        { id: "LEATHER", chance: 0.2 },
+                        { id: "SCREWS", chance: 0.4 },
+                        { id: "GAS_CAN", chance: 0.2 },
+                        { id: "JACKET", chance: 0.1 },
+                        { id: "SHOTGUN", chance: 0.1 },
+                        { id: "RIFLE", chance: 0.1 },
+                        { id: "CROWBAR", chance: 0.15 },
+                    ]
+                },
+                "T_ZOMBIE_RUNNER_LOOT": {
+                    minItems: 1, maxItems: 2,
+                    items: [
+                        { id: "CLOTH", chance: 0.1 },
+                        { id: "ENERGY_DRINK", chance: 0.1 },
+                        { id: "PAINKILLERS", chance: 0.05 },
+                        { id: "JACKET", chance: 0.05 },
+                    ]
+                },
+
+                // T3 Loot
+                "T_GENERIC_T3": {
+                    minItems: 3, maxItems: 5,
+                    items: [
+                        { id: "MRE", chance: 0.4 },
+                        { id: "FIRST_AID_KIT", chance: 0.3 },
+                        { id: "STEEL_PLATE", chance: 0.3 },
+                        { id: "KEVLAR", chance: 0.2 },
+                        { id: "ELECTRONICS", chance: 0.4 },
+                        { id: "HOTWIRE_KIT", chance: 0.25 },
+                        "TACTICAL_VEST",
+                        "ASSAULT_RIFLE",
+                        "WELDING_TORCH",
+                    ]
+                },
+                "T_ZOMBIE_BRUTE_LOOT": {
+                    minItems: 1, maxItems: 3,
+                    items: [
+                        { id: "STEEL_PIPE", chance: 0.2 },
+                        { id: "MRE", chance: 0.1 },
+                        { id: "BODY_ARMOR", chance: 0.05 },
+                        "HAMMER",
+                    ]
+                },
+
+                // T4 Loot
+                "T_GENERIC_T4": {
+                    minItems: 4, maxItems: 8,
+                    items: [
+                        "SURGICAL_KIT",
+                        "TITANIUM_PLATE",
+                        "ADV_CIRCUIT",
+                        "BODY_ARMOR",
+                        "GRENADE_LAUNCHER",
+                        "PLASMA_CUTTER",
+                    ]
+                }
+            },
+
+            ENEMY_TYPES: {
+                "SHAMBLER": { name: "Shambler", hp: 50, speed: 0.6, damage: 10, sightRadius: 150, color: "#888", size: {w: 16, h: 24}, lootTable: "T_ZOMBIE_LOOT" },
+                "RUNNER": { name: "Runner", hp: 30, speed: 1.8, damage: 8, sightRadius: 250, color: "#a64d4d", size: {w: 14, h: 22}, lootTable: "T_ZOMBIE_RUNNER_LOOT" },
+                "BRUTE": { name: "Brute", hp: 150, speed: 0.4, damage: 30, sightRadius: 180, color: "#6e4d2e", size: {w: 20, h: 32}, lootTable: "T_ZOMBIE_BRUTE_LOOT" }
+            },
+            
+            VEHICLE_TYPES: {
+                "SEDAN": { name: "Sedan", hp: 200, speed: 3.5, accel: 0.08, handling: 0.15, fuelCap: 60, fuelRate: 0.0003, noise: 250, storageSlots: 10 },
+                "PICKUP": { name: "Pickup", hp: 300, speed: 3.0, accel: 0.06, handling: 0.1, fuelCap: 80, fuelRate: 0.0004, noise: 300, storageSlots: 18 },
+                "VAN": { name: "Van", hp: 250, speed: 2.5, accel: 0.04, handling: 0.08, fuelCap: 70, fuelRate: 0.0005, noise: 350, storageSlots: 30 },
+                "SEMI_TRACTOR": { name: "Semi Tractor", hp: 500, speed: 2.0, accel: 0.03, handling: 0.05, fuelCap: 200, fuelRate: 0.001, noise: 500, storageSlots: 6, canTow: true }
+            },
+            
+            TRAILER_TYPES: {
+                "BOX_TRAILER": { name: "Box Trailer", hp: 300, storageSlots: 40, weight: 2.0 },
+                "TANKER_TRAILER": { name: "Tanker Trailer", hp: 250, storageSlots: 5, weight: 1.5, holdsFuel: 1000 }
+            }
+        };
+
+        //================================================
+        // GAME STATE & CONSTANTS
+        //================================================
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const minimap = document.getElementById('minimap');
+        const minimapCtx = minimap.getContext('2d');
+
+        const START_MENU = document.getElementById('start-menu');
+        const START_BUTTON = document.getElementById('start-button');
+        const SEED_INPUT = document.getElementById('seed-input');
+        const NIGHT_OVERLAY = document.getElementById('night-overlay');
+
+        const BUILD_PREVIEW = document.getElementById('build-preview');
+        const GAME_MESSAGE = document.getElementById('game-message');
+
+        // Modals
+        const ALL_MODALS = document.querySelectorAll('.modal-panel');
+        const BUILD_MENU = document.getElementById('build-menu');
+        const INVENTORY_PANEL = document.getElementById('inventory-panel');
+        const CRAFTING_PANEL = document.getElementById('crafting-panel');
+        const VEHICLE_STORAGE_PANEL = document.getElementById('vehicle-storage-panel');
+
+        const HOTBAR_EL = document.getElementById('hotbar');
+
+        const CHUNK_SIZE = 512;
+        const TILE_SIZE = 32; // For building grid
+        const RENDER_DISTANCE = 1.5; // Chunks
+        const PLAYER_SPEED = 2.5;
+        const PLAYER_RUN_SPEED = 4.5;
+        const PLAYER_SIZE = 16;
+        
+        const DAY_NIGHT_CYCLE_MS = 20 * 60 * 1000; // 20 minutes realtime
+        const NIGHT_START_PERCENT = 0.8; // 20:00 (0.8 * 24)
+        const NIGHT_END_PERCENT = 0.25; // 06:00
+        const MIN_NIGHT_OPACITY = 0.7;
+
+        // Game state object
+        let game = {
+            isRunning: false,
+            isPaused: false,
+            activeModal: null,
+            world: null,
+            player: null,
+            camera: null,
+            enemies: [],
+            vehicles: [],
+            trailers: [],
+            pois: [],
+            structures: [], // All player/world-built structures
+            lootContainers: [],
+            projectiles: [],
+            noiseEvents: [],
+            seed: "default",
+            gameTime: 0, // 0 to DAY_NIGHT_CYCLE_MS
+            day: 1,
+            keys: {},
+            gameLoopId: null,
+            isBuilding: false,
+            buildType: null, // e.g., "WALL"
+            buildPreview: { x: 0, y: 0, w: TILE_SIZE, h: TILE_SIZE, valid: false },
+            messageTimer: 0,
+            messageText: "",
+            
+            // Drag-and-drop state
+            dragState: {
+                isDragging: false,
+                item: null,
+                originalSlot: null,
+                originalContainer: null, // 'player', 'vehicle', etc.
+                dragElement: document.createElement('div'),
+            }
+        };
+        game.dragState.dragElement.style.position = 'absolute';
+        game.dragState.dragElement.style.pointerEvents = 'none';
+        game.dragState.dragElement.style.zIndex = '1000';
+        game.dragState.dragElement.className = 'inventory-item dragging';
+        document.body.appendChild(game.dragState.dragElement);
+
+
+        //================================================
+        // UTILITY FUNCTIONS
+        //================================================
+
+        // Seedable RNG (for deterministic world gen)
+        class SeededRNG {
+            constructor(seed) {
+                this.seed = this.hash(seed);
+            }
+            hash(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // Convert to 32bit integer
+                }
+                return hash;
+            }
+            random() {
+                let t = this.seed += 0x6D2B79F5;
+                t = Math.imul(t ^ t >>> 15, t | 1);
+                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            }
+            randomInt(min, max) {
+                return Math.floor(this.random() * (max - min + 1)) + min;
+            }
+            noise(x, y) {
+                const rng = new SeededRNG(String(x) + "," + String(y) + this.seed);
+                return rng.random();
+            }
+        }
+
+        function dist(x1, y1, x2, y2) {
+            return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        }
+
+        // AABB collision check
+        function checkCollision(obj1, obj2) {
+            return obj1.x < obj2.x + obj2.w &&
+                   obj1.x + obj1.w > obj2.x &&
+                   obj1.y < obj2.y + obj2.h &&
+                   obj1.y + obj1.h > obj2.y;
+        }
+
+        // Check collision with the structure grid
+        function checkStructureCollision(rect) {
+            const gridMinX = Math.floor(rect.x / TILE_SIZE);
+            const gridMinY = Math.floor(rect.y / TILE_SIZE);
+            const gridMaxX = Math.ceil((rect.x + rect.w) / TILE_SIZE);
+            const gridMaxY = Math.ceil((rect.y + rect.h) / TILE_SIZE);
+
+            for (let gx = gridMinX; gx < gridMaxX; gx++) {
+                for (let gy = gridMinY; gy < gridMaxY; gy++) {
+                    const structure = game.world.getStructureAtGrid(gx, gy);
+                    if (structure && structure.blocksMove) {
+                        // Special check for doors
+                        if (structure.isDoor) {
+                            // In this simple check, we assume doors block everyone
+                            // A real implementation would check if it's open
+                            // For now, let's allow players to pass
+                            if (rect === game.player.getHitbox()) {
+                                continue;
+                            }
+                        }
+                        
+                        const structRect = {
+                            x: gx * TILE_SIZE,
+                            y: gy * TILE_SIZE,
+                            w: TILE_SIZE,
+                            h: TILE_SIZE
+                        };
+                        if (checkCollision(rect, structRect)) {
+                            return structure; // Return the colliding structure
+                        }
+                    }
+                }
+            }
+            return null; // No collision
+        }
+        
+        function worldToScreen(worldX, worldY) {
+            return {
+                x: worldX - game.camera.x,
+                y: worldY - game.camera.y
+            };
+        }
+
+        function screenToWorld(screenX, screenY) {
+            return {
+                x: screenX + game.camera.x,
+                y: screenY + game.camera.y
+            };
+        }
+        
+        function worldToGrid(worldPos) {
+            return Math.floor(worldPos / TILE_SIZE);
+        }
+        
+        function gridToWorld(gridPos) {
+            return gridPos * TILE_SIZE;
+        }
+        
+        //================================================
+        // WORLD GENERATION (Chunk, World)
+        //================================================
+        
+        class Item {
+            constructor(id, quantity = 1) {
+                this.id = id;
+                this.quantity = quantity;
+                this.data = GAME_DATA.ITEMS[id];
+                if (!this.data) {
+                    console.error(`Invalid item ID: ${id}`);
+                    this.id = "SCRAP_METAL";
+                    this.data = GAME_DATA.ITEMS["SCRAP_METAL"];
+                }
+            }
+            
+            get name() { return this.data.name; }
+            get maxStack() { return this.data.stack || 1; }
+            get type() { return this.data.type || "MATERIAL"; }
+            
+            // Returns true if item was fully consumed
+            use(player) {
+                if (this.data.use) {
+                    const consumed = this.data.use(player);
+                    if (consumed) {
+                        this.quantity--;
+                        if (this.quantity <= 0) return true;
+                    }
+                    return false;
+                }
+                game.showMessage(`Cannot use ${this.name}.`);
+                return false;
+            }
+        }
+        
+        class LootContainer {
+            constructor(x, y, w, h, lootTableId, name = "Container") {
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+                this.name = name;
+                this.lootTableId = lootTableId;
+                this.inventory = [];
+                this.isLooted = false;
+            }
+            
+            generateLoot() {
+                if (this.isLooted) return;
+                
+                const lootTable = GAME_DATA.LOOT_TABLES[this.lootTableId];
+                if (!lootTable) {
+                    console.error(`Invalid loot table ID: ${this.lootTableId}`);
+                    return;
+                }
+                
+                const numItems = game.world.rng.randomInt(lootTable.minItems, lootTable.maxItems);
+                
+                for (let i = 0; i < numItems; i++) {
+                    for (const itemEntry of lootTable.items) {
+                        let itemId, chance;
+                        if (typeof itemEntry === 'string') {
+                            itemId = itemEntry;
+                            chance = 1.0; // Shorthand for 100%
+                        } else {
+                            itemId = itemEntry.id;
+                            chance = itemEntry.chance;
+                        }
+
+                        if (game.world.rng.random() <= chance) {
+                            const existing = this.inventory.find(item => item.id === itemId);
+                            const itemData = GAME_DATA.ITEMS[itemId];
+                            if (existing && existing.quantity < itemData.stack) {
+                                existing.quantity++;
+                            } else if (!existing) {
+                                this.inventory.push(new Item(itemId, 1));
+                            }
+                        }
+                    }
+                }
+                this.isLooted = true;
+            }
+            
+            loot(player) {
+                if (!this.isLooted) {
+                    this.generateLoot();
+                }
+                
+                if (this.inventory.length === 0) {
+                    game.showMessage(`This ${this.name} is empty.`);
+                    return;
+                }
+                
+                let wasFull = false;
+                this.inventory = this.inventory.filter(item => {
+                    const added = player.addItem(item);
+                    if (!added) {
+                        wasFull = true;
+                        return true; // Keep item in container if inventory is full
+                    }
+                    return false; // Remove item from container
+                });
+                
+                if (wasFull) {
+                    game.showMessage("Looted some items. Your inventory is full!");
+                } else {
+                    game.showMessage(`Looted the ${this.name}.`);
+                }
+            }
+            
+            getHitbox() {
+                return { x: this.x, y: this.y, w: this.w, h: this.h };
+            }
+            
+            draw(ctx, camera) {
+                const s = worldToScreen(this.x, this.y);
+                if (s.x > canvas.width || s.y > canvas.height || s.x + this.w < 0 || s.y + this.h < 0) {
+                    return;
+                }
+                
+                ctx.fillStyle = this.isLooted ? "#4a4a2a" : "#8a8a4a";
+                ctx.strokeStyle = "#222";
+                ctx.lineWidth = 2;
+                ctx.fillRect(s.x, s.y, this.w, this.h);
+                ctx.strokeRect(s.x, s.y, this.w, this.h);
+                
+                if (this.name === "Corpse") {
+                    ctx.fillStyle = "#a64d4d";
+                    ctx.fillRect(s.x + 2, s.y + 2, this.w - 4, this.h - 4);
+                }
+            }
+        }
+
+        class Structure {
+            constructor(gridX, gridY, typeId) {
+                this.gridX = gridX;
+                this.gridY = gridY;
+                this.x = gridToWorld(gridX);
+                this.y = gridToWorld(gridY);
+                this.w = TILE_SIZE;
+                this.h = TILE_SIZE;
+                this.typeId = typeId;
+                this.data = GAME_DATA.STRUCTURES[typeId];
+                
+                this.hp = this.data.hp;
+                this.maxHp = this.data.hp;
+                
+                this.blocksView = this.data.blocksView;
+                this.blocksMove = this.data.blocksMove;
+                
+                this.isDoor = this.data.isDoor || false;
+                this.isTrap = this.data.isTrap || false;
+                this.isContainer = this.data.isContainer || false;
+                
+                this.isPowered = false;
+                this.powerGen = this.data.powerGen || 0;
+                this.powerDraw = this.data.powerDraw || 0;
+                
+                if (this.isContainer) {
+                    this.storageSlots = this.data.storageSlots || 0;
+                    this.inventory = new Array(this.storageSlots).fill(null);
+                }
+            }
+            
+            getHitbox() {
+                return { x: this.x, y: this.y, w: this.w, h: this.h };
+            }
+
+            takeDamage(amount) {
+                this.hp -= amount;
+                if (this.hp <= 0) {
+                    this.destroy();
+                }
+            }
+
+            destroy() {
+                game.world.removeStructure(this);
+                // Drop resources
+                for (const [itemId, qty] of Object.entries(this.data.cost)) {
+                    const dropQty = Math.floor(qty * 0.5); // Drop 50% of cost
+                    if (dropQty > 0) {
+                        const container = new LootContainer(this.x, this.y, this.w, this.h, "T_GENERIC_T1", "Debris");
+                        container.inventory.push(new Item(itemId, dropQty));
+                        container.isLooted = true;
+                        game.lootContainers.push(container);
+                    }
+                }
+            }
+            
+            draw(ctx, camera) {
+                const s = worldToScreen(this.x, this.y);
+                if (s.x > canvas.width || s.y > canvas.height || s.x + this.w < 0 || s.y + this.h < 0) {
+                    return;
+                }
+                
+                let color = "#888"; // Default wall
+                if (this.typeId === "DOOR" || this.typeId === "VEHICLE_GATE") color = "#654321";
+                if (this.typeId === "SPIKE_TRAP") color = "#777";
+                if (this.typeId === "GENERATOR") color = "#a0a0a0";
+                if (this.typeId === "SOLAR_PANEL") color = "#00008b";
+                if (this.typeId === "REFRIGERATOR") color = "#f0f0f0";
+                if (this.typeId === "STORAGE_CHEST") color = "#8b4513";
+                
+                ctx.fillStyle = color;
+                ctx.fillRect(s.x, s.y, this.w, this.h);
+                ctx.strokeStyle = "#222";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(s.x, s.y, this.w, this.h);
+                
+                if (this.isTrap) {
+                    ctx.fillStyle = "#ccc";
+                    ctx.fillText("^", s.x + this.w / 2 - 3, s.y + this.h / 2 + 3);
+                }
+                
+                // Draw HP bar if damaged
+                if (this.hp < this.maxHp) {
+                    ctx.fillStyle = "#555";
+                    ctx.fillRect(s.x, s.y - 8, this.w, 5);
+                    ctx.fillStyle = "#c00";
+                    ctx.fillRect(s.x, s.y - 8, this.w * (this.hp / this.maxHp), 5);
+                }
+            }
+        }
+        
+        class POI {
+            constructor(x, y, typeId, rng) {
+                this.x = x;
+                this.y = y;
+                this.typeId = typeId;
+                this.data = GAME_DATA.POIS[typeId];
+                if (!this.data) {
+                    console.error(`Invalid POI ID: ${typeId}`);
+                    this.typeId = "HOUSE";
+                    this.data = GAME_DATA.POIS["HOUSE"];
+                }
+                this.name = this.data.name;
+                
+                // Procedurally generate from template
+                this.templateId = this.data.template;
+                if (this.templateId) {
+                    this.generateFromTemplate(rng);
+                }
+                
+                // Spawn vehicles
+                if (this.data.vehicleSpawns) {
+                    for (const spawn of this.data.vehicleSpawns) {
+                        if (rng.random() < spawn.chance) {
+                            const vX = this.x + rng.randomInt(-50, 50);
+                            const vY = this.y + rng.randomInt(-50, 50);
+                            game.world.spawnVehicle(vX, vY, spawn.type, rng);
+                        }
+                    }
+                }
+            }
+            
+            generateFromTemplate(rng) {
+                const template = GAME_DATA.BUILDING_TEMPLATES[this.templateId];
+                if (!template) {
+                    console.error(`Invalid building template: ${this.templateId}`);
+                    return;
+                }
+                
+                const baseGridX = worldToGrid(this.x);
+                const baseGridY = worldToGrid(this.y);
+                
+                for (let y = 0; y < template.size.h; y++) {
+                    for (let x = 0; x < template.size.w; x++) {
+                        const char = template.map[y][x];
+                        const gridX = baseGridX + x;
+                        const gridY = baseGridY + y;
+                        
+                        let structureType = null;
+                        if (char === 'W') structureType = "WALL";
+                        if (char === 'D') structureType = "DOOR";
+                        
+                        if (structureType) {
+                            game.world.addStructure(new Structure(gridX, gridY, structureType));
+                        }
+                        
+                        if (char === 'C') {
+                            const lootTable = template.lootTable || "T_GENERIC_T1";
+                            const container = new LootContainer(
+                                gridToWorld(gridX) + TILE_SIZE / 4, 
+                                gridToWorld(gridY) + TILE_SIZE / 4, 
+                                TILE_SIZE / 2, TILE_SIZE / 2, 
+                                lootTable, 
+                                "Cabinet"
+                            );
+                            game.lootContainers.push(container);
+                        }
+                    }
+                }
+            }
+            
+            draw(ctx, camera) {
+                // Buildings are now drawn as individual structures
+                // We can draw a "zone" label
+                const s = worldToScreen(this.x, this.y);
+                if (s.x > canvas.width || s.y > canvas.height || s.x + 200 < 0 || s.y + 200 < 0) {
+                    return;
+                }
+                
+                ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+                ctx.font = "14px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(this.name, s.x, s.y - 10);
+            }
+        }
+        
+        class Chunk {
+            constructor(x, y, world) {
+                this.x = x; // Chunk coords
+                this.y = y;
+                this.world = world;
+                this.rng = new SeededRNG(this.world.seed + ":" + x + "," + y);
+                
+                this.worldX = this.x * CHUNK_SIZE;
+                this.worldY = this.y * CHUNK_SIZE;
+                
+                const info = this.world.getChunkInfo(this.x, this.y);
+                this.biome = info.biome;
+                this.difficultyRing = info.difficultyRing;
+                this.roadType = info.roadType;
+                
+                this.isGenerated = false;
+            }
+            
+            generateObjects() {
+                if (this.isGenerated) return;
+
+                // 1. Generate POIs
+                const biomeData = GAME_DATA.BIOMES[this.biome];
+                if (this.rng.random() < biomeData.poiChance && biomeData.poiList.length > 0) {
+                    const poiTypeId = biomeData.poiList[this.rng.randomInt(0, biomeData.poiList.length - 1)];
+                    const poiX = this.worldX + this.rng.randomInt(50, CHUNK_SIZE - 50);
+                    const poiY = this.worldY + this.rng.randomInt(50, CHUNK_SIZE - 50);
+                    
+                    // Don't spawn POIs on roads
+                    if (!this.world.isOnRoad(poiX, poiY, 50)) {
+                        game.pois.push(new POI(poiX, poiY, poiTypeId, this.rng));
+                    }
+                }
+                
+                // 2. Generate Enemies
+                // Reduced spawn density
+                const maxZombies = this.difficultyRing.maxDist <= 500 ? 2 : 3 + this.difficultyRing.lootTier * 2;
+                const zombieCount = this.rng.randomInt(0, maxZombies);
+                
+                for (let i = 0; i < zombieCount; i++) {
+                    const x = this.worldX + this.rng.random() * CHUNK_SIZE;
+                    const y = this.worldY + this.rng.random() * CHUNK_SIZE;
+                    
+                    // Don't spawn on roads or inside buildings
+                    if (this.world.isOnRoad(x, y, 10) || checkStructureCollision({x,y,w:1,h:1})) {
+                        continue;
+                    }
+
+                    const enemyTypes = this.difficultyRing.enemyTypes;
+                    const typeId = enemyTypes[this.rng.randomInt(0, enemyTypes.length - 1)];
+                    game.enemies.push(new Enemy(x, y, typeId));
+                }
+                
+                this.isGenerated = true;
+            }
+            
+            draw(ctx, camera) {
+                const s = worldToScreen(this.worldX, this.worldY);
+                if (s.x > canvas.width || s.y > canvas.height || s.x + CHUNK_SIZE < 0 || s.y + CHUNK_SIZE < 0) {
+                    return;
+                }
+                
+                // 1. Draw Biome Base
+                const biomeData = GAME_DATA.BIOMES[this.biome];
+                ctx.fillStyle = biomeData.color;
+                ctx.fillRect(s.x, s.y, CHUNK_SIZE, CHUNK_SIZE);
+                
+                // 2. Draw Roads
+                if (this.roadType) {
+                    const roadData = GAME_DATA.ROAD_TYPES[this.roadType];
+                    const roadWidthPixels = roadData.width * TILE_SIZE;
+                    ctx.fillStyle = roadData.color;
+                    
+                    // This chunk is part of a N-S road
+                    if (this.x % this.world.roadInterval.x === 0) {
+                        ctx.fillRect(s.x + CHUNK_SIZE / 2 - roadWidthPixels / 2, s.y, roadWidthPixels, CHUNK_SIZE);
+                    }
+                    // This chunk is part of an E-W road
+                    if (this.y % this.world.roadInterval.y === 0) {
+                        ctx.fillRect(s.x, s.y + CHUNK_SIZE / 2 - roadWidthPixels / 2, CHUNK_SIZE, roadWidthPixels);
+                    }
+                }
+            }
+        }
+        
+        class World {
+            constructor(seed) {
+                this.seed = seed;
+                this.rng = new SeededRNG(seed);
+                this.chunks = new Map(); // "x,y" -> Chunk
+                this.structureGrid = new Map(); // "gridX,gridY" -> Structure
+                
+                // Road network params
+                this.roadInterval = { x: 10, y: 10 }; // Highway every 10 chunks
+            }
+            
+            getChunk(chunkX, chunkY) {
+                const key = `${chunkX},${chunkY}`;
+                if (!this.chunks.has(key)) {
+                    const chunk = new Chunk(chunkX, chunkY, this);
+                    this.chunks.set(key, chunk);
+                    chunk.generateObjects(); // Generate objects when chunk is first created
+                }
+                return this.chunks.get(key);
+            }
+            
+            getChunkAt(worldX, worldY) {
+                const chunkX = Math.floor(worldX / CHUNK_SIZE);
+                const chunkY = Math.floor(worldY / CHUNK_SIZE);
+                return this.getChunk(chunkX, chunkY);
+            }
+
+            getDifficultyRing(worldX, worldY) {
+                const d = dist(100, 100, worldX, worldY); // Distance from spawn
+                for (const ring of GAME_DATA.DIFFICULTY_RINGS) {
+                    if (d <= ring.maxDist) {
+                        return ring;
+                    }
+                }
+                return GAME_DATA.DIFFICULTY_RINGS[GAME_DATA.DIFFICULTY_RINGS.length - 1];
+            }
+            
+            getBiome(worldX, worldY) {
+                const d = dist(100, 100, worldX, worldY);
+                // Simple concentric biomes for now
+                if (d < 1500) return "RESIDENTIAL";
+                if (d < 3000) return "URBAN";
+                if (d < 4000) return "INDUSTRIAL";
+                if (d < 6000) return "RURAL";
+                return "WASTELAND";
+            }
+            
+            getRoadType(chunkX, chunkY, biome) {
+                // Highway grid
+                if (chunkX % this.roadInterval.x === 0 || chunkY % this.roadInterval.y === 0) {
+                    return "HIGHWAY";
+                }
+                // Surface roads in Urban/Residential
+                if ((biome === "URBAN" || biome === "RESIDENTIAL") && (chunkX % 2 === 0 || chunkY % 2 === 0)) {
+                    return "SURFACE_ROAD";
+                }
+                // Dirt roads in Rural
+                if (biome === "RURAL" && (chunkX % 3 === 0)) {
+                    return "DIRT_ROAD";
+                }
+                return null;
+            }
+            
+            isOnRoad(worldX, worldY, margin = 0) {
+                const chunk = this.getChunkAt(worldX, worldY);
+                if (!chunk.roadType) return false;
+                
+                const roadData = GAME_DATA.ROAD_TYPES[chunk.roadType];
+                const roadWidthPixels = roadData.width * TILE_SIZE;
+                
+                const localX = worldX - chunk.worldX;
+                const localY = worldY - chunk.worldY;
+                
+                // N-S road
+                if (chunk.x % this.roadInterval.x === 0) {
+                    if (localX > CHUNK_SIZE / 2 - roadWidthPixels / 2 - margin && localX < CHUNK_SIZE / 2 + roadWidthPixels / 2 + margin) {
+                        return true;
+                    }
+                }
+                // E-W road
+                if (chunk.y % this.roadInterval.y === 0) {
+                     if (localY > CHUNK_SIZE / 2 - roadWidthPixels / 2 - margin && localY < CHUNK_SIZE / 2 + roadWidthPixels / 2 + margin) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            getChunkInfo(chunkX, chunkY) {
+                const worldX = (chunkX + 0.5) * CHUNK_SIZE;
+                const worldY = (chunkY + 0.5) * CHUNK_SIZE;
+                
+                const difficultyRing = this.getDifficultyRing(worldX, worldY);
+                const biome = this.getBiome(worldX, worldY);
+                const roadType = this.getRoadType(chunkX, chunkY, biome);
+                
+                return { difficultyRing, biome, roadType };
+            }
+            
+            spawnVehicle(x, y, typeId, rng) {
+                const v = new Vehicle(x, y, typeId);
+                // Randomize condition
+                v.fuel = rng.randomInt(0, v.maxFuel * 0.5);
+                v.hp = rng.randomInt(v.maxHp * 0.1, v.maxHp * 0.9);
+                if (rng.random() < 0.7) { // 70% chance of needing hotwire
+                    v.hasKey = false;
+                } else {
+                    // Spawn a key nearby
+                    const container = new LootContainer(x + 20, y + 20, 10, 10, "T_GENERIC_T1", "Glovebox");
+                    container.inventory.push(new Item("VEHICLE_KEY", 1));
+                    container.isLooted = true;
+                    game.lootContainers.push(container);
+                }
+                game.vehicles.push(v);
+            }
+
+            addStructure(structure) {
+                const key = `${structure.gridX},${structure.gridY}`;
+                // Don't overwrite existing structures (e.g., from other POIs)
+                if (!this.structureGrid.has(key)) {
+                    this.structureGrid.set(key, structure);
+                    game.structures.push(structure); // Add to global list for updates
+                }
+            }
+
+            removeStructure(structure) {
+                const key = `${structure.gridX},${structure.gridY}`;
+                this.structureGrid.delete(key);
+                game.structures = game.structures.filter(s => s !== structure);
+            }
+            
+            getStructureAtGrid(gridX, gridY) {
+                return this.structureGrid.get(`${gridX},${gridY}`);
+            }
+
+            draw(ctx, camera) {
+                const startChunkX = Math.floor((camera.x) / CHUNK_SIZE);
+                const endChunkX = Math.ceil((camera.x + camera.w) / CHUNK_SIZE);
+                const startChunkY = Math.floor((camera.y) / CHUNK_SIZE);
+                const endChunkY = Math.ceil((camera.y + camera.h) / CHUNK_SIZE);
+
+                // 1. Draw chunks
+                for (let y = startChunkY - 1; y <= endChunkY; y++) {
+                    for (let x = startChunkX - 1; x <= endChunkX; x++) {
+                        this.getChunk(x, y).draw(ctx, camera);
+                    }
+                }
+            }
+        }
+        
+        //================================================
+        // ENTITIES (Player, Enemy, Vehicle)
+        //================================================
+        
+        class Player {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.w = PLAYER_SIZE;
+                this.h = 24; // Taller than wide
+                
+                this.angle = 0; // For facing direction
+                
+                this.speed = PLAYER_SPEED;
+                this.isRunning = false;
+                
+                this.maxHealth = 100;
+                this.health = 100;
+                this.maxHunger = 100;
+                this.hunger = 100;
+                this.maxThirst = 100;
+                this.thirst = 100;
+                this.maxStamina = 100;
+                this.stamina = 100;
+                this.maxMorale = 100;
+                this.morale = 100;
+                
+                this.hungerTimer = 0;
+                this.thirstTimer = 0;
+                
+                this.vehicle = null; // null or Vehicle object
+                
+                this.inventory = new Array(40).fill(null); // 40 slots
+                this.hotbar = new Array(9).fill(null); // 9 slots
+            }
+            
+            getHitbox() {
+                return { x: this.x, y: this.y, w: this.w, h: this.h };
+            }
+
+            // Returns true if item was fully added, false if inventory is full
+            addItem(item) {
+                const itemData = item.data;
+                
+                // 1. Try to stack
+                if (itemData.stack > 1) {
+                    for (let i = 0; i < this.inventory.length; i++) {
+                        const slot = this.inventory[i];
+                        if (slot && slot.id === item.id && slot.quantity < slot.maxStack) {
+                            const canAdd = slot.maxStack - slot.quantity;
+                            const toAdd = Math.min(canAdd, item.quantity);
+                            slot.quantity += toAdd;
+                            item.quantity -= toAdd;
+                            if (item.quantity <= 0) {
+                                ui.updateInventory();
+                                return true; // Fully added
+                            }
+                        }
+                    }
+                }
+                
+                // 2. Try to add to new slot
+                if (item.quantity > 0) {
+                    for (let i = 0; i < this.inventory.length; i++) {
+                        if (!this.inventory[i]) {
+                            this.inventory[i] = item;
+                            ui.updateInventory();
+                            return true; // Fully added
+                        }
+                    }
+                }
+
+                return false; // Could not add
+            }
+            
+            hasItem(itemId, quantity = 1) {
+                let count = 0;
+                for (const item of this.inventory) {
+                    if (item && item.id === itemId) {
+                        count += item.quantity;
+                    }
+                }
+                return count >= quantity;
+            }
+            
+            // Consumes items from inventory
+            consumeItem(itemId, quantity = 1) {
+                if (!this.hasItem(itemId, quantity)) {
+                    return false;
+                }
+                
+                let remaining = quantity;
+                for (let i = this.inventory.length - 1; i >= 0; i--) {
+                    const item = this.inventory[i];
+                    if (item && item.id === itemId) {
+                        if (item.quantity > remaining) {
+                            item.quantity -= remaining;
+                            remaining = 0;
+                        } else {
+                            remaining -= item.quantity;
+                            this.inventory[i] = null;
+                        }
+                    }
+                    if (remaining <= 0) {
+                        ui.updateInventory();
+                        return true;
+                    }
+                }
+                return false; // Should be impossible if hasItem check passed
+            }
+            
+            useHotbarItem(slotIndex) {
+                const item = this.inventory[slotIndex];
+                if (item) {
+                    if (item.use(this)) {
+                        // Item was consumed
+                        if (item.quantity <= 0) {
+                            this.inventory[slotIndex] = null;
+                        }
+                        ui.updateInventory(); // Refresh hotbar/inventory
+                    }
+                }
+            }
+
+            update(deltaTime) {
+                if (this.vehicle) {
+                    // Player is inside vehicle, update vehicle instead
+                    this.x = this.vehicle.x;
+                    this.y = this.vehicle.y;
+                    this.vehicle.update(deltaTime);
+                    return;
+                }
+
+                // --- Movement ---
+                let dx = 0;
+                let dy = 0;
+                this.isRunning = game.keys['Shift'] && this.stamina > 0;
+                this.speed = this.isRunning ? PLAYER_RUN_SPEED : PLAYER_SPEED;
+                
+                if (game.keys['w']) dy -= 1;
+                if (game.keys['s']) dy += 1;
+                if (game.keys['a']) dx -= 1;
+                if (game.keys['d']) dx += 1;
+
+                if (dx !== 0 || dy !== 0) {
+                    const mag = Math.sqrt(dx * dx + dy * dy);
+                    dx = (dx / mag) * this.speed;
+                    dy = (dy / mag) * this.speed;
+                    
+                    this.angle = Math.atan2(dy, dx); // Update facing direction
+                    
+                    if (this.isRunning) {
+                        this.stamina -= 0.5;
+                        if (this.stamina < 0) this.stamina = 0;
+                        // Create noise event
+                        game.noiseEvents.push({ x: this.x, y: this.y, radius: 80, type: "RUN" });
+                    }
+                } else {
+                    // Not moving, regen stamina
+                    if (this.stamina < this.maxStamina) {
+                        this.stamina += (this.hunger > 50 ? 0.3 : 0.1);
+                    }
+                }
+                
+                // --- Collision ---
+                let nextX = this.x + dx;
+                let nextY = this.y + dy;
+                
+                // Check X-axis collision
+                if (checkStructureCollision({ x: nextX, y: this.y, w: this.w, h: this.h })) {
+                    dx = 0;
+                } else {
+                    this.x = nextX;
+                }
+                
+                // Check Y-axis collision
+                if (checkStructureCollision({ x: this.x, y: nextY, w: this.w, h: this.h })) {
+                    dy = 0;
+                } else {
+                    this.y = nextY;
+                }
+
+                // --- Survival Stats ---
+                const HUNG_RATE = 0.0001; // Depletes over ~16 min
+                const THIR_RATE = 0.00015; // Depletes over ~11 min
+                
+                this.hunger -= HUNG_RATE * deltaTime;
+                this.thirst -= THIR_RATE * deltaTime;
+                
+                if (this.hunger < 0) {
+                    this.hunger = 0;
+                    this.health -= 0.01 * deltaTime; // Starving
+                }
+                if (this.thirst < 0) {
+                    this.thirst = 0;
+                    this.health -= 0.02 * deltaTime; // Dehydrated
+                }
+                
+                this.health = Math.min(this.maxHealth, this.health);
+                this.hunger = Math.min(this.maxHunger, this.hunger);
+                this.thirst = Math.min(this.maxThirst, this.thirst);
+                this.stamina = Math.min(this.maxStamina, this.stamina);
+                this.morale = Math.min(this.maxMorale, this.morale);
+            }
+            
+            interact() {
+                if (this.vehicle) {
+                    this.exitVehicle();
+                    return;
+                }
+                
+                // 1. Check for Vehicle
+                for (const v of game.vehicles) {
+                    if (dist(this.x, this.y, v.x, v.y) < 50) {
+                        this.enterVehicle(v);
+                        return;
+                    }
+                }
+                
+                // 2. Check for Loot Container
+                for (const c of game.lootContainers) {
+                    if (dist(this.x, this.y, c.x, c.y) < 40) {
+                        c.loot(this);
+                        return;
+                    }
+                }
+                
+                // 3. Check for Structures (Storage, etc.)
+                // Find nearest grid tile
+                const gridX = worldToGrid(this.x + this.w / 2);
+                const gridY = worldToGrid(this.y + this.h / 2);
+                // Check adjacent tiles
+                for (let x = gridX - 1; x <= gridX + 1; x++) {
+                    for (let y = gridY - 1; y <= gridY + 1; y++) {
+                        const s = game.world.getStructureAtGrid(x, y);
+                        if (s && s.isContainer) {
+                            game.showMessage(`Interacted with ${s.data.name}. (Storage UI not yet implemented)`);
+                            return;
+                        }
+                        if (s && s.typeId === "GENERATOR") {
+                            if (this.consumeItem("GAS_CAN", 1)) {
+                                game.showMessage("Refueled generator.");
+                                // Note: Generator fuel not tracked yet, just item consumption
+                            } else {
+                                game.showMessage("You need a Gas Can to refuel this.");
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            enterVehicle(v) {
+                if (!v.hasKey) {
+                    if (this.consumeItem("HOTWIRE_KIT", 1)) {
+                        game.showMessage("You hotwired the vehicle!");
+                        v.hasKey = true; // Hotwired
+                    } else {
+                        game.showMessage("The vehicle is locked. You need a key or a hotwire kit.");
+                        return;
+                    }
+                }
+                if (v.hp <= 0) {
+                    game.showMessage("This vehicle is wrecked.");
+                    return;
+                }
+                
+                this.vehicle = v;
+                v.isPlayerDriven = true;
+                game.showMessage(`Entered ${v.data.name}.`);
+            }
+            
+            exitVehicle() {
+                if (!this.vehicle) return;
+                
+                game.showMessage(`Exited ${this.vehicle.data.name}.`);
+                this.vehicle.isPlayerDriven = false;
+                this.x = this.vehicle.x + 30; // Place player beside vehicle
+                this.y = this.vehicle.y;
+                this.vehicle = null;
+            }
+            
+            draw(ctx, camera) {
+                if (this.vehicle) return; // Don't draw player when in vehicle
+                
+                const s = worldToScreen(this.x, this.y);
+                if (s.x > canvas.width || s.y > canvas.height || s.x + this.w < 0 || s.y + this.h < 0) {
+                    return;
+                }
+                
+                ctx.save();
+                ctx.translate(s.x + this.w / 2, s.y + this.h / 2);
+                ctx.rotate(this.angle);
+                
+                // Body
+                ctx.fillStyle = "#0073e6"; // Blue shirt
+                ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+                
+                // Head (drawn "in front" based on angle)
+                ctx.fillStyle = "#f0d0b0"; // Skin tone
+                ctx.fillRect(0, -this.w / 2 + 2, this.w / 2, this.w / 2);
+                
+                ctx.restore();
+            }
+        }
+        
+        class Enemy {
+            constructor(x, y, typeId) {
+                this.x = x;
+                this.y = y;
+                this.typeId = typeId;
+                this.data = GAME_DATA.ENEMY_TYPES[typeId];
+                if (!this.data) {
+                    console.error(`Invalid enemy type: ${typeId}`);
+                    this.typeId = "SHAMBLER";
+                    this.data = GAME_DATA.ENEMY_TYPES["SHAMBLER"];
+                }
+                
+                this.w = this.data.size.w;
+                this.h = this.data.size.h;
+                this.hp = this.data.hp;
+                this.maxHp = this.data.hp;
+                this.speed = this.data.speed;
+                this.sightRadius = this.data.sightRadius;
+                this.color = this.data.color;
+                this.angle = Math.random() * Math.PI * 2;
+                
+                this.state = "UNALERT"; // UNALERT, SEARCHING, FRANTIC_SEARCHING, AGGRO
+                this.target = null;
+                this.lastKnownPos = { x: 0, y: 0 };
+                this.searchTimer = 0;
+            }
+            
+            getHitbox() {
+                return { x: this.x, y: this.y, w: this.w, h: this.h };
+            }
+
+            takeDamage(amount) {
+                this.hp -= amount;
+                this.state = "AGGRO"; // Fight back!
+                this.target = game.player;
+                
+                if (this.hp <= 0) {
+                    this.die();
+                }
+            }
+            
+            die() {
+                // Remove from game
+                game.enemies = game.enemies.filter(e => e !== this);
+                // Spawn loot container (corpse)
+                const corpse = new LootContainer(this.x, this.y, this.w, this.h, this.data.lootTable, "Corpse");
+                game.lootContainers.push(corpse);
+            }
+            
+            update(deltaTime, player) {
+                // --- SENSOR CHECKS ---
+                let canSeePlayer = false;
+                let heardNoise = null;
+                const d = dist(this.x, this.y, player.x, player.y);
+                
+                // 1. Sight
+                let currentSight = this.sightRadius;
+                if (game.isNight) currentSight *= 0.5;
+                if (player.vehicle) currentSight *= (player.vehicle.headlightsOn ? 2.0 : 1.0);
+                
+                if (d < currentSight) {
+                    // TODO: Add line-of-sight check (blocked by walls)
+                    canSeePlayer = true;
+                }
+                
+                // 2. Sound
+                // Only check for sounds if not already aggro
+                if (this.state !== "AGGRO") {
+                    for (const noise of game.noiseEvents) {
+                        if (dist(this.x, this.y, noise.x, noise.y) < noise.radius) {
+                            heardNoise = noise;
+                            break; // React to first noise heard
+                        }
+                    }
+                }
+                
+                // --- FSM ---
+                
+                // UNALERT state
+                if (this.state === "UNALERT") {
+                    if (canSeePlayer) {
+                        this.state = "AGGRO";
+                        this.target = player;
+                    } else if (heardNoise) {
+                        this.state = "FRANTIC_SEARCHING";
+                        this.lastKnownPos = { x: heardNoise.x, y: heardNoise.y };
+                        this.searchTimer = 5000; // 5 seconds
+                    } else {
+                        // Wander
+                        if (Math.random() < 0.01) {
+                            this.angle = Math.random() * Math.PI * 2;
+                        }
+                    }
+                }
+                
+                // SEARCHING state (lost player)
+                if (this.state === "SEARCHING") {
+                    if (canSeePlayer) {
+                        this.state = "AGGRO";
+                        this.target = player;
+                    } else if (heardNoise) {
+                        this.state = "FRANTIC_SEARCHING";
+                        this.lastKnownPos = { x: heardNoise.x, y: heardNoise.y };
+                        this.searchTimer = 5000;
+                    } else {
+                        // Move towards last known pos
+                        this.moveTo(this.lastKnownPos.x, this.lastKnownPos.y);
+                        this.searchTimer -= deltaTime;
+                        if (this.searchTimer <= 0 || dist(this.x, this.y, this.lastKnownPos.x, this.lastKnownPos.y) < 10) {
+                            this.state = "UNALERT"; // Give up
+                        }
+                    }
+                }
+                
+                // FRANTIC_SEARCHING state (heard noise)
+                if (this.state === "FRANTIC_SEARCHING") {
+                    if (canSeePlayer) {
+                        this.state = "AGGRO";
+                        this.target = player;
+                    } else {
+                        // Move towards noise pos
+                        this.moveTo(this.lastKnownPos.x, this.lastKnownPos.y);
+                        this.searchTimer -= deltaTime;
+                        if (this.searchTimer <= 0 || dist(this.x, this.y, this.lastKnownPos.x, this.lastKnownPos.y) < 10) {
+                            this.state = "SEARCHING"; // Calm down to normal search
+                            this.searchTimer = 3000; // 3 seconds
+                        }
+                    }
+                }
+                
+                // AGGRO state (chasing)
+                if (this.state === "AGGRO") {
+                    if (canSeePlayer) {
+                        this.target = player.vehicle ? player.vehicle : player; // Target vehicle if player is in one
+                        this.lastKnownPos = { x: this.target.x, y: this.target.y };
+                        this.moveTo(this.target.x, this.target.y);
+                        
+                        // Attack
+                        const targetHitbox = this.target.getHitbox();
+                        if (checkCollision(this.getHitbox(), targetHitbox)) {
+                            // TODO: Attack timer
+                            if (this.target.takeDamage) { // Check if target is enemy/vehicle/structure
+                                this.target.takeDamage(this.data.damage * (deltaTime / 1000));
+                            }
+                        }
+                        
+                    } else {
+                        // Lost sight
+                        this.state = "SEARCHING";
+                        this.searchTimer = 8000; // 8 seconds
+                    }
+                }
+                
+                // --- Movement ---
+                if (this.state === "UNALERT") {
+                    this.move(this.angle, this.speed * 0.5); // Wander slowly
+                }
+                
+                // Attack structures if blocked
+                if (this.state === "AGGRO") {
+                    const rect = { x: this.x, y: this.y, w: this.w, h: this.h };
+                    const collidingStructure = checkStructureCollision(rect);
+                    if (collidingStructure && collidingStructure.blocksMove && !collidingStructure.isDoor) {
+                        // Attack the wall!
+                        collidingStructure.takeDamage(this.data.damage * (deltaTime / 1000));
+                    }
+                }
+            }
+            
+            move(angle, speed) {
+                const dx = Math.cos(angle) * speed;
+                const dy = Math.sin(angle) * speed;
+                this.angle = angle;
+                
+                let nextX = this.x + dx;
+                let nextY = this.y + dy;
+                
+                const rect = { x: this.x, y: this.y, w: this.w, h: this.h };
+                
+                // Check X-axis collision
+                if (checkStructureCollision({ ...rect, x: nextX })) {
+                    dx = 0;
+                } else {
+                    this.x = nextX;
+                }
+                
+                // Check Y-axis collision
+                if (checkStructureCollision({ ...rect, y: nextY })) {
+                    dy = 0;
+                } else {
+                    this.y = nextY;
+                }
+            }
+            
+            moveTo(targetX, targetY) {
+                const angle = Math.atan2(targetY - this.y, targetX - this.x);
+                this.move(angle, this.speed);
+            }
+            
+            draw(ctx, camera) {
+                const s = worldToScreen(this.x, this.y);
+                if (s.x > canvas.width || s.y > canvas.height || s.x + this.w < 0 || s.y + this.h < 0) {
+                    return;
+                }
+                
+                // Simple sprite
+                ctx.save();
+                ctx.translate(s.x + this.w / 2, s.y + this.h / 2);
+                ctx.rotate(this.angle);
+                
+                // Body
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+                
+                // Head (drawn "in front" based on angle)
+                ctx.fillStyle = "#a0b0a0"; // Zombie skin
+                ctx.fillRect(0, -this.w / 2 + 2, this.w / 2, this.w / 2);
+                
+                ctx.restore();
+                
+                // Draw HP bar if damaged
+                if (this.hp < this.maxHp) {
+                    ctx.fillStyle = "#555";
+                    ctx.fillRect(s.x, s.y - 8, this.w, 5);
+                    ctx.fillStyle = "#c00";
+                    ctx.fillRect(s.x, s.y - 8, this.w * (this.hp / this.maxHp), 5);
+                }
+                
+                // State icon
+                let icon = "";
+                if (this.state === "SEARCHING") icon = "❓";
+                if (this.state === "FRANTIC_SEARCHING") icon = "👂";
+                if (this.state === "AGGRO") icon = "❗";
+                
+                if (icon) {
+                    ctx.fillStyle = "white";
+                    ctx.font = "20px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText(icon, s.x + this.w / 2, s.y - 12);
+                }
+            }
+        }
+        
+        class Vehicle {
+            constructor(x, y, typeId) {
+                this.x = x;
+                this.y = y;
+                this.typeId = typeId;
+                this.data = GAME_DATA.VEHICLE_TYPES[typeId];
+                if (!this.data) {
+                    console.error(`Invalid vehicle type: ${typeId}`);
+                    this.typeId = "SEDAN";
+                    this.data = GAME_DATA.VEHICLE_TYPES["SEDAN"];
+                }
+                
+                this.w = 60; // Standard size for now
+                this.h = 30;
+                
+                this.speed = 0;
+                this.angle = 0; //Math.random() * Math.PI * 2;
+                this.isPlayerDriven = false;
+                
+                this.maxHp = this.data.hp;
+                this.hp = this.maxHp;
+                this.maxFuel = this.data.fuelCap;
+                this.fuel = this.maxFuel;
+                this.storageSlots = this.data.storageSlots;
+                this.inventory = new Array(this.storageSlots).fill(null);
+                
+                this.hasKey = true;
+                this.headlightsOn = false;
+                
+                this.trailer = null;
+            }
+            
+            getHitbox() {
+                // TODO: Rotated hitbox
+                return { x: this.x - this.w/2, y: this.y - this.h/2, w: this.w, h: this.h };
+            }
+            
+            takeDamage(amount) {
+                this.hp -= amount;
+                if (this.hp <= 0) {
+                    this.hp = 0;
+                    this.speed = 0;
+                    game.showMessage(`${this.data.name} is wrecked!`);
+                    if (this.isPlayerDriven) {
+                        game.player.exitVehicle();
+                    }
+                }
+            }
+            
+            toggleHeadlights() {
+                this.headlightsOn = !this.headlightsOn;
+                game.showMessage(`Headlights ${this.headlightsOn ? "ON" : "OFF"}.`);
+            }
+            
+            toggleTrailer() {
+                if (!this.data.canTow) {
+                    game.showMessage("This vehicle can't tow trailers.");
+                    return;
+                }
+                
+                if (this.trailer) {
+                    // Detach
+                    this.trailer.isAttached = false;
+                    this.trailer = null;
+                    game.showMessage("Trailer detached.");
+                } else {
+                    // Try to attach
+                    for (const t of game.trailers) {
+                        if (!t.isAttached && dist(this.x, this.y, t.x, t.y) < 80) {
+                            this.trailer = t;
+                            t.isAttached = true;
+                            game.showMessage("Trailer attached!");
+                            return;
+                        }
+                    }
+                    game.showMessage("No trailer nearby to attach.");
+                }
+            }
+            
+            update(deltaTime) {
+                if (this.hp <= 0) return;
+                
+                if (this.isPlayerDriven && this.fuel > 0) {
+                    let acceleration = 0;
+                    let turn = 0;
+                    
+                    if (game.keys['w']) acceleration = this.data.accel;
+                    if (game.keys['s']) acceleration = -this.data.accel * 0.5; // Slower reverse
+                    if (game.keys['a']) turn = -this.data.handling;
+                    if (game.keys['d']) turn = this.data.handling;
+                    
+                    // Simple friction
+                    this.speed *= 0.98; 
+                    
+                    // Apply acceleration
+                    this.speed += acceleration;
+                    if (this.speed > this.data.speed) this.speed = this.data.speed;
+                    if (this.speed < -this.data.speed * 0.5) this.speed = -this.data.speed * 0.5;
+                    
+                    // Apply turning (only when moving)
+                    if (Math.abs(this.speed) > 0.1) {
+                        this.angle += turn * (this.speed / this.data.speed);
+                    }
+                    
+                    // Consume fuel
+                    this.fuel -= this.data.fuelRate * Math.abs(this.speed) * (this.trailer ? 2 : 1);
+                    if (this.fuel < 0) {
+                        this.fuel = 0;
+                        game.showMessage("Out of fuel!");
+                    }
+                    
+                    // Create noise event
+                    const noiseRadius = this.data.noise * (Math.abs(this.speed) / this.data.speed);
+                    if (noiseRadius > 50) {
+                        game.noiseEvents.push({ x: this.x, y: this.y, radius: noiseRadius, type: "VEHICLE" });
+                    }
+                    
+                } else {
+                    this.speed *= 0.95; // More friction when not driven
+                }
+                
+                // Update position
+                const dx = Math.cos(this.angle) * this.speed;
+                const dy = Math.sin(this.angle) * this.speed;
+                this.x += dx;
+                this.y += dy;
+                
+                // Collision with enemies
+                for (const enemy of game.enemies) {
+                    if (Math.abs(this.speed) > 1.0 && checkCollision(this.getHitbox(), enemy.getHitbox())) {
+                        enemy.takeDamage(this.data.hp * 0.1); // Damage enemy
+                        this.takeDamage(1); // Damage vehicle
+                    }
+                }
+                
+                // Update trailer position
+                if (this.trailer) {
+                    // Simple follow logic
+                    const d = dist(this.x, this.y, this.trailer.x, this.trailer.y);
+                    const followDist = 50; // Distance to keep
+                    
+                    if (d > followDist) {
+                        const angleToTrailer = Math.atan2(this.y - this.trailer.y, this.x - this.trailer.x);
+                        this.trailer.angle = angleToTrailer;
+                        this.trailer.x = this.x - Math.cos(angleToTrailer) * followDist;
+                        this.trailer.y = this.y - Math.sin(angleToTrailer) * followDist;
+                    }
+                }
+            }
+            
+            draw(ctx, camera) {
+                const s = worldToScreen(this.x, this.y);
+                if (s.x > canvas.width + this.w || s.y > canvas.height + this.h || s.x < -this.w || s.y < -this.h) {
+                    return;
+                }
+                
+                ctx.save();
+                ctx.translate(s.x, s.y);
+                ctx.rotate(this.angle);
+                
+                // Body
+                ctx.fillStyle = this.isPlayerDriven ? "#00c000" : "#c0c0c0";
+                if (this.typeId === "SEMI_TRACTOR") ctx.fillStyle = "#a00000";
+                ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+                
+                // Windshield
+                ctx.fillStyle = "#aaddff";
+                ctx.fillRect(this.w / 4, -this.h / 2, this.w / 4, this.h);
+                
+                // Headlights
+                if (this.headlightsOn) {
+                    ctx.fillStyle = "rgba(255, 255, 200, 0.8)";
+                    ctx.beginPath();
+                    ctx.moveTo(this.w / 2, -this.h / 2);
+                    ctx.lineTo(this.w / 2 + 100, -100);
+                    ctx.lineTo(this.w / 2 + 100, 100);
+                    ctx.lineTo(this.w / 2, this.h / 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+        }
+        
+        class Trailer {
+            constructor(x, y, typeId) {
+                this.x = x;
+                this.y = y;
+                this.typeId = typeId;
+                this.data = GAME_DATA.TRAILER_TYPES[typeId];
+                
+                this.w = 100;
+                this.h = 40;
+                this.angle = 0;
+                this.isAttached = false;
+                
+                this.maxHp = this.data.hp;
+                this.hp = this.maxHp;
+                this.storageSlots = this.data.storageSlots;
+                this.inventory = new Array(this.storageSlots).fill(null);
+            }
+            
+            draw(ctx, camera) {
+                const s = worldToScreen(this.x, this.y);
+                if (s.x > canvas.width + this.w || s.y > canvas.height + this.h || s.x < -this.w || s.y < -this.h) {
+                    return;
+                }
+                
+                ctx.save();
+                ctx.translate(s.x, s.y);
+                ctx.rotate(this.angle);
+                
+                let color = "#777";
+                if (this.typeId === "TANKER_TRAILER") color = "#ddd";
+                
+                ctx.fillStyle = color;
+                ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+                
+                ctx.restore();
+            }
+        }
+        
+        class Camera {
+            constructor(x, y, w, h) {
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+                this.target = null;
+            }
+            
+            follow(target) {
+                this.target = target;
+            }
+            
+            update() {
+                if (!this.target) return;
+                
+                // Center camera on target
+                this.x = this.target.x - this.w / 2;
+                this.y = this.target.y - this.h / 2;
+            }
+        }
+        
+        //================================================
+        // UI & INVENTORY MANAGEMENT
+        //================================================
+        
+        const ui = {
+            
+            dragStart(e, item, slotIndex, containerType) {
+                if (!item) return;
+                
+                game.dragState.isDragging = true;
+                game.dragState.item = item;
+                game.dragState.originalSlot = slotIndex;
+                game.dragState.originalContainer = containerType;
+                
+                // Set drag element
+                game.dragState.dragElement.innerHTML = `
+                    ${item.name}
+                    <span class="inventory-item-stack">${item.quantity > 1 ? item.quantity : ''}</span>
+                `;
+                game.dragState.dragElement.style.display = 'flex';
+                this.dragMove(e);
+                
+                // Temporarily remove from original slot
+                this.setItemInContainer(containerType, slotIndex, null);
+                this.refreshAll();
+            },
+
+            dragMove(e) {
+                if (!game.dragState.isDragging) return;
+                game.dragState.dragElement.style.left = `${e.clientX + 5}px`;
+                game.dragState.dragElement.style.top = `${e.clientY + 5}px`;
+            },
+            
+            dragEnd(e) {
+                if (!game.dragState.isDragging) return;
+
+                game.dragState.isDragging = false;
+                game.dragState.dragElement.style.display = 'none';
+
+                const dropTarget = this.getDropTarget(e);
+
+                if (dropTarget) {
+                    // Dropped on a valid slot
+                    const { containerType, slotIndex } = dropTarget;
+                    const existingItem = this.getItemFromContainer(containerType, slotIndex);
+
+                    if (existingItem && existingItem.id === game.dragState.item.id && existingItem.quantity < existingItem.maxStack) {
+                        // Stack
+                        const canAdd = existingItem.maxStack - existingItem.quantity;
+                        const toAdd = Math.min(canAdd, game.dragState.item.quantity);
+                        existingItem.quantity += toAdd;
+                        game.dragState.item.quantity -= toAdd;
+                        
+                        // If any remains, put it back
+                        if (game.dragState.item.quantity > 0) {
+                            this.setItemInContainer(game.dragState.originalContainer, game.dragState.originalSlot, game.dragState.item);
+                        }
+                    } else if (!existingItem) {
+                        // Place in empty slot
+                        this.setItemInContainer(containerType, slotIndex, game.dragState.item);
+                    } else {
+                        // Swap with existing item
+                        this.setItemInContainer(containerType, slotIndex, game.dragState.item);
+                        this.setItemInContainer(game.dragState.originalContainer, game.dragState.originalSlot, existingItem);
+                    }
+                } else {
+                    // Invalid drop, put item back
+                    this.setItemInContainer(game.dragState.originalContainer, game.dragState.originalSlot, game.dragState.item);
+                }
+
+                game.dragState.item = null;
+                this.refreshAll();
+            },
+            
+            getDropTarget(e) {
+                const dropElement = document.elementFromPoint(e.clientX, e.clientY);
+                if (!dropElement) return null;
+                
+                const slot = dropElement.closest('.inventory-slot');
+                if (slot) {
+                    const grid = slot.closest('.storage-grid, #inventory-grid');
+                    if (!grid) return null;
+
+                    const containerType = grid.dataset.container;
+                    const slotIndex = parseInt(slot.dataset.slot);
+                    
+                    if (containerType && slotIndex !== undefined) {
+                        return { containerType, slotIndex };
+                    }
+                }
+                return null;
+            },
+            
+            getItemFromContainer(containerType, slotIndex) {
+                if (containerType === 'player') {
+                    return game.player.inventory[slotIndex];
+                }
+                if (containerType === 'vehicle') {
+                    const vehicle = game.player.vehicle || this.getNearbyVehicle();
+                    return vehicle ? vehicle.inventory[slotIndex] : null;
+                }
+                return null;
+            },
+
+            setItemInContainer(containerType, slotIndex, item) {
+                if (containerType === 'player') {
+                    game.player.inventory[slotIndex] = item;
+                } else if (containerType === 'vehicle') {
+                    const vehicle = game.player.vehicle || this.getNearbyVehicle();
+                    if (vehicle) {
+                        vehicle.inventory[slotIndex] = item;
+                    }
+                }
+            },
+            
+            refreshAll() {
+                this.updateHotbar();
+                if (game.activeModal === INVENTORY_PANEL) this.updateInventory();
+                if (game.activeModal === CRAFTING_PANEL) this.updateCraftingPanel();
+                if (game.activeModal === VEHICLE_STORAGE_PANEL) this.updateVehicleStorage();
+            },
+            
+            init() {
+                // Setup drag listeners
+                document.addEventListener('mousemove', (e) => this.dragMove(e));
+                document.addEventListener('mouseup', (e) => this.dragEnd(e));
+                
+                // Setup modal close buttons
+                ALL_MODALS.forEach(modal => {
+                    modal.querySelector('.modal-panel-close').addEventListener('click', () => {
+                        this.toggleModal(null);
+                    });
+                });
+                
+                // Setup Inventory Tabs
+                INVENTORY_PANEL.querySelector('#inventory-tabs').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('inventory-tab')) {
+                        INVENTORY_PANEL.querySelectorAll('.inventory-tab').forEach(t => t.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.updateInventory(e.target.dataset.tab);
+                    }
+                });
+                
+                // Setup Crafting List
+                CRAFTING_PANEL.querySelector('#crafting-recipe-list').addEventListener('click', (e) => {
+                    const recipeEl = e.target.closest('.crafting-recipe');
+                    if (recipeEl) {
+                        CRAFTING_PANEL.querySelectorAll('.crafting-recipe').forEach(r => r.classList.remove('selected'));
+                        recipeEl.classList.add('selected');
+                        this.selectCraftingRecipe(recipeEl.dataset.recipeId);
+                    }
+                });
+                
+                // Setup Craft Button
+                document.getElementById('craft-button').addEventListener('click', () => {
+                    this.craftSelectedRecipe();
+                });
+                
+                // Init Hotbar
+                this.updateHotbar();
+            },
+            
+            toggleModal(modal, forceState = null) {
+                // Close any active modal first
+                if (game.activeModal && game.activeModal !== modal) {
+                    game.activeModal.style.display = 'none';
+                }
+                
+                let newState = false;
+                if (modal) {
+                    const shouldOpen = (forceState !== null) ? forceState : (modal.style.display === 'none');
+                    modal.style.display = shouldOpen ? 'block' : 'none';
+                    game.activeModal = shouldOpen ? modal : null;
+                    newState = shouldOpen;
+                } else {
+                    // Close all
+                    ALL_MODALS.forEach(m => m.style.display = 'none');
+                    game.activeModal = null;
+                }
+                
+                game.isPaused = newState;
+                
+                // Refresh content when opening
+                if (newState) {
+                    if (modal === BUILD_MENU) this.updateBuildMenu();
+                    if (modal === INVENTORY_PANEL) this.updateInventory();
+                    if (modal === CRAFTING_PANEL) this.updateCraftingPanel();
+                    if (modal === VEHICLE_STORAGE_PANEL) this.updateVehicleStorage();
+                }
+            },
+            
+            updateHotbar() {
+                HOTBAR_EL.innerHTML = '';
+                for (let i = 0; i < 9; i++) {
+                    const item = game.player.inventory[i];
+                    const slot = document.createElement('div');
+                    slot.className = 'hotbar-slot';
+                    
+                    const keyEl = document.createElement('span');
+                    keyEl.className = 'hotbar-slot-key';
+                    keyEl.textContent = i + 1;
+                    slot.appendChild(keyEl);
+                    
+                    if (item) {
+                        slot.textContent = item.name;
+                        
+                        const stackEl = document.createElement('span');
+                        stackEl.className = 'hotbar-item-stack';
+                        if (item.quantity > 1) {
+                            stackEl.textContent = item.quantity;
+                        }
+                        slot.appendChild(stackEl);
+                    }
+                    HOTBAR_EL.appendChild(slot);
+                }
+            },
+            
+            updateInventory(filter = "ALL") {
+                const grid = document.getElementById('inventory-grid');
+                grid.innerHTML = '';
+                
+                for (let i = 0; i < 40; i++) {
+                    const item = game.player.inventory[i];
+                    const slot = this.createInventorySlot(item, i, 'player');
+                    
+                    if (filter !== "ALL" && item && item.type !== filter) {
+                        slot.style.opacity = '0.3';
+                    }
+                    
+                    grid.appendChild(slot);
+                }
+            },
+            
+            createInventorySlot(item, index, containerType) {
+                const slot = document.createElement('div');
+                slot.className = 'inventory-slot';
+                slot.dataset.slot = index;
+                slot.dataset.container = containerType;
+                
+                if (item) {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'inventory-item';
+                    itemEl.textContent = item.name;
+                    itemEl.title = `${item.name}\n${item.data.desc || ''}`;
+                    
+                    const stackEl = document.createElement('span');
+                    stackEl.className = 'inventory-item-stack';
+                    if (item.quantity > 1) {
+                        stackEl.textContent = item.quantity;
+                    }
+                    itemEl.appendChild(stackEl);
+                    
+                    // Add drag listener
+                    itemEl.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        this.dragStart(e, item, index, containerType);
+                    });
+                    
+                    slot.appendChild(itemEl);
+                }
+                
+                return slot;
+            },
+            
+            updateBuildMenu() {
+                const content = document.getElementById('build-menu-content');
+                content.innerHTML = '';
+                const categories = {};
+                
+                for (const [id, structure] of Object.entries(GAME_DATA.STRUCTURES)) {
+                    if (!categories[structure.category]) {
+                        categories[structure.category] = [];
+                    }
+                    categories[structure.category].push({ id, ...structure });
+                }
+                
+                for (const [category, items] of Object.entries(categories)) {
+                    const catEl = document.createElement('div');
+                    catEl.className = 'build-category';
+                    catEl.innerHTML = `<h3>${category}</h3>`;
+                    
+                    for (const item of items) {
+                        let hasMaterials = true;
+                        let costStr = "Cost: ";
+                        for (const [matId, qty] of Object.entries(item.cost)) {
+                            if (!game.player.hasItem(matId, qty)) {
+                                hasMaterials = false;
+                            }
+                            costStr += `${qty} ${GAME_DATA.ITEMS[matId].name}, `;
+                        }
+                        costStr = costStr.slice(0, -2);
+                        
+                        const button = document.createElement('button');
+                        button.className = 'build-item-button';
+                        if (!hasMaterials) {
+                            button.classList.add('disabled');
+                        }
+                        
+                        button.innerHTML = `
+                            ${item.name}
+                            <span class="build-item-cost">${costStr}</span>
+                        `;
+                        
+                        button.onclick = () => {
+                            if (hasMaterials) {
+                                game.isBuilding = true;
+                                game.buildType = item.id;
+                                BUILD_PREVIEW.style.display = 'block';
+                                this.toggleModal(null); // Close build menu
+                            } else {
+                                game.showMessage("Not enough materials!");
+                            }
+                        };
+                        catEl.appendChild(button);
+                    }
+                    content.appendChild(catEl);
+                }
+            },
+            
+            updateCraftingPanel() {
+                const list = document.getElementById('crafting-recipe-list');
+                list.innerHTML = '';
+                
+                for (const [id, recipe] of Object.entries(GAME_DATA.RECIPES)) {
+                    const recipeEl = document.createElement('div');
+                    recipeEl.className = 'crafting-recipe';
+                    recipeEl.dataset.recipeId = id;
+                    recipeEl.textContent = recipe.name;
+                    
+                    if (!recipe.unlocked) {
+                        recipeEl.classList.add('locked');
+                        recipeEl.textContent += " (Locked)";
+                    }
+                    list.appendChild(recipeEl);
+                }
+                
+                // Clear details
+                this.selectCraftingRecipe(null);
+            },
+            
+            selectCraftingRecipe(recipeId) {
+                const nameEl = document.getElementById('crafting-details-name');
+                const descEl = document.getElementById('crafting-details-desc');
+                const materialsEl = document.getElementById('crafting-materials-list');
+                const craftBtn = document.getElementById('craft-button');
+                
+                craftBtn.dataset.recipeId = recipeId; // Store for crafting
+                
+                if (!recipeId) {
+                    nameEl.textContent = "Select a Recipe";
+                    descEl.textContent = "";
+                    materialsEl.innerHTML = "";
+                    craftBtn.disabled = true;
+                    return;
+                }
+                
+                const recipe = GAME_DATA.RECIPES[recipeId];
+                if (!recipe.unlocked) {
+                    nameEl.textContent = `${recipe.name} (Locked)`;
+                    descEl.textContent = "You need to find the blueprint for this item.";
+                    materialsEl.innerHTML = "";
+                    craftBtn.disabled = true;
+                    return;
+                }
+                
+                let canCraft = true;
+                nameEl.textContent = recipe.name;
+                descEl.textContent = recipe.desc;
+                materialsEl.innerHTML = "";
+                
+                for (const [matId, qty] of Object.entries(recipe.cost)) {
+                    const has = game.player.hasItem(matId, qty);
+                    if (!has) canCraft = false;
+                    
+                    const matName = GAME_DATA.ITEMS[matId].name;
+                    const li = document.createElement('li');
+                    li.className = has ? 'material-available' : 'material-needed';
+                    li.textContent = `${qty} x ${matName}`;
+                    materialsEl.appendChild(li);
+                }
+                
+                craftBtn.disabled = !canCraft;
+            },
+            
+            craftSelectedRecipe() {
+                const recipeId = document.getElementById('craft-button').dataset.recipeId;
+                if (!recipeId) return;
+                
+                const recipe = GAME_DATA.RECIPES[recipeId];
+                if (!recipe || !recipe.unlocked) return;
+                
+                // Final check for materials
+                let canCraft = true;
+                for (const [matId, qty] of Object.entries(recipe.cost)) {
+                    if (!game.player.hasItem(matId, qty)) {
+                        canCraft = false;
+                        break;
+                    }
+                }
+                
+                if (canCraft) {
+                    // Consume materials
+                    for (const [matId, qty] of Object.entries(recipe.cost)) {
+                        game.player.consumeItem(matId, qty);
+                    }
+                    
+                    // Add crafted item
+                    const qtyProduced = recipe.produces || 1;
+                    const craftedItem = new Item(recipeId, qtyProduced);
+                    game.player.addItem(craftedItem);
+                    
+                    game.showMessage(`Crafted ${qtyProduced}x ${recipe.name}!`);
+                    
+                    // Refresh UI
+                    this.updateCraftingPanel();
+                    CRAFTING_PANEL.querySelectorAll('.crafting-recipe').forEach(r => {
+                        if (r.dataset.recipeId === recipeId) r.classList.add('selected');
+                    });
+                    this.selectCraftingRecipe(recipeId);
+                    this.updateInventory(); // For hotbar/item changes
+                }
+            },
+            
+            getNearbyVehicle() {
+                for (const v of game.vehicles) {
+                    if (dist(game.player.x, game.player.y, v.x, v.y) < 50) {
+                        return v;
+                    }
+                }
+                return null;
+            },
+            
+            updateVehicleStorage() {
+                const vehicle = game.player.vehicle || this.getNearbyVehicle();
+                
+                if (!vehicle) {
+                    this.toggleModal(null); // Close panel if no vehicle
+                    game.showMessage("No vehicle nearby.");
+                    return;
+                }
+                
+                document.getElementById('vehicle-storage-name').textContent = `${vehicle.data.name} Storage`;
+                
+                // Update stats
+                document.getElementById('vehicle-fuel-display').textContent = vehicle.fuel.toFixed(1);
+                document.getElementById('vehicle-fuel-cap-display').textContent = vehicle.maxFuel;
+                document.getElementById('vehicle-health-display').textContent = vehicle.hp.toFixed(0);
+                document.getElementById('vehicle-health-cap-display').textContent = vehicle.maxHp;
+                
+                // Update grids
+                const playerGrid = document.getElementById('vehicle-player-grid');
+                const vehicleGrid = document.getElementById('vehicle-storage-grid');
+                playerGrid.innerHTML = '';
+                vehicleGrid.innerHTML = '';
+                
+                // Player inventory
+                playerGrid.dataset.container = 'player';
+                for (let i = 0; i_c = 0; i_c < game.player.inventory.length; i_c++) {
+                    const item = game.player.inventory[i_c];
+                    playerGrid.appendChild(this.createInventorySlot(item, i_c, 'player'));
+                }
+                
+                // Vehicle inventory
+                vehicleGrid.dataset.container = 'vehicle';
+                for (let i_v = 0; i_v < vehicle.storageSlots; i_v++) {
+                    const item = vehicle.inventory[i_v];
+                    vehicleGrid.appendChild(this.createInventorySlot(item, i_v, 'vehicle'));
+                }
+            },
+            
+        };
+
+        //================================================
+        // MAIN GAME LOGIC
+        //================================================
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            game.camera = new Camera(0, 0, canvas.width, canvas.height);
+            
+            START_BUTTON.addEventListener('click', startGame);
+            
+            // Input Handlers
+            window.addEventListener('keydown', (e) => {
+                if (!game.isRunning) return;
+                
+                game.keys[e.key] = true;
+                
+                // Hotbar keys
+                if (['1','2','3','4','5','6','7','8','9'].includes(e.key)) {
+                    if (!game.isPaused) {
+                        game.player.useHotbarItem(parseInt(e.key) - 1);
+                        e.preventDefault();
+                    }
+                }
+                
+                // System keys
+                if (e.key === 'Escape') {
+                    if (game.isBuilding) {
+                        game.isBuilding = false;
+                        BUILD_PREVIEW.style.display = 'none';
+                    } else if (game.activeModal) {
+                        ui.toggleModal(null);
+                    }
+                }
+                
+                if (e.key === 'e') {
+                    if (!game.isPaused) game.player.interact();
+                }
+                if (e.key === 'l') {
+                    if (!game.isPaused && game.player.vehicle) {
+                        game.player.vehicle.toggleHeadlights();
+                    }
+                }
+                if (e.key === 't') {
+                    if (!game.isPaused && game.player.vehicle) {
+                        game.player.vehicle.toggleTrailer();
+                    }
+                }
+                
+                // UI Toggles
+                if (e.key === 'b') {
+                    if (!game.isBuilding) {
+                        ui.toggleModal(BUILD_MENU);
+                    }
+                }
+                if (e.key === 'i') {
+                    ui.toggleModal(INVENTORY_PANEL);
+                }
+                if (e.key === 'c') {
+                    ui.toggleModal(CRAFTING_PANEL);
+                }
+                if (e.key === 'v') {
+                    if (!game.player.vehicle) { // Only open if NOT in a vehicle
+                        ui.toggleModal(VEHICLE_STORAGE_PANEL);
+                    }
+                }
+            });
+            window.addEventListener('keyup', (e) => {
+                game.keys[e.key] = false;
+            });
+            
+            // Build mode mouse move
+            canvas.addEventListener('mousemove', (e) => {
+                if (game.isBuilding) {
+                    const rect = canvas.getBoundingClientRect();
+                    const screenX = e.clientX - rect.left;
+                    const screenY = e.clientY - rect.top;
+                    const worldPos = screenToWorld(screenX, screenY);
+                    
+                    const gridX = worldToGrid(worldPos.x);
+                    const gridY = worldToGrid(worldPos.y);
+                    
+                    game.buildPreview.x = gridToWorld(gridX);
+                    game.buildPreview.y = gridToWorld(gridY);
+                    
+                    // Check validity
+                    game.buildPreview.valid = !game.world.getStructureAtGrid(gridX, gridY);
+                    
+                    const s = worldToScreen(game.buildPreview.x, game.buildPreview.y);
+                    BUILD_PREVIEW.style.left = `${s.x}px`;
+                    BUILD_PREVIEW.style.top = `${s.y}px`;
+                    BUILD_PREVIEW.style.width = `${TILE_SIZE}px`;
+                    BUILD_PREVIEW.style.height = `${TILE_SIZE}px`;
+                    
+                    if (game.buildPreview.valid) {
+                        BUILD_PREVIEW.classList.remove('invalid');
+                    } else {
+                        BUILD_PREVIEW.classList.add('invalid');
+                    }
+                }
+            });
+            
+            // Build mode click
+            canvas.addEventListener('click', (e) => {
+                if (game.isBuilding && game.buildType && game.buildPreview.valid) {
+                    const gridX = worldToGrid(game.buildPreview.x);
+                    const gridY = worldToGrid(game.buildPreview.y);
+                    
+                    const structureData = GAME_DATA.STRUCTURES[game.buildType];
+                    
+                    // Check and consume materials
+                    let canBuild = true;
+                    for (const [matId, qty] of Object.entries(structureData.cost)) {
+                        if (!game.player.hasItem(matId, qty)) {
+                            canBuild = false;
+                            break;
+                        }
+                    }
+                    
+                    if (canBuild) {
+                        for (const [matId, qty] of Object.entries(structureData.cost)) {
+                            game.player.consumeItem(matId, qty);
+                        }
+                        
+                        const newStructure = new Structure(gridX, gridY, game.buildType);
+                        game.world.addStructure(newStructure);
+                        ui.updateInventory(); // Refresh inventory/hotbar
+                        
+                        // Keep building if holding shift
+                        if (!game.keys['Shift']) {
+                            game.isBuilding = false;
+                            BUILD_PREVIEW.style.display = 'none';
+                        }
+                    } else {
+                        game.showMessage("Not enough materials!");
+                        game.isBuilding = false;
+                        BUILD_PREVIEW.style.display = 'none';
+                    }
+                }
+            });
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                game.camera.w = canvas.width;
+                game.camera.h = canvas.height;
+            });
+            
+            ui.init();
+        }
+
+        function startGame() {
+            game.seed = SEED_INPUT.value || "survive_" + Date.now();
+            console.log(`Starting game with seed: ${game.seed}`);
+            
+            game.world = new World(game.seed);
+            game.player = new Player(100, 100); // Start at a "safe" (0,0) offset
+            game.camera.follow(game.player);
+            
+            // Give player starting items
+            game.player.addItem(new Item("KNIFE", 1));
+            game.player.addItem(new Item("BANDAGE", 3));
+            game.player.addItem(new Item("WATER_BOTTLE", 1));
+            game.player.addItem(new Item("CANNED_FOOD", 1));
+            game.player.addItem(new Item("HAMMER", 1));
+            game.player.addItem(new Item("WOOD", 20));
+            game.player.addItem(new Item("SCRAP_METAL", 10));
+            ui.updateInventory();
+            
+            // Spawn a test trailer
+            game.trailers.push(new Trailer(150, 150, "BOX_TRAILER"));
+            
+            START_MENU.style.display = 'none';
+            game.isRunning = true;
+            game.gameLoopId = requestAnimationFrame(gameLoop);
+        }
+        
+        game.showMessage = (text, duration = 3000) => {
+            GAME_MESSAGE.textContent = text;
+            GAME_MESSAGE.style.display = 'block';
+            
+            if (game.messageTimer) {
+                clearTimeout(game.messageTimer);
+            }
+            game.messageTimer = setTimeout(() => {
+                GAME_MESSAGE.style.display = 'none';
+                game.messageTimer = 0;
+            }, duration);
+        }
+
+        let lastTime = 0;
+        function gameLoop(timestamp) {
+            if (!game.isRunning) return;
+            
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+            
+            if (!game.isPaused) {
+                update(deltaTime);
+            }
+            
+            draw();
+            
+            game.gameLoopId = requestAnimationFrame(gameLoop);
+        }
+
+        function update(deltaTime) {
+            if (!deltaTime || deltaTime > 1000) deltaTime = 16; // Fix for large deltas on pause/resume
+            
+            // Update game time
+            game.gameTime = (game.gameTime + deltaTime) % DAY_NIGHT_CYCLE_MS;
+            const timePercent = game.gameTime / DAY_NIGHT_CYCLE_MS;
+            
+            if (timePercent < 0.001) { // Rolled over to a new day
+                game.day++;
+            }
+            
+            // Night check
+            game.isNight = timePercent >= NIGHT_START_PERCENT || timePercent < NIGHT_END_PERCENT;
+            
+            // Update entities
+            game.player.update(deltaTime);
+            
+            // Despawn distant enemies
+            game.enemies = game.enemies.filter(e => {
+                if (dist(game.player.x, game.player.y, e.x, e.y) > 1500) {
+                    return false; // Despawn
+                }
+                e.update(deltaTime, game.player);
+                return e.hp > 0;
+            });
+            
+            game.vehicles.forEach(v => {
+                if (!v.isPlayerDriven) v.update(deltaTime);
+            });
+            game.trailers.forEach(t => {
+                // Future AI logic
+            });
+            
+            game.camera.update();
+            
+            // Clear one-shot event buses
+            game.noiseEvents = [];
+            
+            // Update UI
+            updateUI(timePercent);
+        }
+        
+        function updateUI(timePercent) {
+            // Stats
+            document.getElementById('health-bar').style.width = `${game.player.health}%`;
+            document.getElementById('hunger-bar').style.width = `${game.player.hunger}%`;
+            document.getElementById('thirst-bar').style.width = `${game.player.thirst}%`;
+            document.getElementById('stamina-bar').style.width = `${game.player.stamina}%`;
+            document.getElementById('morale-bar').style.width = `${game.player.morale}%`;
+            
+            // Time
+            const gameHour = Math.floor(timePercent * 24);
+            const gameMinute = Math.floor(((timePercent * 24) - gameHour) * 60);
+            document.getElementById('time-display').textContent = `Day ${game.day}, ${String(gameHour).padStart(2, '0')}:${String(gameMinute).padStart(2, '0')}`;
+            
+            // Night Overlay
+            if (game.isNight) {
+                let opacity = MIN_NIGHT_OPACITY;
+                if (timePercent >= NIGHT_START_PERCENT) { // Fading in
+                    opacity = ((timePercent - NIGHT_START_PERCENT) / 0.05) * MIN_NIGHT_OPACITY; // Fade over ~1hr
+                } else if (timePercent < NIGHT_END_PERCENT) { // Fading out
+                    opacity = (1 - (timePercent / NIGHT_END_PERCENT)) * MIN_NIGHT_OPACITY;
+                }
+                NIGHT_OVERLAY.style.opacity = Math.min(opacity, MIN_NIGHT_OPACITY);
+            } else {
+                NIGHT_OVERLAY.style.opacity = 0;
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 1. Draw World
+            game.world.draw(ctx, game.camera);
+            
+            // 2. Draw POI Labels
+            game.pois.forEach(p => p.draw(ctx, game.camera));
+            
+            // 3. Draw Structures
+            game.structures.forEach(s => s.draw(ctx, game.camera));
+            
+            // 4. Draw Trailers
+            game.trailers.forEach(t => t.draw(ctx, game.camera));
+            
+            // 5. Draw Vehicles
+            game.vehicles.forEach(v => v.draw(ctx, game.camera));
+            
+            // 6. Draw Loot Containers
+            game.lootContainers.forEach(c => c.draw(ctx, game.camera));
+            
+            // 7. Draw Enemies
+            game.enemies.forEach(e => e.draw(ctx, game.camera));
+            
+            // 8. Draw Player
+            game.player.draw(ctx, game.camera);
+            
+            // 9. Draw Minimap
+            drawMiniMap();
+        }
+        
+        function drawMiniMap() {
+            minimapCtx.fillStyle = "#1a1a1a";
+            minimapCtx.fillRect(0, 0, minimap.width, minimap.height);
+            
+            const minimapScale = 0.1;
+            const minimapPlayerX = minimap.width / 2;
+            const minimapPlayerY = minimap.height / 2;
+            
+            // Get surrounding chunks
+            const playerChunk = game.world.getChunkAt(game.player.x, game.player.y);
+            
+            for (let x = playerChunk.x - 2; x <= playerChunk.x + 2; x++) {
+                for (let y = playerChunk.y - 2; y <= playerChunk.y + 2; y++) {
+                    const chunk = game.world.getChunk(x, y);
+                    
+                    const m = {
+                        x: (chunk.worldX - game.player.x) * minimapScale + minimapPlayerX,
+                        y: (chunk.worldY - game.player.y) * minimapScale + minimapPlayerY,
+                        size: CHUNK_SIZE * minimapScale
+                    };
+                    
+                    minimapCtx.fillStyle = GAME_DATA.BIOMES[chunk.biome].color;
+                    minimapCtx.fillRect(m.x, m.y, m.size, m.size);
+                    
+                    // Draw roads on minimap
+                    if (chunk.roadType) {
+                        const roadData = GAME_DATA.ROAD_TYPES[chunk.roadType];
+                        const roadWidthPixels = roadData.width * TILE_SIZE * minimapScale;
+                        minimapCtx.fillStyle = roadData.color;
+                        if (chunk.x % game.world.roadInterval.x === 0) { // N-S
+                            minimapCtx.fillRect(m.x + m.size / 2 - roadWidthPixels / 2, m.y, roadWidthPixels, m.size);
+                        }
+                        if (chunk.y % game.world.roadInterval.y === 0) { // E-W
+                            minimapCtx.fillRect(m.x, m.y + m.size / 2 - roadWidthPixels / 2, m.size, roadWidthPixels);
+                        }
+                    }
+                }
+            }
+            
+            // Draw player
+            minimapCtx.fillStyle = "blue";
+            minimapCtx.fillRect(minimapPlayerX - 2, minimapPlayerY - 2, 4, 4);
+            
+            // Draw enemies
+            minimapCtx.fillStyle = "red";
+            game.enemies.forEach(e => {
+                const m = {
+                    x: (e.x - game.player.x) * minimapScale + minimapPlayerX,
+                    y: (e.y - game.player.y) * minimapScale + minimapPlayerY,
+                };
+                if (m.x > 0 && m.x < minimap.width && m.y > 0 && m.y < minimap.height) {
+                    minimapCtx.fillRect(m.x - 1, m.y - 1, 2, 2);
+                }
+            });
+            
+            // Draw vehicles
+            minimapCtx.fillStyle = "white";
+            game.vehicles.forEach(v => {
+                const m = {
+                    x: (v.x - game.player.x) * minimapScale + minimapPlayerX,
+                    y: (v.y - game.player.y) * minimapScale + minimapPlayerY,
+                };
+                if (m.x > 0 && m.x < minimap.width && m.y > 0 && m.y < minimap.height) {
+                    minimapCtx.fillRect(m.x - 2, m.y - 1, 4, 2);
+                }
+            });
+        }
+
+        // Start the init process
+        init();
+
+    </script>
+</body>
+</html>
