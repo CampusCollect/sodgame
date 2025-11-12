@@ -20,6 +20,10 @@ export class InventoryController {
     // demo loadout
     this.inventory.add(createStack("item_canned_food", 2));
     this.inventory.add(createStack("item_bandage", 1));
+    this.inventory.add(createStack("material_wood", 12));
+    this.inventory.add(createStack("material_metal", 10));
+    this.inventory.add(createStack("material_steel", 8));
+    this.inventory.add(createStack("item_component_circuit", 2));
   }
 
   toggle(): void {
@@ -37,13 +41,34 @@ export class InventoryController {
     this.grid.style.setProperty("--cols", String(renderState.columns));
     this.grid.style.setProperty("--rows", String(renderState.rows));
     this.grid.innerHTML = "";
-    renderState.slots.forEach(slot => {
-      const cell = document.createElement("div");
-      cell.className = "inventory-cell";
-      if (slot) {
-        const definition = resolveItemDefinition(slot.itemId);
-        cell.innerHTML = `<strong>${definition.name}</strong><span>x${slot.quantity}</span>`;
-        cell.dataset.condition = slot.condition.toString();
+    this.header.innerText = `Weight ${this.inventory.getCurrentWeight().toFixed(1)} / ${this.inventory.weightLimitKg} kg`;
+
+    for (let row = 0; row < renderState.rows; row += 1) {
+      for (let col = 0; col < renderState.columns; col += 1) {
+        const index = row * renderState.columns + col;
+        const cellState = renderState.cells[index];
+        if (cellState.stack && !cellState.isOrigin) {
+          continue;
+        }
+        const cell = document.createElement("div");
+        cell.className = "inventory-cell";
+        cell.style.gridColumnStart = String(col + 1);
+        cell.style.gridRowStart = String(row + 1);
+
+        if (cellState.stack && cellState.isOrigin) {
+          const definition = resolveItemDefinition(cellState.stack.itemId);
+          cell.classList.add("inventory-cell--occupied");
+          cell.style.gridColumnEnd = `span ${cellState.width}`;
+          cell.style.gridRowEnd = `span ${cellState.height}`;
+          cell.innerHTML = `<strong>${definition.name}</strong><span>x${cellState.stack.quantity}</span>`;
+          cell.dataset.condition = cellState.stack.condition.toString();
+          cell.dataset.weight = (definition.weight_kg * cellState.stack.quantity).toFixed(1);
+          if (cellState.stack.rotation === 90) {
+            cell.dataset.rotated = "true";
+          }
+        }
+
+        this.grid.append(cell);
       }
     }
   }

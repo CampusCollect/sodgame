@@ -23,7 +23,12 @@ export function resolveItemDefinition(itemId: string): ItemDefinition {
   return definition;
 }
 
-export function createStack(itemId: string, quantity = 1, condition = 100): ItemStack {
+export function createStack(
+  itemId: string,
+  quantity = 1,
+  condition = 100,
+  rotation: 0 | 90 = 0
+): ItemStack {
   resolveItemDefinition(itemId);
-  return { itemId, quantity, condition };
+  return { itemId, quantity, condition, rotation };
 }

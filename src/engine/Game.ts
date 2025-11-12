@@ -86,6 +86,7 @@ export class Game {
   private draw(): void {
     this.ctx.clearRect(0, 0, this.options.width, this.options.height);
     this.world.draw(this.ctx, this.player.position);
+    this.building.draw(this.ctx, this.player.position);
     this.vehicles.draw(this.ctx, this.player.position);
     this.player.draw(this.ctx, this.options.width, this.options.height);
     this.zombies.draw(this.ctx, this.player.position);
