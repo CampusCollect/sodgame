@@ -1,5 +1,5 @@
 import type { Inventory } from "../inventory/Inventory";
-import { resolveItemDefinition } from "../inventory/Item";
+import type { ItemStack } from "../inventory/Item";
 
 export class TransparentContainerHUD {
   private readonly element: HTMLDivElement;
@@ -28,37 +28,8 @@ export class TransparentContainerHUD {
     if (label) {
       this.title.innerText = label;
     }
-    const renderState = inventory.getRenderState();
-    this.grid.style.setProperty("--columns", renderState.columns.toString());
-    this.grid.style.setProperty("--rows", renderState.rows.toString());
-    this.grid.innerHTML = "";
-
-    for (let row = 0; row < renderState.rows; row += 1) {
-      for (let col = 0; col < renderState.columns; col += 1) {
-        const index = row * renderState.columns + col;
-        const cellState = renderState.cells[index];
-        if (cellState.stack && !cellState.isOrigin) {
-          continue;
-        }
-        const slot = document.createElement("div");
-        slot.className = "transparent-container__slot";
-        slot.style.gridColumnStart = String(col + 1);
-        slot.style.gridRowStart = String(row + 1);
-
-        if (cellState.stack && cellState.isOrigin) {
-          const definition = resolveItemDefinition(cellState.stack.itemId);
-          slot.style.gridColumnEnd = `span ${cellState.width}`;
-          slot.style.gridRowEnd = `span ${cellState.height}`;
-          slot.innerText = `${definition.name} x${cellState.stack.quantity}`;
-          slot.setAttribute("data-condition", cellState.stack.condition.toFixed(0));
-          if (cellState.stack.rotation === 90) {
-            slot.dataset.rotated = "true";
-          }
-        }
-
-        this.grid.append(slot);
-      }
-    }
+    const render = inventory.slots;
+    this.grid.replaceChildren(...render.map(slot => this.renderSlot(slot.item)));
   }
 
   show(): void {
@@ -69,4 +40,15 @@ export class TransparentContainerHUD {
     this.element.style.display = "none";
   }
 
+  private renderSlot(item: ItemStack | null): HTMLDivElement {
+    const slot = document.createElement("div");
+    slot.className = "transparent-container__slot";
+    if (!item) {
+      slot.innerText = "";
+      return slot;
+    }
+    slot.innerText = `${item.itemId} x${item.quantity}`;
+    slot.setAttribute("data-condition", item.condition.toString());
+    return slot;
+  }
 }

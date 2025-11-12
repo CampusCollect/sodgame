@@ -1,10 +1,5 @@
 # WORKLOG
 
-## 2024-05-12 – Crafting Queue + Planner
-- Introduced a JSON-driven crafting controller with recipe book, skill checks, and per-station queues feeding back into the player inventory.
-- Added a DOM crafting planner (key `C`) that surfaces recipe requirements, blueprint locks, and queue progress with inline error feedback.
-- Extended the inventory core with quantity checks/consumption hooks to support crafting inputs without duplicating grid logic.
-
 ## 2024-05-11 – Inventory Grid Upgrade
 - Replaced the placeholder slot list with a grid-aware inventory model that respects item sizes, rotation, and weight caps.
 - Implemented shared rendering helpers so player and transparent container HUDs now visualize multi-cell items accurately.

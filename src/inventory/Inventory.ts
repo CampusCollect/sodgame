@@ -53,20 +53,6 @@ export class Inventory {
     return this.grid.getPlacedItems();
   }
 
-  hasItems(requirements: { itemId: string; quantity: number }[]): boolean {
-    return requirements.every(req => this.grid.countItemQuantity(req.itemId) >= req.quantity);
-  }
-
-  consumeItems(requirements: { itemId: string; quantity: number }[]): boolean {
-    if (!this.hasItems(requirements)) {
-      return false;
-    }
-    for (const req of requirements) {
-      this.grid.consumeItemQuantity(req.itemId, req.quantity);
-    }
-    return true;
-  }
-
   getCurrentWeight(): number {
     return this.grid
       .getPlacedItems()
