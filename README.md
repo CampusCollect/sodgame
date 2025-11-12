@@ -11,7 +11,7 @@ npm run dev
 
 > **Note:** The execution environment used for this milestone cannot reach the public npm registry (403). The repository already vendors a populated `node_modules` folder so `npm run dev`/`npm run build` continue to work; mirror the packages internally if you need a clean install.
 
-The development server will auto-open the canvas demo. Use **WASD** to move, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, and **B** to open the base building planner.
+The development server will auto-open the canvas demo. Use **WASD** to move and **Tab** to toggle the inventory overlay.
 
 ## Tech Stack
 
@@ -19,12 +19,6 @@ The development server will auto-open the canvas demo. Use **WASD** to move, **T
 - Modular directories under `src/` mirroring the mega-spec system boundaries (e.g. `worldgen`, `inventory`, `vehicles`).
 - DOM overlays for HUD/inventory paired with canvas rendering for the simulation layer.
 - JSON-driven content registry (`data/`) powering items, vehicles, zombies, facilities, and progression curves.
-
-## Current Highlights
-
-- Grid-aware backpack inventory with rotation, stack merging, and live weight tracking shared across the player UI and transparent container HUDs.
-- Interactive crafting planner with station tabs, recipe requirements, skill gating, and live queue progress backed by the JSON recipe set.
-- Base building planner with live power tracking, placement previews, and collision-aware structure placement that consumes inventory resources.
 
 ## Next Steps
 

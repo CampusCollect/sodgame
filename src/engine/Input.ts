@@ -1,4 +1,4 @@
-type InputEventName = "toggle-inventory" | "toggle-crafting" | "toggle-building" | "mouse-move";
+type InputEventName = "toggle-inventory" | "toggle-crafting" | "mouse-move";
 
 type InputListener = () => void;
 
@@ -9,9 +9,7 @@ type ListenerMap = {
 const KEY_BINDINGS: Record<string, InputEventName> = {
   Tab: "toggle-inventory",
   c: "toggle-crafting",
-  C: "toggle-crafting",
-  b: "toggle-building",
-  B: "toggle-building"
+  C: "toggle-crafting"
 };
 
 export class InputManager {

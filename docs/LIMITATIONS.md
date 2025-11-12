@@ -15,9 +15,5 @@
 - Asset pipeline (sprites, audio) not wired; demo uses simple vector rendering.
 - Save/load, networking, and persistence are unimplemented.
 - UI overlays are DOM-based; controller support and accessibility testing remain TODO.
-- Inventory weight checks currently reject entire stacks when capacity is exceeded rather than splitting or queuing overflow.
-- Crafting assumes the player inventory doubles as both input and output storage; dedicated workstation inventories and survivor job hand-offs are still TODO.
-- Crafting output currently fails silently into the void when inventories are full; hook up ground drops or station storage in the next sprint.
-- Base building placements are instantaneous; survivor construction jobs, build timers, and structural integrity checks are deferred.
 
 Each milestone must update this register with fresh risks and mitigation status.

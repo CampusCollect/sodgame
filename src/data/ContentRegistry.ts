@@ -151,7 +151,6 @@ export interface StructureDefinition {
   tier: number;
   hp?: number;
   power_required_kw?: number;
-  power_output_kw?: number;
 }
 
 export interface FacilityTierDefinition {
