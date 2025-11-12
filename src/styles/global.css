@@ -173,8 +173,6 @@ select {
   display: grid;
   gap: 6px;
   grid-template-columns: repeat(var(--columns, 6), minmax(0, 1fr));
-  grid-template-rows: repeat(var(--rows, 6), minmax(44px, 1fr));
-  grid-auto-flow: dense;
 }
 
 .transparent-container__slot,
@@ -187,17 +185,6 @@ select {
   justify-content: center;
   font-size: 12px;
   color: inherit;
-  position: relative;
-}
-
-.transparent-container__slot[data-rotated="true"]::after,
-.transparent-cargo__cell[data-rotated="true"]::after {
-  content: "⟳";
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: 10px;
-  color: rgba(226, 232, 240, 0.8);
 }
 
 .maintenance-ui {

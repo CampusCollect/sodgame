@@ -15,6 +15,5 @@
 - Asset pipeline (sprites, audio) not wired; demo uses simple vector rendering.
 - Save/load, networking, and persistence are unimplemented.
 - UI overlays are DOM-based; controller support and accessibility testing remain TODO.
-- Inventory weight checks currently reject entire stacks when capacity is exceeded rather than splitting or queuing overflow.
 
 Each milestone must update this register with fresh risks and mitigation status.

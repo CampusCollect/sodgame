@@ -20,10 +20,6 @@ The development server will auto-open the canvas demo. Use **WASD** to move and 
 - DOM overlays for HUD/inventory paired with canvas rendering for the simulation layer.
 - JSON-driven content registry (`data/`) powering items, vehicles, zombies, facilities, and progression curves.
 
-## Current Highlights
-
-- Grid-aware backpack inventory with rotation, stack merging, and live weight tracking shared across the player UI and transparent container HUDs.
-
 ## Next Steps
 
 - Flesh out the placeholder directors (zombies, vehicles) with data-driven behavior.
