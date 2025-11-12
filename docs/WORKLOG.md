@@ -1,5 +1,10 @@
 # WORKLOG
 
+## 2024-05-11 – Inventory Grid Upgrade
+- Replaced the placeholder slot list with a grid-aware inventory model that respects item sizes, rotation, and weight caps.
+- Implemented shared rendering helpers so player and transparent container HUDs now visualize multi-cell items accurately.
+- Added lightweight weight-tracking UI; soft limitation: partial acceptance when overweight is deferred (`ASSUMPTION: weight overfill currently blocks the full stack rather than splitting`).
+
 ## 2024-11-12 – Roadmap Initialization
 - Documented a phased execution roadmap that slices the mega-spec into Git-friendly milestones.
 - Highlighted the Build-Then-Verify loop expectations within each phase to ensure disciplined delivery.

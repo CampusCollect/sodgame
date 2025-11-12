@@ -1,17 +1,20 @@
-import { Inventory, toRenderState } from "./Inventory";
+import { Inventory } from "./Inventory";
 import { InputManager } from "../engine/Input";
 import { createStack, resolveItemDefinition } from "./Item";
 
 export class InventoryController {
   private readonly container: HTMLDivElement;
   private readonly grid: HTMLDivElement;
+  private readonly header: HTMLDivElement;
 
   constructor(private readonly inventory: Inventory, _input: InputManager) {
     this.container = document.createElement("div");
     this.container.className = "inventory-panel hidden";
+    this.header = document.createElement("div");
+    this.header.className = "inventory-panel__header";
     this.grid = document.createElement("div");
     this.grid.className = "inventory-grid";
-    this.container.append(this.grid);
+    this.container.append(this.header, this.grid);
     document.body.append(this.container);
 
     // demo loadout
@@ -30,8 +33,9 @@ export class InventoryController {
   }
 
   render(): void {
-    const renderState = toRenderState(this.inventory);
+    const renderState = this.inventory.getRenderState();
     this.grid.style.setProperty("--cols", String(renderState.columns));
+    this.grid.style.setProperty("--rows", String(renderState.rows));
     this.grid.innerHTML = "";
     renderState.slots.forEach(slot => {
       const cell = document.createElement("div");
@@ -41,7 +45,6 @@ export class InventoryController {
         cell.innerHTML = `<strong>${definition.name}</strong><span>x${slot.quantity}</span>`;
         cell.dataset.condition = slot.condition.toString();
       }
-      this.grid.append(cell);
-    });
+    }
   }
 }
