@@ -1,0 +1,20 @@
+{
+  "upgrades": [
+    {
+      "id": "upgrade_generator_extra_tank",
+      "name": "Generator Extra Tank",
+      "applies_to": "generator",
+      "effects": { "fuel_capacity_multiplier": 1.5 },
+      "cost": { "material_metal": 6, "item_fuel_can": 1 },
+      "build_time_seconds": 90
+    },
+    {
+      "id": "upgrade_vehicle_bullbar",
+      "name": "Vehicle Bull Bar",
+      "applies_to": "vehicle",
+      "effects": { "hp_bonus": 0.2, "speed_penalty": 0.05 },
+      "cost": { "material_steel": 8 },
+      "build_time_seconds": 120
+    }
+  ]
+}

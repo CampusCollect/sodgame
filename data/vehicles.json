@@ -1,0 +1,44 @@
+{
+  "vehicles": [
+    {
+      "id": "vehicle_sedan",
+      "name": "Sedan",
+      "seats": 4,
+      "cargo_kg": 300,
+      "fuel_l": 40,
+      "speed_ms": 12,
+      "noise_idle": 25,
+      "noise_drive": 45,
+      "hp_max": 200,
+      "requires_trailer": false,
+      "compatible_trailers": [],
+      "container": "container_vehicle_trunk_sedan"
+    },
+    {
+      "id": "vehicle_pickup",
+      "name": "Pickup Truck",
+      "seats": 4,
+      "cargo_kg": 600,
+      "fuel_l": 60,
+      "speed_ms": 14,
+      "noise_idle": 30,
+      "noise_drive": 55,
+      "hp_max": 260,
+      "requires_trailer": false,
+      "compatible_trailers": ["trailer_flatbed", "trailer_box"]
+    },
+    {
+      "id": "vehicle_semi_tractor",
+      "name": "Semi Tractor",
+      "seats": 2,
+      "cargo_kg": 40,
+      "fuel_l": 200,
+      "speed_ms": 10,
+      "noise_idle": 30,
+      "noise_drive": 60,
+      "hp_max": 500,
+      "requires_trailer": true,
+      "compatible_trailers": ["trailer_box", "trailer_flatbed", "trailer_tanker", "trailer_reefer", "trailer_carrier"]
+    }
+  ]
+}
