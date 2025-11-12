@@ -1,0 +1,90 @@
+import { World } from "../worldgen/World";
+import { Player } from "../entities/Player";
+import { InputManager } from "./Input";
+import { Hud } from "../ui/Hud";
+import { InventoryController } from "../inventory/InventoryController";
+import { ZombieDirector } from "../ai/ZombieDirector";
+import { VehicleDirector } from "../vehicles/VehicleDirector";
+
+export interface GameOptions {
+  canvas: HTMLCanvasElement;
+  width: number;
+  height: number;
+}
+
+export class Game {
+  private readonly ctx: CanvasRenderingContext2D;
+  readonly world: World;
+  readonly player: Player;
+  readonly input: InputManager;
+  readonly hud: Hud;
+  readonly inventory: InventoryController;
+  readonly zombies: ZombieDirector;
+  readonly vehicles: VehicleDirector;
+
+  private lastFrame = performance.now();
+  private animationHandle: number | null = null;
+
+  constructor(private readonly options: GameOptions) {
+    const context = options.canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Failed to initialize canvas context");
+    }
+    this.ctx = context;
+    options.canvas.width = options.width;
+    options.canvas.height = options.height;
+
+    this.world = new World();
+    this.player = new Player({ x: 0, y: 0 });
+    this.input = new InputManager(options.canvas);
+    this.inventory = new InventoryController(this.player.inventory, this.input);
+    this.hud = new Hud(this.player, this.inventory);
+    this.zombies = new ZombieDirector();
+    this.vehicles = new VehicleDirector();
+
+    this.configureInput();
+  }
+
+  private configureInput(): void {
+    this.input.on("toggle-inventory", () => {
+      this.inventory.toggle();
+    });
+  }
+
+  start(): void {
+    const loop = (timestamp: number) => {
+      const delta = (timestamp - this.lastFrame) / 1000;
+      this.lastFrame = timestamp;
+      this.update(delta);
+      this.draw();
+      this.animationHandle = requestAnimationFrame(loop);
+    };
+
+    this.animationHandle = requestAnimationFrame(loop);
+  }
+
+  stop(): void {
+    if (this.animationHandle !== null) {
+      cancelAnimationFrame(this.animationHandle);
+      this.animationHandle = null;
+    }
+  }
+
+  private update(deltaTime: number): void {
+    this.input.update();
+    this.world.update(deltaTime);
+    this.player.update(deltaTime, this.input, this.world);
+    this.zombies.update(deltaTime, this.world, this.player);
+    this.vehicles.update(deltaTime, this.world, this.player);
+    this.hud.update(deltaTime);
+  }
+
+  private draw(): void {
+    this.ctx.clearRect(0, 0, this.options.width, this.options.height);
+    this.world.draw(this.ctx, this.player.position);
+    this.vehicles.draw(this.ctx, this.player.position);
+    this.player.draw(this.ctx, this.options.width, this.options.height);
+    this.zombies.draw(this.ctx, this.player.position);
+    this.hud.drawOverlay(this.ctx, this.options);
+  }
+}
