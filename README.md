@@ -5,9 +5,11 @@ This repository now ships a clean-room TypeScript/Vite foundation for the large-
 ## Getting Started
 
 ```bash
-npm install
+npm install # optional when registry access is available
 npm run dev
 ```
+
+> **Note:** The execution environment used for this milestone cannot reach the public npm registry (403). The repository already vendors a populated `node_modules` folder so `npm run dev`/`npm run build` continue to work; mirror the packages internally if you need a clean install.
 
 The development server will auto-open the canvas demo. Use **WASD** to move and **Tab** to toggle the inventory overlay.
 
@@ -16,6 +18,7 @@ The development server will auto-open the canvas demo. Use **WASD** to move and 
 - [Vite](https://vitejs.dev) + TypeScript for hot-reload iteration.
 - Modular directories under `src/` mirroring the mega-spec system boundaries (e.g. `worldgen`, `inventory`, `vehicles`).
 - DOM overlays for HUD/inventory paired with canvas rendering for the simulation layer.
+- JSON-driven content registry (`data/`) powering items, vehicles, zombies, facilities, and progression curves.
 
 ## Next Steps
 

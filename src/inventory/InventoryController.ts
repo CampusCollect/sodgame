@@ -1,6 +1,6 @@
 import { Inventory, toRenderState } from "./Inventory";
 import { InputManager } from "../engine/Input";
-import { createStack } from "./Item";
+import { createStack, resolveItemDefinition } from "./Item";
 
 export class InventoryController {
   private readonly container: HTMLDivElement;
@@ -37,7 +37,9 @@ export class InventoryController {
       const cell = document.createElement("div");
       cell.className = "inventory-cell";
       if (slot) {
-        cell.innerHTML = `<strong>${slot.definition.name}</strong><span>x${slot.quantity}</span>`;
+        const definition = resolveItemDefinition(slot.itemId);
+        cell.innerHTML = `<strong>${definition.name}</strong><span>x${slot.quantity}</span>`;
+        cell.dataset.condition = slot.condition.toString();
       }
       this.grid.append(cell);
     });

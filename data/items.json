@@ -1,0 +1,215 @@
+{
+  "items": [
+    {
+      "id": "item_bandage",
+      "name": "Bandage",
+      "size": [1, 1],
+      "weight_kg": 0.1,
+      "stack_max": 5,
+      "durability_max": 1,
+      "tags": ["medical", "consumable"],
+      "actions": ["consume", "drop", "split"],
+      "description": "Stops light bleeding and restores minor health."
+    },
+    {
+      "id": "item_canned_food",
+      "name": "Canned Beans",
+      "size": [1, 1],
+      "weight_kg": 0.6,
+      "stack_max": 4,
+      "durability_max": 100,
+      "tags": ["food"],
+      "freshness_hours": 336,
+      "actions": ["consume", "drop"],
+      "description": "Shelf-stable calories; morale bonus when shared."
+    },
+    {
+      "id": "item_melee_bat",
+      "name": "Aluminum Bat",
+      "size": [1, 4],
+      "weight_kg": 2.4,
+      "stack_max": 1,
+      "durability_max": 80,
+      "tags": ["weapon", "melee"],
+      "actions": ["equip", "drop", "repair"],
+      "description": "Reliable melee weapon with moderate knockback."
+    },
+    {
+      "id": "item_rifle_ak47",
+      "name": "AK-47",
+      "size": [2, 4],
+      "weight_kg": 3.5,
+      "stack_max": 1,
+      "durability_max": 100,
+      "attachments": ["optic", "magazine", "suppressor"],
+      "tags": ["weapon", "firearm", "loud"],
+      "actions": ["equip", "drop", "inspect"],
+      "description": "Rugged 7.62mm rifle with high noise signature."
+    },
+    {
+      "id": "item_ammo_762",
+      "name": "7.62mm Rounds",
+      "size": [1, 1],
+      "weight_kg": 0.02,
+      "stack_max": 60,
+      "durability_max": 100,
+      "tags": ["ammo"],
+      "actions": ["combine", "split", "drop"],
+      "description": "Standard rifle ammunition compatible with AK platform."
+    },
+    {
+      "id": "item_rucksack_food",
+      "name": "Food Rucksack",
+      "size": [2, 2],
+      "weight_kg": 12,
+      "stack_max": 1,
+      "durability_max": 100,
+      "tags": ["rucksack", "bulk"],
+      "actions": ["deposit", "drop"],
+      "description": "Bulk food haul for base stockpile; heavy when carried."
+    },
+    {
+      "id": "item_tool_kit",
+      "name": "Mechanic Tool Kit",
+      "size": [2, 2],
+      "weight_kg": 5,
+      "stack_max": 1,
+      "durability_max": 100,
+      "tags": ["tool", "repair"],
+      "actions": ["equip", "drop", "inspect"],
+      "description": "Required for vehicle repairs and crafting recipes."
+    },
+    {
+      "id": "item_generator_part",
+      "name": "Generator Part",
+      "size": [1, 2],
+      "weight_kg": 4,
+      "stack_max": 3,
+      "durability_max": 100,
+      "tags": ["component", "power"],
+      "actions": ["deposit", "drop"],
+      "description": "Spare parts needed for generator upkeep."
+    },
+    {
+      "id": "item_blueprint_turret",
+      "name": "Turret Blueprint",
+      "size": [1, 1],
+      "weight_kg": 0.1,
+      "stack_max": 1,
+      "durability_max": 1,
+      "tags": ["blueprint"],
+      "actions": ["research", "drop"],
+      "description": "Unlocks automated turret crafting at electronics bench."
+    },
+    {
+      "id": "item_medkit",
+      "name": "Field Medkit",
+      "size": [2, 2],
+      "weight_kg": 1.2,
+      "stack_max": 2,
+      "durability_max": 1,
+      "tags": ["medical", "consumable"],
+      "actions": ["consume", "drop"],
+      "description": "Heals significant injuries; best used out of combat."
+    },
+    {
+      "id": "item_fuel_can",
+      "name": "Fuel Can (20L)",
+      "size": [2, 3],
+      "weight_kg": 18,
+      "stack_max": 1,
+      "durability_max": 1,
+      "tags": ["fuel"],
+      "actions": ["refuel", "drop"],
+      "description": "Portable gasoline; refills vehicles and generators."
+    },
+    {
+      "id": "item_component_circuit",
+      "name": "Circuit Board",
+      "size": [1, 1],
+      "weight_kg": 0.2,
+      "stack_max": 10,
+      "durability_max": 100,
+      "tags": ["component", "electronics"],
+      "actions": ["deposit", "drop"],
+      "description": "Core ingredient for advanced crafting recipes."
+    },
+    {
+      "id": "item_cloth_scrap",
+      "name": "Cloth Scrap",
+      "size": [1, 1],
+      "weight_kg": 0.05,
+      "stack_max": 20,
+      "durability_max": 100,
+      "tags": ["material", "fabric"],
+      "actions": ["combine", "drop"],
+      "description": "Basic fabric harvested from clothing; used for bandages."
+    },
+    {
+      "id": "material_gunpowder",
+      "name": "Gunpowder",
+      "size": [1, 1],
+      "weight_kg": 0.05,
+      "stack_max": 30,
+      "durability_max": 100,
+      "tags": ["material", "explosive"],
+      "actions": ["combine", "drop"],
+      "description": "Propellant required for ammunition crafting."
+    },
+    {
+      "id": "material_brass",
+      "name": "Brass Casings",
+      "size": [1, 1],
+      "weight_kg": 0.1,
+      "stack_max": 30,
+      "durability_max": 100,
+      "tags": ["material", "metal"],
+      "actions": ["combine", "drop"],
+      "description": "Spent casings reworked into new ammunition shells."
+    },
+    {
+      "id": "material_lead",
+      "name": "Lead Ingots",
+      "size": [1, 1],
+      "weight_kg": 0.2,
+      "stack_max": 20,
+      "durability_max": 100,
+      "tags": ["material", "metal"],
+      "actions": ["combine", "drop"],
+      "description": "Raw lead smelted for bullet tips."
+    },
+    {
+      "id": "material_steel",
+      "name": "Steel Plates",
+      "size": [1, 2],
+      "weight_kg": 3,
+      "stack_max": 10,
+      "durability_max": 100,
+      "tags": ["material", "metal"],
+      "actions": ["combine", "drop"],
+      "description": "Structural component for advanced crafting."
+    },
+    {
+      "id": "material_wood",
+      "name": "Lumber Stack",
+      "size": [1, 2],
+      "weight_kg": 2,
+      "stack_max": 15,
+      "durability_max": 100,
+      "tags": ["material", "wood"],
+      "actions": ["combine", "drop"],
+      "description": "Base building material for T1 structures."
+    },
+    {
+      "id": "material_metal",
+      "name": "Metal Scrap",
+      "size": [1, 1],
+      "weight_kg": 1,
+      "stack_max": 20,
+      "durability_max": 100,
+      "tags": ["material", "metal"],
+      "actions": ["combine", "drop"],
+      "description": "General purpose scrap used in facility upgrades."
+    }
+  ]
+}
