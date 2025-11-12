@@ -10,3 +10,9 @@
 - Stubbed world generation, inventory overlay, zombie and vehicle directors to anchor future systems.
 - Established baseline HUD/inventory UI with modular styling.
 - Encountered npm registry 403 when installing dependencies from container; documented as environment limitation for CI planning.
+
+## 2024-05-10 – Research Consolidation & Data Pass
+- Completed mandated research summaries for all eleven core systems; linked documents under `docs/research/`.
+- Added data schema scaffolds (items, vehicles, zombies, etc.) and TypeScript loaders to prepare for data-driven systems.
+- Stubbed new simulation modules (FSM, cargo manifest, noise bus) and UI overlays to align with mega-spec deliverables.
+- ASSUMPTION: Initial data sets are representative samples rather than full 50+ item catalogs; expand alongside implementation sprints.
