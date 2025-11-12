@@ -5,6 +5,7 @@ import { Hud } from "../ui/Hud";
 import { InventoryController } from "../inventory/InventoryController";
 import { ZombieDirector } from "../ai/ZombieDirector";
 import { VehicleDirector } from "../vehicles/VehicleDirector";
+import { CraftingController } from "../crafting/CraftingController";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -21,6 +22,7 @@ export class Game {
   readonly inventory: InventoryController;
   readonly zombies: ZombieDirector;
   readonly vehicles: VehicleDirector;
+  readonly crafting: CraftingController;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -41,6 +43,7 @@ export class Game {
     this.hud = new Hud(this.player, this.inventory);
     this.zombies = new ZombieDirector();
     this.vehicles = new VehicleDirector();
+    this.crafting = new CraftingController(this.player.inventory, this.input);
 
     this.configureInput();
   }
@@ -76,6 +79,7 @@ export class Game {
     this.player.update(deltaTime, this.input, this.world);
     this.zombies.update(deltaTime, this.world, this.player);
     this.vehicles.update(deltaTime, this.world, this.player);
+    this.crafting.update(deltaTime);
     this.hud.update(deltaTime);
   }
 
