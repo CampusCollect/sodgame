@@ -5,6 +5,11 @@ import { Hud } from "../ui/Hud";
 import { InventoryController } from "../inventory/InventoryController";
 import { ZombieDirector } from "../ai/ZombieDirector";
 import { VehicleDirector } from "../vehicles/VehicleDirector";
+import { CraftingController } from "../crafting/CraftingController";
+import { BuildingController } from "../building/BuildingController";
+import { SurvivorController } from "../survivors/SurvivorController";
+import { FactionController } from "../factions/FactionController";
+import { WorldContainerManager } from "../loot/WorldContainerManager";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -21,6 +26,11 @@ export class Game {
   readonly inventory: InventoryController;
   readonly zombies: ZombieDirector;
   readonly vehicles: VehicleDirector;
+  readonly crafting: CraftingController;
+  readonly building: BuildingController;
+  readonly survivors: SurvivorController;
+  readonly factions: FactionController;
+  readonly containers: WorldContainerManager;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -41,6 +51,17 @@ export class Game {
     this.hud = new Hud(this.player, this.inventory);
     this.zombies = new ZombieDirector();
     this.vehicles = new VehicleDirector();
+    this.crafting = new CraftingController(this.player.inventory, this.input);
+    this.building = new BuildingController(this.player, this.input, options.canvas, {
+      width: options.width,
+      height: options.height
+    });
+    this.survivors = new SurvivorController(this.input);
+    this.factions = new FactionController(this.input);
+    this.containers = new WorldContainerManager(this.player, this.input, {
+      width: options.width,
+      height: options.height
+    });
 
     this.configureInput();
   }
@@ -76,12 +97,19 @@ export class Game {
     this.player.update(deltaTime, this.input, this.world);
     this.zombies.update(deltaTime, this.world, this.player);
     this.vehicles.update(deltaTime, this.world, this.player);
+    this.crafting.update(deltaTime);
+    this.building.update();
+    this.survivors.update(deltaTime);
+    this.factions.update(deltaTime);
+    this.containers.update(deltaTime);
     this.hud.update(deltaTime);
   }
 
   private draw(): void {
     this.ctx.clearRect(0, 0, this.options.width, this.options.height);
     this.world.draw(this.ctx, this.player.position);
+    this.building.draw(this.ctx, this.player.position);
+    this.containers.draw(this.ctx, this.player.position);
     this.vehicles.draw(this.ctx, this.player.position);
     this.player.draw(this.ctx, this.options.width, this.options.height);
     this.zombies.draw(this.ctx, this.player.position);

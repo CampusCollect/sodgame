@@ -1,0 +1,22 @@
+{
+  "convoys": [
+    {
+      "id": "convoy_military_tech",
+      "faction": "faction_military",
+      "route": ["poi_airbase", "poi_research_lab"],
+      "cargo": ["item_blueprint_turret", "item_component_circuit", "item_ammo_762"],
+      "guards": 6,
+      "escort_vehicles": 2,
+      "interval_hours": 8
+    },
+    {
+      "id": "convoy_union_supply",
+      "faction": "faction_union",
+      "route": ["poi_town_hall", "poi_farm_02"],
+      "cargo": ["item_canned_food", "item_bandage", "item_fuel_can"],
+      "guards": 3,
+      "escort_vehicles": 1,
+      "interval_hours": 12
+    }
+  ]
+}

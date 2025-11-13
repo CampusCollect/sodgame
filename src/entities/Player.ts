@@ -21,6 +21,7 @@ export class Player {
 
   position: Vector2;
   direction: Vector2 = { x: 0, y: 1 };
+  private movementIntensity = 0;
 
   constructor({ x, y }: PlayerOptions) {
     this.position = { x, y };
@@ -39,6 +40,8 @@ export class Player {
       velocity.y /= length;
       this.direction = { ...velocity };
     }
+
+    this.movementIntensity = length;
 
     const nextPosition = {
       x: this.position.x + velocity.x * PLAYER_SPEED * deltaTime,
@@ -60,5 +63,9 @@ export class Player {
     ctx.fillStyle = "#1f2937";
     ctx.fillRect(-4, -this.size / 2 - 6, 8, 6);
     ctx.restore();
+  }
+
+  getMovementIntensity(): number {
+    return this.movementIntensity;
   }
 }

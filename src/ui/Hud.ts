@@ -15,7 +15,8 @@ export class Hud {
     this.statusLine.className = "hud-status";
     this.tooltip = document.createElement("div");
     this.tooltip.className = "hud-tooltip";
-    this.tooltip.innerText = "Tab – Inventory | WASD – Move";
+    this.tooltip.innerText =
+      "WASD – Move | Tab – Inventory | C – Crafting | B – Building | J – Survivors | R – Raids | E – Interact";
 
     this.container.append(this.statusLine, this.tooltip);
     document.body.append(this.container);
