@@ -5,6 +5,8 @@ type InputEventName =
   | "toggle-survivors"
   | "toggle-raids"
   | "interact"
+  | "use-stealth-tool"
+  | "cycle-stealth-tool"
   | "mouse-move";
 
 type InputListener = () => void;
@@ -24,7 +26,11 @@ const KEY_BINDINGS: Record<string, InputEventName> = {
   r: "toggle-raids",
   R: "toggle-raids",
   e: "interact",
-  E: "interact"
+  E: "interact",
+  x: "use-stealth-tool",
+  X: "use-stealth-tool",
+  z: "cycle-stealth-tool",
+  Z: "cycle-stealth-tool"
 };
 
 export class InputManager {

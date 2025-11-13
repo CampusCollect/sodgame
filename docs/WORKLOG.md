@@ -1,5 +1,11 @@
 # WORKLOG
 
+# 2024-05-17 – Stealth Controller, Noise HUD, and Tools
+- Moved the shared noise propagation layer into the stealth module, layered on visibility + alarm controllers, and exposed the bus to zombies so every system reacts to the same events.
+- Added sprint/crouch stances, distraction tools (cycle with **Z**, deploy with **X**), and DOM HUD widgets (noise meter + light indicator) so QA can validate stealth feedback loops without debug overlays.
+- Documented the new bindings, smoke tests, data files, and updated risks (alarms don’t yet drive reinforcements) across README/architecture/testing/limitations.
+- ASSUMPTION: Alarm triggers currently surface UI state only—faction AI responses will hook in during the combat milestone.
+
 # 2024-05-16 – Loot Containers & Generator
 - Implemented `LootGenerator` + `WorldContainerManager` so weighted drops populate world crates, surface through the transparent HUD, and support **E/Loot All** transfers with respawn timers.
 - Extended the HUD tooltip, transparent container UI, and styles with action buttons + hints so QA can see contextual controls without console hacks.

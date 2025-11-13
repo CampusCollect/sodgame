@@ -2,7 +2,7 @@ import { InputManager } from "../engine/Input";
 import { World } from "../worldgen/World";
 import { Inventory } from "../inventory/Inventory";
 
-const PLAYER_SPEED = 160; // units per second
+const BASE_SPEED = 150; // units per second
 
 export interface Vector2 {
   x: number;
@@ -22,6 +22,8 @@ export class Player {
   position: Vector2;
   direction: Vector2 = { x: 0, y: 1 };
   private movementIntensity = 0;
+  private crouching = false;
+  private sprinting = false;
 
   constructor({ x, y }: PlayerOptions) {
     this.position = { x, y };
@@ -34,6 +36,11 @@ export class Player {
     if (input.isKeyPressed("a")) velocity.x -= 1;
     if (input.isKeyPressed("d")) velocity.x += 1;
 
+    this.crouching = input.isKeyPressed("control");
+    this.sprinting = !this.crouching && input.isKeyPressed("shift");
+    const speedMultiplier = this.crouching ? 0.5 : this.sprinting ? 1.35 : 1;
+    const moveSpeed = BASE_SPEED * speedMultiplier;
+
     const length = Math.hypot(velocity.x, velocity.y);
     if (length > 0) {
       velocity.x /= length;
@@ -41,11 +48,11 @@ export class Player {
       this.direction = { ...velocity };
     }
 
-    this.movementIntensity = length;
+    this.movementIntensity = length * speedMultiplier;
 
     const nextPosition = {
-      x: this.position.x + velocity.x * PLAYER_SPEED * deltaTime,
-      y: this.position.y + velocity.y * PLAYER_SPEED * deltaTime
+      x: this.position.x + velocity.x * moveSpeed * deltaTime,
+      y: this.position.y + velocity.y * moveSpeed * deltaTime
     };
 
     this.position = world.constrainToWorld(nextPosition, this.size);
@@ -67,5 +74,11 @@ export class Player {
 
   getMovementIntensity(): number {
     return this.movementIntensity;
+  }
+
+  getStance(): "crouch" | "walk" | "sprint" {
+    if (this.crouching) return "crouch";
+    if (this.sprinting) return "sprint";
+    return "walk";
   }
 }

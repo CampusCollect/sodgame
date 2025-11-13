@@ -25,3 +25,9 @@
 ## Assumptions
 - Raycast-based light checks will use simplified 2D line sweeps for now; full shadow maps can wait.
 - Alarm reinforcements spawn via abstracted event system until faction AI is online.
+
+## Implementation Notes
+- `NoiseBus` now powers both the zombie director and stealth HUD. Movement stances emit different classes to match MGSV/Far Cry expectations.
+- Visibility currently factors ambient day/night curves, stance, movement intensity, and live noise level; occlusion/cover to follow once tile metadata lands.
+- Alarm controller raises temporary warnings when noise spikes above 75/100 and logs future hooks for faction reinforcements.
+- Stealth tools are data-driven (`data/stealth_tools.json`) with cooldowns/duration overrides; **Z/X** bindings mirror Splinter Cell quick gadgets.

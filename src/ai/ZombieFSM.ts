@@ -1,4 +1,4 @@
-import type { NoiseEvent } from "./NoisePropagation";
+import type { NoiseEvent } from "../stealth/NoiseBus";
 import type { Vector2 } from "../entities/Player";
 import type { ZombieTypeDefinition } from "../data/ContentRegistry";
 

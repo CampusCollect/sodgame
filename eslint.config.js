@@ -11,6 +11,7 @@ const browserGlobals = {
   HTMLCanvasElement: "readonly",
   CanvasRenderingContext2D: "readonly",
   HTMLDivElement: "readonly",
+  HTMLSpanElement: "readonly",
   HTMLHeadingElement: "readonly",
   HTMLSelectElement: "readonly",
   HTMLParagraphElement: "readonly",

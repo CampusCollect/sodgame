@@ -12,6 +12,7 @@
 | Survivor jobs not yet linked to facility throughput | Medium | Medium | Track assignments in controller, surface in UI | Apply production modifiers once facilities exist |
 | Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
 | Loot containers spawn at fixed demo spots and share one respawn timer | Low | Medium | Document locations + timers; hook into loot generator | Tie spawns to world chunks, add lockpicking + alarms |
+| Alarm controller does not yet drive faction reinforcements | Medium | Medium | Trigger placeholder alarms off extreme noise | Wire alarms into faction AI + POI state machines |
 
 ## Known Gaps
 - Mega-spec mechanics (crafting, advanced AI, factions, etc.) are not yet ported – this milestone focuses on architecture reset.
@@ -25,5 +26,6 @@
 - Survivor morale events are manual triggers only for now; tie them to gameplay events (sieges, loot runs, deaths) during combat/AI integration.
 - Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
 - Loot containers only exist in the starter biome for now and auto-open when in range; lockpicking, search times, and faction ownership modifiers remain TODO.
+- Alarm HUD + stealth tools exist, but reinforcements, power cuts, and POI ownership changes are deferred for the faction combat milestone.
 
 Each milestone must update this register with fresh risks and mitigation status.

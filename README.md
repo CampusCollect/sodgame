@@ -11,7 +11,7 @@ npm run dev
 
 > **Note:** The execution environment used for this milestone cannot reach the public npm registry (403). The repository already vendors a populated `node_modules` folder so `npm run dev`/`npm run build` continue to work; mirror the packages internally if you need a clean install.
 
-The development server will auto-open the canvas demo. Use **WASD** to move, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, **B** for the base building planner, **J** to open the survivor roster and job board, **R** to launch the raid/convoy planner, and **E** to interact with nearby loot containers.
+The development server will auto-open the canvas demo. Use **WASD** to move, **Shift** to sprint, **Ctrl** to crouch, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, **B** for the base building planner, **J** to open the survivor roster and job board, **R** to launch the raid/convoy planner, **Z/X** to cycle/use stealth tools, and **E** to interact with nearby loot containers.
 
 ## Tech Stack
 
@@ -28,6 +28,7 @@ The development server will auto-open the canvas demo. Use **WASD** to move, **T
 - Survivor management pass with morale tracking, relationship adjustments, and a job assignment board surfaced through the new **J** panel.
 - Faction reputation + convoy raid planner (**R**) that surfaces intel windows, allows ambush simulations, and logs the resulting loot/reputation swings.
 - Looted world containers seeded around the starting area that use the transparent HUD, **E**-key interaction, and the new loot generator to stream weighted drops with respawn timers.
+- Stealth controller with a shared noise bus, ambient light/detection model, alarm scaffolding, and HUD widgets (noise meter + light badge) plus distraction tools mapped to **Z/X**.
 
 ## Next Steps
 

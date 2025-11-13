@@ -18,5 +18,6 @@
 - `LootGenerator` + `WorldContainerManager` – rolls JSON loot tables into world containers, shows transparent HUD overlays, and manages respawn timers plus **E**-key loot actions.
 - `SurvivorManager` + `SurvivorController` + `SurvivorPanel` – maintains roster morale/relationships, job assignments, and exposes them via an accessible DOM dialog (`J`).
 - `FactionManager` + `ConvoyScheduler` + `RaidPlanner` + `RaidPlanningUI` – tracks reputation per faction, runs ticking convoy schedules, and drives the raid/convoy planner overlay triggered with `R`.
+- `StealthController` + `NoiseBus` + `VisibilitySystem` – aggregates noise events for all systems, computes ambient light/visibility, feeds HUD meters, and surfaces alarm states plus distraction tools bound to `Z/X`.
 
 Each system now consumes shared data definitions, enabling iteration on balance via JSON instead of code edits. Subsequent milestones will replace stubs with full mechanics while respecting the same module boundaries.

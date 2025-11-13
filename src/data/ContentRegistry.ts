@@ -17,6 +17,7 @@ import progressionData from "../../data/progression_curve.json";
 import skillsData from "../../data/skills.json";
 import traitsData from "../../data/traits.json";
 import survivorsData from "../../data/survivors.json";
+import stealthToolsData from "../../data/stealth_tools.json";
 
 export interface ItemDefinition {
   id: string;
@@ -103,6 +104,16 @@ export interface NoiseClassDefinition {
   range_m: number;
   intensity: number;
   duration_s: number;
+}
+
+export interface StealthToolDefinition {
+  id: string;
+  name: string;
+  description: string;
+  noise_class: string;
+  range_m: number;
+  cooldown_s: number;
+  duration_override_s?: number;
 }
 
 export interface LootItemRoll {
@@ -249,6 +260,7 @@ export interface ContentSnapshot {
   trailers: TrailerDefinition[];
   zombie_types: ZombieTypeDefinition[];
   noise_classes: NoiseClassDefinition[];
+  stealth_tools: StealthToolDefinition[];
   loot_tables: LootTableDefinition[];
   traders: TraderDefinition[];
   barter_values: Record<string, number>;
@@ -274,6 +286,7 @@ export class ContentRegistry {
       trailers: trailersData.trailers,
       zombie_types: zombieTypesData.zombie_types,
       noise_classes: noiseClassesData.noise_classes,
+      stealth_tools: stealthToolsData.stealth_tools,
       loot_tables: lootTablesData.loot_tables,
       traders: tradersData.traders,
       barter_values: tradersData.barter_values,

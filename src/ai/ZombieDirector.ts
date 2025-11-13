@@ -3,28 +3,23 @@ import type { World } from "../worldgen/World";
 import type { Vector2 } from "../entities/Player";
 import { content } from "../data";
 import { ZombieFSM, type ZombieInstance } from "./ZombieFSM";
-import { NoisePropagation } from "./NoisePropagation";
+import { NoiseBus } from "../stealth/NoiseBus";
 import { HordeController } from "./HordeController";
-
-const PLAYER_FOOTSTEP_CLASS = "noise_footstep_walk";
 
 type ZombieStateId = ZombieInstance["state"] extends { state: infer S } ? S : never;
 
 export class ZombieDirector {
   private readonly fsm = new ZombieFSM(content.zombie_types, 18);
-  private readonly noise = new NoisePropagation(content.noise_classes);
+  private readonly noise: NoiseBus;
   private readonly hordes = new HordeController();
 
-  constructor() {
+  constructor(noise?: NoiseBus) {
+    this.noise = noise ?? new NoiseBus(content.noise_classes);
     const zombies = this.fsm.activeZombies;
     this.hordes.registerHorde({ id: "starter", members: [...zombies], state: "wandering", target: null });
   }
 
   update(deltaTime: number, _world: World, player: Player): void {
-    if (player.getMovementIntensity() > 0.2) {
-      this.noise.emit(PLAYER_FOOTSTEP_CLASS, { ...player.position });
-    }
-    this.noise.update(deltaTime);
     this.fsm.update(deltaTime, player.position, this.noise.getActiveEvents());
     this.hordes.update(deltaTime, player.position);
   }
