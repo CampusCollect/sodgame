@@ -6,6 +6,8 @@ import { InventoryController } from "../inventory/InventoryController";
 import { ZombieDirector } from "../ai/ZombieDirector";
 import { VehicleDirector } from "../vehicles/VehicleDirector";
 import { CraftingController } from "../crafting/CraftingController";
+import { BuildingController } from "../building/BuildingController";
+import { SurvivorController } from "../survivors/SurvivorController";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -23,6 +25,8 @@ export class Game {
   readonly zombies: ZombieDirector;
   readonly vehicles: VehicleDirector;
   readonly crafting: CraftingController;
+  readonly building: BuildingController;
+  readonly survivors: SurvivorController;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -44,6 +48,11 @@ export class Game {
     this.zombies = new ZombieDirector();
     this.vehicles = new VehicleDirector();
     this.crafting = new CraftingController(this.player.inventory, this.input);
+    this.building = new BuildingController(this.player, this.input, options.canvas, {
+      width: options.width,
+      height: options.height
+    });
+    this.survivors = new SurvivorController(this.input);
 
     this.configureInput();
   }
@@ -80,12 +89,15 @@ export class Game {
     this.zombies.update(deltaTime, this.world, this.player);
     this.vehicles.update(deltaTime, this.world, this.player);
     this.crafting.update(deltaTime);
+    this.building.update();
+    this.survivors.update(deltaTime);
     this.hud.update(deltaTime);
   }
 
   private draw(): void {
     this.ctx.clearRect(0, 0, this.options.width, this.options.height);
     this.world.draw(this.ctx, this.player.position);
+    this.building.draw(this.ctx, this.player.position);
     this.vehicles.draw(this.ctx, this.player.position);
     this.player.draw(this.ctx, this.options.width, this.options.height);
     this.zombies.draw(this.ctx, this.player.position);

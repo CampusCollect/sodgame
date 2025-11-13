@@ -14,6 +14,9 @@ import structuresData from "../../data/structures.json";
 import facilitiesData from "../../data/facilities.json";
 import upgradesData from "../../data/upgrades.json";
 import progressionData from "../../data/progression_curve.json";
+import skillsData from "../../data/skills.json";
+import traitsData from "../../data/traits.json";
+import survivorsData from "../../data/survivors.json";
 
 export interface ItemDefinition {
   id: string;
@@ -151,6 +154,7 @@ export interface StructureDefinition {
   tier: number;
   hp?: number;
   power_required_kw?: number;
+  power_output_kw?: number;
 }
 
 export interface FacilityTierDefinition {
@@ -198,6 +202,38 @@ export interface SeasonalEventDefinition {
   duration_days: number;
 }
 
+export interface SkillDefinition {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface TraitDefinition {
+  id: string;
+  name: string;
+  category: "positive" | "negative" | "neutral";
+  description: string;
+}
+
+export interface SurvivorTemplate {
+  id: string;
+  name: string;
+  skills: Record<string, number>;
+  traits: string[];
+  background: string;
+}
+
+export interface SurvivorJobDefinition {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface SurvivorContentDefinition {
+  starting_roster: SurvivorTemplate[];
+  job_catalog: SurvivorJobDefinition[];
+}
+
 export interface ProgressionDefinition {
   rings: ProgressionRingDefinition[];
   base_heat: BaseHeatDefinition;
@@ -222,6 +258,9 @@ export interface ContentSnapshot {
   facilities: FacilityDefinition[];
   upgrades: UpgradeDefinition[];
   progression: ProgressionDefinition;
+  skills: SkillDefinition[];
+  traits: TraitDefinition[];
+  survivors: SurvivorContentDefinition;
 }
 
 export class ContentRegistry {
@@ -243,7 +282,10 @@ export class ContentRegistry {
       structures: structuresData.structures,
       facilities: facilitiesData.facilities,
       upgrades: upgradesData.upgrades,
-      progression: progressionData
+      progression: progressionData,
+      skills: skillsData.skills,
+      traits: traitsData.traits,
+      survivors: survivorsData
     };
   }
 }

@@ -1,5 +1,26 @@
 # WORKLOG
 
+# 2024-05-14 – Survivor Roster, Morale, and Jobs
+- Introduced a survivor controller (`J` shortcut) that surfaces the roster, morale trends, and quick morale events for QA.
+- Implemented morale decay/events, relationship deltas, and job assignments wired through the JSON survivor catalog.
+- Added data sets for skills, traits, and starting survivors so subsequent systems can reason about community composition.
+- ASSUMPTION: Job assignments currently track intent only; facility production modifiers will hook in during the facility sprint.
+
+# 2024-05-13 – Base Building Planner & Power Pass
+- Introduced a base building controller (`B` shortcut) with collision-aware placement previews, live power accounting, and
+inventory-backed material consumption.
+- Added a diesel generator and powered gate definitions to the data set, wiring power output/consumption into the placement
+flow.
+- Surfaced placement feedback in-canvas (ghost outlines) and within the planner UI so testers can see readiness, material gaps,
+and power deficits in real time.
+- ASSUMPTION: Construction time is abstracted for this milestone; structures place instantly and job assignments will hook in
+later.
+
+## 2024-05-12 – Crafting Queue + Planner
+- Introduced a JSON-driven crafting controller with recipe book, skill checks, and per-station queues feeding back into the player inventory.
+- Added a DOM crafting planner (key `C`) that surfaces recipe requirements, blueprint locks, and queue progress with inline error feedback.
+- Extended the inventory core with quantity checks/consumption hooks to support crafting inputs without duplicating grid logic.
+
 ## 2024-05-11 – Inventory Grid Upgrade
 - Replaced the placeholder slot list with a grid-aware inventory model that respects item sizes, rotation, and weight caps.
 - Implemented shared rendering helpers so player and transparent container HUDs now visualize multi-cell items accurately.
