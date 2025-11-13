@@ -1,5 +1,11 @@
 # WORKLOG
 
+# 2024-05-15 – Faction Reputation & Convoy Planner
+- Added a data-backed faction manager plus convoy scheduler that ticks in real time, revealing intel windows and handling ambush cooldowns.
+- Wired a new raid planner overlay (`R`) that exposes faction standings, convoy cargo/ETA, and lets QA trigger simulated ambushes with log output.
+- Documented keybindings + architecture updates and noted that combat resolution remains simulated (loot + reputation deltas only).
+- ASSUMPTION: Convoy ambushes resolve abstractly for now—future passes will instantiate world encounters and vehicle combat.
+
 # 2024-05-14 – Survivor Roster, Morale, and Jobs
 - Introduced a survivor controller (`J` shortcut) that surfaces the roster, morale trends, and quick morale events for QA.
 - Implemented morale decay/events, relationship deltas, and job assignments wired through the JSON survivor catalog.

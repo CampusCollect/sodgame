@@ -15,5 +15,6 @@
 7. Inspect the bottom-left transparent HUDs by calling `window.game.inventory.toggle()` and `window.game.player.inventory.getRenderState()` from the console to ensure container overlays reuse the same grid rendering logic.
 8. Verify trailers spawn attached to the semi in the world and the transparent cargo HUD can be invoked via `new TransparentCargoHUD('Demo').showForTrailer(...)` in console for debugging.
 9. Press **J** to open the survivor roster. Change Mateos's assignment to Mechanic, trigger the "Mission Success" morale button, and confirm morale/relationship numbers update while the roster list reflects the new job label. Close the panel with the × button or **J** again.
+10. Hit **R** to open the raid planner. Observe faction standings, wait ~30 seconds for a convoy intel window, then click **Ambush** – the status banner should confirm success, reputation drops for that faction, and the intel feed log captures the loot summary.
 
 Future QA scenarios from the mega-spec will be added as systems come online.

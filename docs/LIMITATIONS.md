@@ -10,6 +10,7 @@
 | Vehicle physics & AI not implemented | High | High | Stub hitch/cargo systems, document expectations | Implement driving, noise, maintenance loops |
 | Save/load, networking, and persistence missing | High | High | Flagged as future milestone | Design serialization + migration plan |
 | Survivor jobs not yet linked to facility throughput | Medium | Medium | Track assignments in controller, surface in UI | Apply production modifiers once facilities exist |
+| Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
 
 ## Known Gaps
 - Mega-spec mechanics (crafting, advanced AI, factions, etc.) are not yet ported – this milestone focuses on architecture reset.
@@ -21,5 +22,6 @@
 - Crafting output currently fails silently into the void when inventories are full; hook up ground drops or station storage in the next sprint.
 - Base building placements are instantaneous; survivor construction jobs, build timers, and structural integrity checks are deferred.
 - Survivor morale events are manual triggers only for now; tie them to gameplay events (sieges, loot runs, deaths) during combat/AI integration.
+- Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
 
 Each milestone must update this register with fresh risks and mitigation status.

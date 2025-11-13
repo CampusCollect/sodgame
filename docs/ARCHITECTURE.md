@@ -16,5 +16,6 @@
 - `VehicleDirector` – instantiates vehicles/trailers from data definitions with hitch + cargo manifest scaffolds.
 - `TransparentCargoHUD` & `MaintenanceUI` – UI overlays for trailer cargo manifests and vehicle condition readouts.
 - `SurvivorManager` + `SurvivorController` + `SurvivorPanel` – maintains roster morale/relationships, job assignments, and exposes them via an accessible DOM dialog (`J`).
+- `FactionManager` + `ConvoyScheduler` + `RaidPlanner` + `RaidPlanningUI` – tracks reputation per faction, runs ticking convoy schedules, and drives the raid/convoy planner overlay triggered with `R`.
 
 Each system now consumes shared data definitions, enabling iteration on balance via JSON instead of code edits. Subsequent milestones will replace stubs with full mechanics while respecting the same module boundaries.

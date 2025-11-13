@@ -702,3 +702,165 @@ select {
     max-height: 200px;
   }
 }
+/* Raid planner panel */
+.raid-panel {
+  position: fixed;
+  top: 72px;
+  right: 24px;
+  width: 460px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  background: rgba(8, 12, 20, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  color: #f8fafc;
+  z-index: 40;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.raid-panel__title {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+}
+
+.raid-panel__status {
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  color: #cbd5f5;
+}
+
+.raid-panel__status--error {
+  color: #feb2b2;
+}
+
+.raid-panel__columns {
+  display: flex;
+  gap: 12px;
+}
+
+.raid-panel__column {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.raid-panel__column h3 {
+  margin-top: 0;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #a0aec0;
+}
+
+.raid-panel__faction {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.raid-panel__faction:last-child {
+  border-bottom: none;
+}
+
+.raid-panel__convoys {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.raid-panel__convoy {
+  border-radius: 12px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.raid-panel__convoy header {
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.raid-panel__convoy-meta,
+.raid-panel__convoy-status {
+  font-size: 0.8rem;
+  color: #cbd5f5;
+}
+
+.raid-panel__convoy-button {
+  align-self: flex-end;
+  background: #e53e3e;
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.raid-panel__convoy-button:disabled {
+  background: rgba(255, 255, 255, 0.12);
+  cursor: not-allowed;
+}
+
+.raid-panel__convoy-button:not(:disabled):hover,
+.raid-panel__convoy-button:not(:disabled):focus-visible {
+  background: #c53030;
+}
+
+.raid-panel__convoy--intel {
+  border-color: #f6ad55;
+}
+
+.raid-panel__convoy--enroute {
+  border-color: #63b3ed;
+}
+
+.raid-panel__convoy--cooldown {
+  border-color: #718096;
+}
+
+.raid-panel__log {
+  margin-top: 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.raid-panel__log h3 {
+  margin-top: 0;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: #a0aec0;
+}
+
+.raid-panel__log ul {
+  list-style: disc;
+  padding-left: 18px;
+  margin: 0;
+  color: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  .raid-panel {
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+
+  .raid-panel__columns {
+    flex-direction: column;
+  }
+}

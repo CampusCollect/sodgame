@@ -8,6 +8,7 @@ import { VehicleDirector } from "../vehicles/VehicleDirector";
 import { CraftingController } from "../crafting/CraftingController";
 import { BuildingController } from "../building/BuildingController";
 import { SurvivorController } from "../survivors/SurvivorController";
+import { FactionController } from "../factions/FactionController";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -27,6 +28,7 @@ export class Game {
   readonly crafting: CraftingController;
   readonly building: BuildingController;
   readonly survivors: SurvivorController;
+  readonly factions: FactionController;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -53,6 +55,7 @@ export class Game {
       height: options.height
     });
     this.survivors = new SurvivorController(this.input);
+    this.factions = new FactionController(this.input);
 
     this.configureInput();
   }
@@ -91,6 +94,7 @@ export class Game {
     this.crafting.update(deltaTime);
     this.building.update();
     this.survivors.update(deltaTime);
+    this.factions.update(deltaTime);
     this.hud.update(deltaTime);
   }
 
