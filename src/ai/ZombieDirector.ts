@@ -86,4 +86,40 @@ export class ZombieDirector {
   applyDifficulty(targetCount: number, mix: Record<string, number>): void {
     this.fsm.applySpawnPlan(targetCount, mix);
   }
+
+  private getColorForState(state: ZombieStateId): string {
+    switch (state) {
+      case "idle":
+        return "#f97316";
+      case "investigating":
+      case "frantic":
+        return "#facc15";
+      case "aggro":
+      case "aggro-search":
+        return "#ef4444";
+      case "feeding":
+        return "#22d3ee";
+      default:
+        return "#f97316";
+    }
+  }
+
+  private getGlyph(state: ZombieStateId): string {
+    switch (state) {
+      case "idle":
+        return "·";
+      case "investigating":
+        return "?";
+      case "frantic":
+        return "!";
+      case "aggro":
+        return "⚠";
+      case "aggro-search":
+        return "✦";
+      case "feeding":
+        return "✚";
+      default:
+        return "·";
+    }
+  }
 }
