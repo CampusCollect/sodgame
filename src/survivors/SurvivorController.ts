@@ -1,5 +1,5 @@
 import type { InputManager } from "../engine/Input";
-import { SurvivorManager } from "./SurvivorManager";
+import { SurvivorManager, type SurvivorSummary } from "./SurvivorManager";
 import { SurvivorPanel } from "../ui/SurvivorPanel";
 import type { MoraleEventType } from "./MoraleSystem";
 
@@ -72,5 +72,24 @@ export class SurvivorController {
         });
     }
     this.syncPanel();
+  }
+
+  getRosterSnapshot(): SurvivorSummary[] {
+    return this.manager.getRoster();
+  }
+
+  getCommunityPowerScore(): number {
+    const roster = this.manager.getRoster();
+    if (!roster.length) {
+      return 0;
+    }
+    const skillTotals = roster.map(survivor =>
+      Object.values(survivor.skills).reduce((sum, skill) => sum + skill.level, 0)
+    );
+    const averageSkill = skillTotals.reduce((a, b) => a + b, 0) / roster.length;
+    const moraleAverage = roster.reduce((sum, survivor) => sum + survivor.morale, 0) / roster.length;
+    const jobAssignments = roster.filter(survivor => survivor.job).length;
+    const score = averageSkill + moraleAverage / 20 + jobAssignments;
+    return Number(score.toFixed(2));
   }
 }

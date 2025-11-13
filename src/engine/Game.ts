@@ -11,6 +11,7 @@ import { SurvivorController } from "../survivors/SurvivorController";
 import { FactionController } from "../factions/FactionController";
 import { WorldContainerManager } from "../loot/WorldContainerManager";
 import { StealthController } from "../stealth/StealthController";
+import { ProgressionController } from "../progression/ProgressionController";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -33,6 +34,7 @@ export class Game {
   readonly survivors: SurvivorController;
   readonly factions: FactionController;
   readonly containers: WorldContainerManager;
+  readonly progression: ProgressionController;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -65,6 +67,7 @@ export class Game {
       width: options.width,
       height: options.height
     });
+    this.progression = new ProgressionController(this.player, this.building, this.survivors, this.zombies);
 
     this.configureInput();
   }
@@ -106,7 +109,8 @@ export class Game {
     this.survivors.update(deltaTime);
     this.factions.update(deltaTime);
     this.containers.update(deltaTime);
-    this.hud.update(deltaTime);
+    const progressionSummary = this.progression.update(deltaTime);
+    this.hud.update(deltaTime, progressionSummary);
   }
 
   private draw(): void {

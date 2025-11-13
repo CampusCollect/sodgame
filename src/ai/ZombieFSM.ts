@@ -19,21 +19,36 @@ export interface ZombieInstance {
 
 export class ZombieFSM {
   private readonly zombies: ZombieInstance[] = [];
+  private readonly definitions = new Map<string, ZombieTypeDefinition>();
+  private readonly defaultWeights: Record<string, number> = {};
 
   constructor(zombieTypes: ZombieTypeDefinition[], initialCount = 24) {
+    zombieTypes.forEach(type => {
+      this.definitions.set(type.id, type);
+      this.defaultWeights[type.id] = type.spawn_weight ?? 1;
+    });
+    const distribution = this.buildDistribution(this.defaultWeights);
     for (let i = 0; i < initialCount; i += 1) {
-      const type = zombieTypes[Math.floor(Math.random() * zombieTypes.length)];
-      this.zombies.push({
-        id: `z_${i}`,
-        type,
-        position: { x: Math.random() * 600 - 300, y: Math.random() * 600 - 300 },
-        state: { state: "idle", timer: 0 }
-      });
+      this.zombies.push(this.spawnZombie(distribution));
     }
   }
 
   get activeZombies(): readonly ZombieInstance[] {
     return this.zombies;
+  }
+
+  applySpawnPlan(targetCount: number, weights: Record<string, number>): void {
+    const distribution = this.buildDistribution(Object.keys(weights).length ? weights : this.defaultWeights);
+    const clampedTarget = Math.max(6, Math.min(150, targetCount));
+    while (this.zombies.length < clampedTarget) {
+      this.zombies.push(this.spawnZombie(distribution));
+    }
+    while (this.zombies.length > clampedTarget) {
+      this.zombies.pop();
+    }
+    this.zombies.forEach(zombie => {
+      zombie.type = this.pickType(distribution);
+    });
   }
 
   update(delta: number, playerPosition: Vector2, noises: NoiseEvent[]): void {
@@ -102,4 +117,48 @@ export class ZombieFSM {
       y: zombie.position.y + (dy / distance) * speed * delta
     };
   }
+
+  private spawnZombie(distribution: WeightedType[]): ZombieInstance {
+    const type = this.pickType(distribution);
+    return {
+      id: `z_${Math.random().toString(36).slice(2, 7)}`,
+      type,
+      position: randomSpawnPosition(),
+      state: { state: "idle", timer: 0 }
+    };
+  }
+
+  private buildDistribution(weights: Record<string, number>): WeightedType[] {
+    const entries = Object.entries(weights).filter(([id, weight]) => this.definitions.has(id) && weight > 0);
+    if (!entries.length) {
+      return this.buildDistribution(this.defaultWeights);
+    }
+    const totalWeight = entries.reduce((total, [, weight]) => total + weight, 0);
+    let cumulative = 0;
+    return entries.map(([id, weight]) => {
+      cumulative += weight / totalWeight;
+      return { cumulative, definition: this.definitions.get(id)! };
+    });
+  }
+
+  private pickType(distribution: WeightedType[]): ZombieTypeDefinition {
+    if (!distribution.length) {
+      const fallback = this.definitions.values().next().value;
+      if (!fallback) {
+        throw new Error("Zombie definitions missing");
+      }
+      return fallback;
+    }
+    const roll = Math.random();
+    return distribution.find(entry => roll <= entry.cumulative)?.definition ?? distribution[distribution.length - 1].definition;
+  }
+}
+
+interface WeightedType {
+  cumulative: number;
+  definition: ZombieTypeDefinition;
+}
+
+function randomSpawnPosition(): Vector2 {
+  return { x: Math.random() * 1200 - 600, y: Math.random() * 1200 - 600 };
 }

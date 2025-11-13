@@ -1,5 +1,11 @@
 # WORKLOG
 
+# 2024-05-19 – Progression, Base Heat, and Seasons
+- Implemented `ProgressionController` with difficulty scaler, base heat tracker, and season manager so distance + community stats retune zombie counts, update HUD meta text, and show a dedicated progression card.
+- Hooked the new controller into the engine loop plus zombies/HUD, added survivor/base metrics needed for the calculations, and layered in CSS for the always-on progression card.
+- Documented the heuristics (backpack weight ≈ loot value, structure HP ≈ defense) along with testing steps, risks, and future integration notes.
+- ASSUMPTION: 10 real-time minutes map to one in-game day for seasonal rotation until the proper time/weather system lands.
+
 # 2024-05-18 – Vehicle Driving & Cargo HUD
 - Expanded `VehicleDirector` so the player can enter/exit demo vehicles with **E**, drive them with simplified acceleration/turning, and receive contextual hints via a DOM badge.
 - Wired the transparent cargo HUD (**V**) into the new `CargoManifest` grid renderer so the semi trailer surfaces stored vehicles/crates with live kg totals.

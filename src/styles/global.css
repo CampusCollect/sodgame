@@ -995,3 +995,43 @@ select {
   white-space: nowrap;
   font-weight: 500;
 }
+.hud-meta {
+  font-size: 13px;
+  color: rgba(226, 232, 240, 0.85);
+  margin-top: 2px;
+}
+
+.progression-panel {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #f8fafc;
+  padding: 12px 16px;
+  border-radius: 12px;
+  min-width: 220px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.progression-panel__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+  gap: 16px;
+}
+
+.progression-panel__effects {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.progression-panel__warning {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #fbbf24;
+}

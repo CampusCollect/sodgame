@@ -13,6 +13,7 @@
 | Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
 | Loot containers spawn at fixed demo spots and share one respawn timer | Low | Medium | Document locations + timers; hook into loot generator | Tie spawns to world chunks, add lockpicking + alarms |
 | Alarm controller does not yet drive faction reinforcements | Medium | Medium | Trigger placeholder alarms off extreme noise | Wire alarms into faction AI + POI state machines |
+| Progression/heat scoring uses heuristic proxies (inventory weight + structure HP) | Medium | Medium | Surface assumptions in HUD + docs | Replace with true loot value, facility power, and survivor-driven sieges |
 
 ## Known Gaps
 - Mega-spec mechanics (crafting, advanced AI, factions, etc.) are not yet ported – this milestone focuses on architecture reset.
@@ -28,5 +29,6 @@
 - Loot containers only exist in the starter biome for now and auto-open when in range; lockpicking, search times, and faction ownership modifiers remain TODO.
 - Alarm HUD + stealth tools exist, but reinforcements, power cuts, and POI ownership changes are deferred for the faction combat milestone.
 - Vehicle handling ignores collisions, damage, and trailer detach workflows for now; player can only drive the demo rigs.
+- Base heat currently treats backpack weight as "loot value" and structure HP as "defense"; hook into real storage/facility stats once those systems exist.
 
 Each milestone must update this register with fresh risks and mitigation status.

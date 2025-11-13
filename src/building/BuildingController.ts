@@ -1,7 +1,7 @@
 import type { Player } from "../entities/Player";
 import type { InputManager } from "../engine/Input";
 import { TILE_SIZE } from "../worldgen/Chunk";
-import { BuildingManager } from "./BuildingManager";
+import { BuildingManager, type PlacedStructure } from "./BuildingManager";
 
 interface GhostState {
   tile: { x: number; y: number } | null;
@@ -264,5 +264,23 @@ export class BuildingController {
           : "Placement blocked"
         : "Missing materials"
       : "Select a structure to begin";
+  }
+
+  getPlacedStructures(): PlacedStructure[] {
+    return this.manager.getPlaced();
+  }
+
+  getDefenseScore(): number {
+    const placed = this.manager.getPlaced();
+    if (!placed.length) {
+      return 0;
+    }
+    const score = placed.reduce((total, structure) => {
+      const hp = structure.definition.hp ?? structure.definition.tier * 100;
+      const defensive = /wall|gate|tower|fence|turret/i.test(structure.definition.id);
+      const weighting = defensive ? 1 : 0.35;
+      return total + hp * weighting;
+    }, 0);
+    return Number(score.toFixed(1));
   }
 }
