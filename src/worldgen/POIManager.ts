@@ -110,7 +110,7 @@ export class POIManager {
       return !(bounds.x2 <= other.x1 || bounds.x1 >= other.x2 || bounds.y2 <= other.y1 || bounds.y1 >= other.y2);
     });
   }
-
+  
   private pickTemplate(poiTypeId: string, rng: () => number): PoiTemplateDefinition | null {
     const candidates = this.templateLookup.get(poiTypeId);
     if (!candidates?.length) {
