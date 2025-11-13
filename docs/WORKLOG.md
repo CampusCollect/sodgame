@@ -1,5 +1,11 @@
 # WORKLOG
 
+# 2024-05-16 – Loot Containers & Generator
+- Implemented `LootGenerator` + `WorldContainerManager` so weighted drops populate world crates, surface through the transparent HUD, and support **E/Loot All** transfers with respawn timers.
+- Extended the HUD tooltip, transparent container UI, and styles with action buttons + hints so QA can see contextual controls without console hacks.
+- Added an `interact` binding to the input layer and documented the new smoke test, risks, and keybinding updates across README/testing/limitations.
+- ASSUMPTION: Looted crates spawn at fixed demo coordinates for now; chunk-aware distribution + lockpicking come in the worldgen/stealth milestone.
+
 # 2024-05-15 – Faction Reputation & Convoy Planner
 - Added a data-backed faction manager plus convoy scheduler that ticks in real time, revealing intel windows and handling ambush cooldowns.
 - Wired a new raid planner overlay (`R`) that exposes faction standings, convoy cargo/ETA, and lets QA trigger simulated ambushes with log output.

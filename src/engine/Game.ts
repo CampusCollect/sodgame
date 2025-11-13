@@ -9,6 +9,7 @@ import { CraftingController } from "../crafting/CraftingController";
 import { BuildingController } from "../building/BuildingController";
 import { SurvivorController } from "../survivors/SurvivorController";
 import { FactionController } from "../factions/FactionController";
+import { WorldContainerManager } from "../loot/WorldContainerManager";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -29,6 +30,7 @@ export class Game {
   readonly building: BuildingController;
   readonly survivors: SurvivorController;
   readonly factions: FactionController;
+  readonly containers: WorldContainerManager;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -56,6 +58,10 @@ export class Game {
     });
     this.survivors = new SurvivorController(this.input);
     this.factions = new FactionController(this.input);
+    this.containers = new WorldContainerManager(this.player, this.input, {
+      width: options.width,
+      height: options.height
+    });
 
     this.configureInput();
   }
@@ -95,6 +101,7 @@ export class Game {
     this.building.update();
     this.survivors.update(deltaTime);
     this.factions.update(deltaTime);
+    this.containers.update(deltaTime);
     this.hud.update(deltaTime);
   }
 
@@ -102,6 +109,7 @@ export class Game {
     this.ctx.clearRect(0, 0, this.options.width, this.options.height);
     this.world.draw(this.ctx, this.player.position);
     this.building.draw(this.ctx, this.player.position);
+    this.containers.draw(this.ctx, this.player.position);
     this.vehicles.draw(this.ctx, this.player.position);
     this.player.draw(this.ctx, this.options.width, this.options.height);
     this.zombies.draw(this.ctx, this.player.position);

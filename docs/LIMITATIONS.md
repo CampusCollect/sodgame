@@ -11,6 +11,7 @@
 | Save/load, networking, and persistence missing | High | High | Flagged as future milestone | Design serialization + migration plan |
 | Survivor jobs not yet linked to facility throughput | Medium | Medium | Track assignments in controller, surface in UI | Apply production modifiers once facilities exist |
 | Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
+| Loot containers spawn at fixed demo spots and share one respawn timer | Low | Medium | Document locations + timers; hook into loot generator | Tie spawns to world chunks, add lockpicking + alarms |
 
 ## Known Gaps
 - Mega-spec mechanics (crafting, advanced AI, factions, etc.) are not yet ported – this milestone focuses on architecture reset.
@@ -23,5 +24,6 @@
 - Base building placements are instantaneous; survivor construction jobs, build timers, and structural integrity checks are deferred.
 - Survivor morale events are manual triggers only for now; tie them to gameplay events (sieges, loot runs, deaths) during combat/AI integration.
 - Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
+- Loot containers only exist in the starter biome for now and auto-open when in range; lockpicking, search times, and faction ownership modifiers remain TODO.
 
 Each milestone must update this register with fresh risks and mitigation status.

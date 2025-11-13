@@ -5,6 +5,8 @@ export class TransparentContainerHUD {
   private readonly element: HTMLDivElement;
   private readonly grid: HTMLDivElement;
   private readonly title: HTMLHeadingElement;
+  private readonly actions: HTMLDivElement;
+  private readonly hint: HTMLParagraphElement;
 
   constructor(label: string) {
     this.element = document.createElement("div");
@@ -19,7 +21,15 @@ export class TransparentContainerHUD {
     this.grid = document.createElement("div");
     this.grid.className = "transparent-container__grid";
 
-    this.element.append(this.title, this.grid);
+    this.actions = document.createElement("div");
+    this.actions.className = "transparent-container__actions";
+    this.actions.style.display = "none";
+
+    this.hint = document.createElement("p");
+    this.hint.className = "transparent-container__hint";
+    this.hint.style.display = "none";
+
+    this.element.append(this.title, this.grid, this.actions, this.hint);
     document.body.append(this.element);
     this.hide();
   }
@@ -59,6 +69,36 @@ export class TransparentContainerHUD {
         this.grid.append(slot);
       }
     }
+  }
+
+  setHint(text?: string): void {
+    if (!text) {
+      this.hint.style.display = "none";
+      this.hint.innerText = "";
+      return;
+    }
+    this.hint.style.display = "block";
+    this.hint.innerText = text;
+  }
+
+  setActions(actions: { label: string; onClick: () => void; title?: string }[]): void {
+    this.actions.innerHTML = "";
+    if (actions.length === 0) {
+      this.actions.style.display = "none";
+      return;
+    }
+    this.actions.style.display = "flex";
+    actions.forEach(action => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "transparent-container__action";
+      button.innerText = action.label;
+      if (action.title) {
+        button.title = action.title;
+      }
+      button.addEventListener("click", action.onClick);
+      this.actions.append(button);
+    });
   }
 
   show(): void {

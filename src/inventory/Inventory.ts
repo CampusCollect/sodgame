@@ -53,6 +53,11 @@ export class Inventory {
     return this.grid.getPlacedItems();
   }
 
+  removePlacedItem(id: string): ItemStack | null {
+    const removed = this.grid.removeItem(id);
+    return removed ? removed.stack : null;
+  }
+
   getQuantity(itemId: string): number {
     return this.grid.countItemQuantity(itemId);
   }
