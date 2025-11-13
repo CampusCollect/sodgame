@@ -5,22 +5,33 @@ This repository now ships a clean-room TypeScript/Vite foundation for the large-
 ## Getting Started
 
 ```bash
-npm install
+npm install # optional when registry access is available
 npm run dev
 ```
 
-The development server will auto-open the canvas demo. Use **WASD** to move and **Tab** to toggle the inventory overlay.
+> **Note:** The execution environment used for this milestone cannot reach the public npm registry (403). The repository already vendors a populated `node_modules` folder so `npm run dev`/`npm run build` continue to work; mirror the packages internally if you need a clean install.
+
+The development server will auto-open the canvas demo. Use **WASD** to move, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, **B** for the base building planner, and **J** to open the survivor roster and job board.
 
 ## Tech Stack
 
 - [Vite](https://vitejs.dev) + TypeScript for hot-reload iteration.
 - Modular directories under `src/` mirroring the mega-spec system boundaries (e.g. `worldgen`, `inventory`, `vehicles`).
 - DOM overlays for HUD/inventory paired with canvas rendering for the simulation layer.
+- JSON-driven content registry (`data/`) powering items, vehicles, zombies, facilities, and progression curves.
+
+## Current Highlights
+
+- Grid-aware backpack inventory with rotation, stack merging, and live weight tracking shared across the player UI and transparent container HUDs.
+- Interactive crafting planner with station tabs, recipe requirements, skill gating, and live queue progress backed by the JSON recipe set.
+- Base building planner with live power tracking, placement previews, and collision-aware structure placement that consumes inventory resources.
+- Survivor management pass with morale tracking, relationship adjustments, and a job assignment board surfaced through the new **J** panel.
 
 ## Next Steps
 
 - Flesh out the placeholder directors (zombies, vehicles) with data-driven behavior.
 - Port the research-backed mechanics into their dedicated modules.
 - Expand automated testing with Vitest as systems mature.
+- Wire survivor job output into facilities, sieges, and crafting speed bonuses.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) and [docs/WORKLOG.md](docs/WORKLOG.md) for milestone planning and day-to-day execution notes.
