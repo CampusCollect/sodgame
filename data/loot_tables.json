@@ -1,0 +1,31 @@
+{
+  "loot_tables": [
+    {
+      "id": "loot_residential_t1",
+      "tier": 1,
+      "items": [
+        { "id": "item_canned_food", "weight": 30, "qty_range": [1, 3] },
+        { "id": "item_bandage", "weight": 20, "qty_range": [1, 2] },
+        { "id": "item_melee_bat", "weight": 5, "condition_range": [40, 80] }
+      ]
+    },
+    {
+      "id": "loot_military_t4",
+      "tier": 4,
+      "items": [
+        { "id": "item_rifle_ak47", "weight": 8, "condition_range": [60, 100] },
+        { "id": "item_ammo_762", "weight": 20, "qty_range": [20, 60] },
+        { "id": "item_blueprint_turret", "weight": 3, "qty_range": [1, 1] }
+      ]
+    },
+    {
+      "id": "loot_industrial_t3",
+      "tier": 3,
+      "items": [
+        { "id": "item_tool_kit", "weight": 12, "qty_range": [1, 1] },
+        { "id": "item_generator_part", "weight": 14, "qty_range": [1, 2] },
+        { "id": "item_component_circuit", "weight": 10, "qty_range": [1, 4] }
+      ]
+    }
+  ]
+}

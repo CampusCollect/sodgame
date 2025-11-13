@@ -1,4 +1,13 @@
-type InputEventName = "toggle-inventory" | "mouse-move";
+type InputEventName =
+  | "toggle-inventory"
+  | "toggle-crafting"
+  | "toggle-building"
+  | "toggle-survivors"
+  | "toggle-raids"
+  | "interact"
+  | "use-stealth-tool"
+  | "cycle-stealth-tool"
+  | "mouse-move";
 
 type InputListener = () => void;
 
@@ -7,7 +16,21 @@ type ListenerMap = {
 };
 
 const KEY_BINDINGS: Record<string, InputEventName> = {
-  Tab: "toggle-inventory"
+  Tab: "toggle-inventory",
+  c: "toggle-crafting",
+  C: "toggle-crafting",
+  b: "toggle-building",
+  B: "toggle-building",
+  j: "toggle-survivors",
+  J: "toggle-survivors",
+  r: "toggle-raids",
+  R: "toggle-raids",
+  e: "interact",
+  E: "interact",
+  x: "use-stealth-tool",
+  X: "use-stealth-tool",
+  z: "cycle-stealth-tool",
+  Z: "cycle-stealth-tool"
 };
 
 export class InputManager {

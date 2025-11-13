@@ -1,0 +1,21 @@
+{
+  "rings": [
+    { "ring": 1, "radius_km": 5, "loot_tiers": [1], "zombie_weights": { "zombie_shambler": 0.9, "zombie_runner": 0.1 } },
+    { "ring": 2, "radius_km": 15, "loot_tiers": [1, 2], "zombie_weights": { "zombie_shambler": 0.7, "zombie_runner": 0.2, "zombie_brute": 0.1 } },
+    { "ring": 3, "radius_km": 30, "loot_tiers": [2, 3], "zombie_weights": { "zombie_runner": 0.4, "zombie_brute": 0.15, "zombie_screamer": 0.05, "zombie_shambler": 0.4 } },
+    { "ring": 4, "radius_km": 50, "loot_tiers": [3, 4], "zombie_weights": { "zombie_runner": 0.5, "zombie_brute": 0.2, "zombie_screamer": 0.1, "zombie_crawler": 0.2 } },
+    { "ring": 5, "radius_km": 75, "loot_tiers": [4, 5], "zombie_weights": { "zombie_runner": 0.35, "zombie_brute": 0.25, "zombie_screamer": 0.15, "zombie_crawler": 0.15, "zombie_boss_bloater": 0.1 } }
+  ],
+  "base_heat": {
+    "loot_value_weight": 1.2,
+    "defense_weight": 0.8,
+    "days_survived_weight": 0.5,
+    "siege_thresholds": [30, 60, 90]
+  },
+  "seasonal_events": [
+    { "season": "spring", "effects": ["rain_more_mud"], "duration_days": 30 },
+    { "season": "summer", "effects": ["heat_exhaustion"], "duration_days": 30 },
+    { "season": "fall", "effects": ["foggy_mornings"], "duration_days": 30 },
+    { "season": "winter", "effects": ["blizzard_visibility", "fuel_usage_increase"], "duration_days": 30 }
+  ]
+}
