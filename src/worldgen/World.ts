@@ -1,4 +1,5 @@
 import { Chunk, CHUNK_SIZE, TILE_SIZE } from "./Chunk";
+import type { ChunkPoi } from "./Chunk";
 import type { Vector2 } from "../entities/Player";
 import { ContentRegistry } from "../data/ContentRegistry";
 import { BiomeManager } from "./BiomeManager";
@@ -26,7 +27,7 @@ export class World {
   constructor() {
     const content = ContentRegistry.load();
     this.biomeManager = new BiomeManager(content.biomes);
-    this.poiManager = new POIManager(content.poi_types);
+    this.poiManager = new POIManager(content.poi_types, content.poi_templates);
     this.roadNetwork = new RoadNetwork();
   }
 
@@ -79,6 +80,18 @@ export class World {
 
   constrainToWorld(position: Vector2, _size: number): Vector2 {
     return { x: position.x, y: position.y };
+  }
+
+  getPoisNear(position: Vector2, radius: number): ChunkPoi[] {
+    const results: ChunkPoi[] = [];
+    const { x: chunkX, y: chunkY } = this.worldToChunk(position);
+    for (let cx = chunkX - radius; cx <= chunkX + radius; cx += 1) {
+      for (let cy = chunkY - radius; cy <= chunkY + radius; cy += 1) {
+        const chunk = this.getOrCreateChunk(cx, cy);
+        results.push(...chunk.definition.pois);
+      }
+    }
+    return results;
   }
 
   private streamChunks(playerPosition: Vector2): void {

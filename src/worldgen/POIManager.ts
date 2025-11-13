@@ -1,4 +1,8 @@
-import type { BiomeDefinition, PoiTypeDefinition } from "../data/ContentRegistry";
+import type {
+  BiomeDefinition,
+  PoiTemplateDefinition,
+  PoiTypeDefinition
+} from "../data/ContentRegistry";
 import type { Vector2 } from "../entities/Player";
 import { CHUNK_SIZE, TILE_SIZE, type ChunkPoi } from "./Chunk";
 
@@ -21,7 +25,20 @@ function hashCoordinates(x: number, y: number): number {
 }
 
 export class POIManager {
-  constructor(private readonly poiTypes: PoiTypeDefinition[]) {}
+  private readonly templateLookup = new Map<string, PoiTemplateDefinition[]>();
+
+  constructor(
+    private readonly poiTypes: PoiTypeDefinition[],
+    templates: PoiTemplateDefinition[]
+  ) {
+    templates.forEach((template) => {
+      template.applies_to.forEach((typeId) => {
+        const list = this.templateLookup.get(typeId) ?? [];
+        list.push(template);
+        this.templateLookup.set(typeId, list);
+      });
+    });
+  }
 
   generateForChunk(
     chunkX: number,
@@ -54,6 +71,7 @@ export class POIManager {
           continue;
         }
 
+        const template = this.pickTemplate(poi.id, rng);
         placements.push({
           id: `${poi.id}_${chunkX}_${chunkY}_${i}`,
           typeId: poi.id,
@@ -65,7 +83,8 @@ export class POIManager {
           respawnDays: poi.respawn_days,
           alarm: poi.alarm,
           isMajor: Boolean(poi.is_major),
-          zombieDensity: poi.zombie_density
+          zombieDensity: poi.zombie_density,
+          templateId: template?.id
         });
       }
     }
@@ -90,5 +109,14 @@ export class POIManager {
       };
       return !(bounds.x2 <= other.x1 || bounds.x1 >= other.x2 || bounds.y2 <= other.y1 || bounds.y1 >= other.y2);
     });
+  }
+  
+  private pickTemplate(poiTypeId: string, rng: () => number): PoiTemplateDefinition | null {
+    const candidates = this.templateLookup.get(poiTypeId);
+    if (!candidates?.length) {
+      return null;
+    }
+    const index = Math.floor(rng() * candidates.length);
+    return candidates[index];
   }
 }

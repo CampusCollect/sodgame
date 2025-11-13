@@ -20,6 +20,7 @@ import survivorsData from "../../data/survivors.json";
 import stealthToolsData from "../../data/stealth_tools.json";
 import biomesData from "../../data/biomes.json";
 import poiData from "../../data/poi_spawns.json";
+import poiTemplatesData from "../../data/poi_templates.json";
 
 export interface ItemDefinition {
   id: string;
@@ -62,6 +63,20 @@ export interface PoiTypeDefinition {
   respawn_days: [number, number];
   is_major?: boolean;
   zombie_density: number;
+}
+
+export interface PoiTemplateContainerPlacement {
+  id: string;
+  container_id: string;
+  offset: [number, number];
+  loot_table?: string;
+}
+
+export interface PoiTemplateDefinition {
+  id: string;
+  applies_to: string[];
+  label: string;
+  containers: PoiTemplateContainerPlacement[];
 }
 
 export interface ContainerDefinition {
@@ -306,6 +321,7 @@ export interface ContentSnapshot {
   survivors: SurvivorContentDefinition;
   biomes: BiomeDefinition[];
   poi_types: PoiTypeDefinition[];
+  poi_templates: PoiTemplateDefinition[];
 }
 
 export class ContentRegistry {
@@ -333,7 +349,8 @@ export class ContentRegistry {
       traits: traitsData.traits,
       survivors: survivorsData,
       biomes: biomesData.biomes,
-      poi_types: poiData.poi_types
+      poi_types: poiData.poi_types,
+      poi_templates: poiTemplatesData.templates
     };
   }
 }

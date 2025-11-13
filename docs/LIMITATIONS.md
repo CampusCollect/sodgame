@@ -11,7 +11,7 @@
 | Save/load, networking, and persistence missing | High | High | Flagged as future milestone | Design serialization + migration plan |
 | Survivor jobs not yet linked to facility throughput | Medium | Medium | Track assignments in controller, surface in UI | Apply production modifiers once facilities exist |
 | Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
-| Loot containers spawn at fixed demo spots and share one respawn timer | Low | Medium | Document locations + timers; hook into loot generator | Tie spawns to world chunks, add lockpicking + alarms |
+| POI templates spawn loot scenes only (no walls/alarms yet) | Medium | Medium | Containers now sync to POIs with template data | Expand templates with interior tiles, locks, and faction state |
 | Alarm controller does not yet drive faction reinforcements | Medium | Medium | Trigger placeholder alarms off extreme noise | Wire alarms into faction AI + POI state machines |
 | Progression/heat scoring uses heuristic proxies (inventory weight + structure HP) | Medium | Medium | Surface assumptions in HUD + docs | Replace with true loot value, facility power, and survivor-driven sieges |
 | Chunk streaming currently lives only in-memory | High | Medium | Deterministic seeds keep POIs/roads reproducible | Add save/load of chunk deltas + async IO |
@@ -28,9 +28,9 @@
 - Base building placements are instantaneous; survivor construction jobs, build timers, and structural integrity checks are deferred.
 - Survivor morale events are manual triggers only for now; tie them to gameplay events (sieges, loot runs, deaths) during combat/AI integration.
 - Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
-- Loot containers only exist in the starter biome for now and auto-open when in range; lockpicking, search times, and faction ownership modifiers remain TODO.
+- Containers spawn per POI template but still open instantly and lack lockpicking/search time mechanics.
 - Alarm HUD + stealth tools exist, but reinforcements, power cuts, and POI ownership changes are deferred for the faction combat milestone.
-- Chunk POI overlays currently drive only visuals – no interior generation or container spawning is tied to them yet.
+- POI templates do not yet include collision tiles, barricades, or faction NPC spawns; they currently place loot containers only.
 - Road network does not yet constrain vehicle physics or convoy routing; it is a navigational overlay only.
 - Vehicle handling ignores collisions, damage, and trailer detach workflows for now; player can only drive the demo rigs.
 - Base heat currently treats backpack weight as "loot value" and structure HP as "defense"; hook into real storage/facility stats once those systems exist.

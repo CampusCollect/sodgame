@@ -63,10 +63,15 @@ export class Game {
     });
     this.survivors = new SurvivorController(this.input);
     this.factions = new FactionController(this.input);
-    this.containers = new WorldContainerManager(this.player, this.input, {
-      width: options.width,
-      height: options.height
-    });
+    this.containers = new WorldContainerManager(
+      this.player,
+      this.input,
+      {
+        width: options.width,
+        height: options.height
+      },
+      this.world
+    );
     this.progression = new ProgressionController(this.player, this.building, this.survivors, this.zombies);
 
     this.configureInput();
@@ -115,7 +120,10 @@ export class Game {
 
   private draw(): void {
     this.ctx.clearRect(0, 0, this.options.width, this.options.height);
-    this.world.draw(this.ctx, this.player.position);
+    this.world.draw(this.ctx, this.player.position, {
+      width: this.options.width,
+      height: this.options.height
+    });
     this.building.draw(this.ctx, this.player.position);
     this.containers.draw(this.ctx, this.player.position);
     this.vehicles.draw(this.ctx, this.player.position);

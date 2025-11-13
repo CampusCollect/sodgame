@@ -1,5 +1,11 @@
 # WORKLOG
 
+# 2024-05-21 – POI Templates, Loot Scenes, and MLP Plan
+- Authored `data/poi_templates.json` plus new world container definitions so every generated POI now instantiates a deterministic loot scene (fridges, lockers, duffles, crates) when the player approaches.
+- Reworked `WorldContainerManager` to sync with streamed chunks instead of demo coordinates, driving container respawns from each POI’s loot timer and cleaning up scenes when the player leaves the area.
+- Added an "MLP readiness" matrix to `docs/ROADMAP.md`, refreshed README highlights, and logged the outstanding blockers between the current finite map and a playable loop.
+- ASSUMPTION: For testing, one in-game day currently equals **60 real-time seconds** when translating POI `respawn_days` ranges into container respawn timers; revisit once the global time system lands.
+
 # 2024-05-20 – Chunk Streaming, POIs, and Roads
 - Introduced JSON-backed biome + POI catalogs (`data/biomes.json`, `data/poi_spawns.json`) and extended `ContentRegistry` so world generation can stay data-driven.
 - Rebuilt `World` around `BiomeManager`, `POIManager`, and `RoadNetwork` to stream chunks lazily, keep a 3/5 chunk active/cache radius, and surface transparent POI overlays plus spline roads tying major POIs together.

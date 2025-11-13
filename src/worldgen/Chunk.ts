@@ -24,6 +24,7 @@ export interface ChunkPoi {
   alarm: "silent" | "active";
   isMajor: boolean;
   zombieDensity: number;
+  templateId?: string;
 }
 
 export interface ChunkDefinition {

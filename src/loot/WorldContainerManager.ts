@@ -1,11 +1,14 @@
 import type { Player, Vector2 } from "../entities/Player";
 import type { InputManager } from "../engine/Input";
 import { content } from "../data";
-import type { ContainerDefinition } from "../data/ContentRegistry";
+import type { ContainerDefinition, PoiTemplateDefinition } from "../data/ContentRegistry";
 import { Inventory } from "../inventory/Inventory";
 import type { ItemStack } from "../inventory/Item";
 import { TransparentContainerHUD } from "../ui/TransparentContainerHUD";
 import { LootGenerator } from "./LootGenerator";
+import type { World } from "../worldgen/World";
+import type { ChunkPoi } from "../worldgen/Chunk";
+import { TILE_SIZE } from "../worldgen/Chunk";
 
 interface SpawnedContainer {
   id: string;
@@ -18,7 +21,8 @@ interface SpawnedContainer {
 }
 
 const INTERACTION_RANGE = 140;
-const RESPAWN_SECONDS = 90;
+const POI_SYNC_RADIUS = 2;
+const SECONDS_PER_IN_GAME_DAY = 60;
 
 let nextContainerId = 0;
 
@@ -27,11 +31,14 @@ export class WorldContainerManager {
   private readonly hud = new TransparentContainerHUD("Container");
   private readonly loot = new LootGenerator();
   private active: SpawnedContainer | null = null;
+  private readonly poiScenes = new Map<string, string[]>();
+  private readonly templates: PoiTemplateDefinition[] = content.poi_templates;
 
   constructor(
     private readonly player: Player,
     private readonly input: InputManager,
-    private readonly viewport: { width: number; height: number }
+    private readonly viewport: { width: number; height: number },
+    private readonly world: World
   ) {
     this.hud.setActions([
       {
@@ -40,11 +47,11 @@ export class WorldContainerManager {
         onClick: () => this.lootActiveContainer()
       }
     ]);
-    this.spawnDemoContainers();
     this.input.on("interact", () => this.lootActiveContainer());
   }
 
   update(deltaTime: number): void {
+    this.syncPoiScenes();
     this.containers.forEach(container => this.updateRespawn(container, deltaTime));
     const previous = this.active?.id;
     this.active = this.findActiveContainer();
@@ -87,16 +94,16 @@ export class WorldContainerManager {
     });
   }
 
-  private spawnDemoContainers(): void {
-    this.spawnContainer("container_world_crate_large", { x: 120, y: -60 }, "loot_residential_t1");
-    this.spawnContainer("container_world_crate_large", { x: -220, y: 140 }, "loot_industrial_t3");
-    this.spawnContainer("container_world_crate_large", { x: 280, y: 120 }, "loot_military_t4");
-  }
-
-  private spawnContainer(definitionId: string, position: Vector2, lootTableId: string): void {
+  private spawnContainer(
+    definitionId: string,
+    position: Vector2,
+    lootTableId: string,
+    respawnSeconds: number
+  ): SpawnedContainer | null {
     const definition = content.containers.find(container => container.id === definitionId);
     if (!definition) {
-      throw new Error(`Container definition ${definitionId} missing`);
+      console.warn(`Container definition ${definitionId} missing`);
+      return null;
     }
     const inventory = new Inventory({
       columns: definition.grid[0],
@@ -111,11 +118,12 @@ export class WorldContainerManager {
       inventory,
       position,
       lootTableId,
-      respawnSeconds: RESPAWN_SECONDS,
-      respawnTimer: RESPAWN_SECONDS
+      respawnSeconds,
+      respawnTimer: respawnSeconds
     };
     this.containers.push(container);
     this.refill(container);
+    return container;
   }
 
   private findActiveContainer(): SpawnedContainer | null {
@@ -187,5 +195,102 @@ export class WorldContainerManager {
       }
     });
     container.respawnTimer = container.respawnSeconds;
+  }
+
+  private syncPoiScenes(): void {
+    const visiblePois = this.world.getPoisNear(this.player.position, POI_SYNC_RADIUS);
+    const visibleIds = new Set(visiblePois.map((poi) => poi.id));
+
+    for (const poiId of Array.from(this.poiScenes.keys())) {
+      if (!visibleIds.has(poiId)) {
+        this.destroyScene(poiId);
+      }
+    }
+
+    visiblePois.forEach((poi) => {
+      if (!this.poiScenes.has(poi.id)) {
+        this.spawnSceneForPoi(poi);
+      }
+    });
+  }
+
+  private spawnSceneForPoi(poi: ChunkPoi): void {
+    const template = this.resolveTemplate(poi);
+    const respawnSeconds = this.convertRespawnToSeconds(poi.respawnDays);
+    const spawnedIds: string[] = [];
+
+    if (template) {
+      template.containers.forEach((placement) => {
+        const position = this.offsetToWorld(poi, placement.offset);
+        const container = this.spawnContainer(
+          placement.container_id,
+          position,
+          placement.loot_table ?? poi.lootTable,
+          respawnSeconds
+        );
+        if (container) {
+          spawnedIds.push(container.id);
+        }
+      });
+    }
+
+    if (spawnedIds.length === 0) {
+      const fallback = this.spawnContainer(
+        "container_world_crate_large",
+        this.centerOfPoi(poi),
+        poi.lootTable,
+        respawnSeconds
+      );
+      if (fallback) {
+        spawnedIds.push(fallback.id);
+      }
+    }
+
+    if (spawnedIds.length > 0) {
+      this.poiScenes.set(poi.id, spawnedIds);
+    }
+  }
+
+  private destroyScene(poiId: string): void {
+    const containerIds = this.poiScenes.get(poiId);
+    if (!containerIds) return;
+    containerIds.forEach((id) => this.removeContainerById(id));
+    this.poiScenes.delete(poiId);
+  }
+
+  private removeContainerById(id: string): void {
+    const index = this.containers.findIndex((container) => container.id === id);
+    if (index === -1) return;
+    this.containers.splice(index, 1);
+    if (this.active?.id === id) {
+      this.active = null;
+      this.hud.hide();
+    }
+  }
+
+  private resolveTemplate(poi: ChunkPoi): PoiTemplateDefinition | undefined {
+    if (poi.templateId) {
+      return this.templates.find((template) => template.id === poi.templateId);
+    }
+    return this.templates.find((template) => template.applies_to.includes(poi.typeId));
+  }
+
+  private offsetToWorld(poi: ChunkPoi, offset: [number, number]): Vector2 {
+    return {
+      x: poi.worldPosition.x + offset[0] * TILE_SIZE,
+      y: poi.worldPosition.y + offset[1] * TILE_SIZE
+    };
+  }
+
+  private centerOfPoi(poi: ChunkPoi): Vector2 {
+    return {
+      x: poi.worldPosition.x + (poi.size[0] * TILE_SIZE) / 2,
+      y: poi.worldPosition.y + (poi.size[1] * TILE_SIZE) / 2
+    };
+  }
+
+  private convertRespawnToSeconds(range: [number, number]): number {
+    const avgDays = (range[0] + range[1]) / 2;
+    return Math.max(90, avgDays * SECONDS_PER_IN_GAME_DAY);
   }
 }

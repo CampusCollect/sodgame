@@ -29,14 +29,15 @@ The development server will auto-open the canvas demo. Use **WASD** to move, **S
 - Survivor management pass with morale tracking, relationship adjustments, and a job assignment board surfaced through the new **J** panel.
 - Faction reputation + convoy raid planner (**R**) that surfaces intel windows, allows ambush simulations, and logs the resulting loot/reputation swings.
 - Looted world containers seeded around the starting area that use the transparent HUD, **E**-key interaction, and the new loot generator to stream weighted drops with respawn timers.
+- POI template scenes that attach interactive loot containers to each generated site so scavenging now happens inside residential blocks, malls, yards, and checkpoints instead of fixed demo crates.
 - Stealth controller with a shared noise bus, ambient light/detection model, alarm scaffolding, and HUD widgets (noise meter + light badge) plus distraction tools mapped to **Z/X**.
 - Driveable vehicles with enter/exit prompts, simplified acceleration/turning, and a transparent trailer cargo HUD (**V**) that visualises the manifest grid/weight usage for the semi demo setup.
 - Progression controller that scales rings by distance, visualises base heat + siege warnings, rotates seasonal modifiers, and retunes zombie populations + loot tiers automatically.
 
 ## Next Steps
 
+- Close the gaps called out in the new "MLP readiness" table inside [docs/ROADMAP.md](docs/ROADMAP.md) – persistence, convoy encounters, and facilities/jobs wiring are the remaining blockers to a playable loop.
 - Flesh out the remaining director stubs (zombies, vehicles) with full combat/AI, collisions, and convoy routing.
-- Port the research-backed mechanics into their dedicated modules.
 - Expand automated testing with Vitest as systems mature.
 - Wire survivor job output and new heat/siege cues into facilities, sieges, and crafting speed bonuses.
 
