@@ -99,7 +99,7 @@ export class Game {
 
   private update(deltaTime: number): void {
     this.input.update();
-    this.world.update(deltaTime);
+    this.world.update(deltaTime, this.player.position);
     this.player.update(deltaTime, this.input, this.world);
     this.stealth.update(deltaTime);
     this.zombies.update(deltaTime, this.world, this.player);

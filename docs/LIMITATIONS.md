@@ -14,6 +14,8 @@
 | Loot containers spawn at fixed demo spots and share one respawn timer | Low | Medium | Document locations + timers; hook into loot generator | Tie spawns to world chunks, add lockpicking + alarms |
 | Alarm controller does not yet drive faction reinforcements | Medium | Medium | Trigger placeholder alarms off extreme noise | Wire alarms into faction AI + POI state machines |
 | Progression/heat scoring uses heuristic proxies (inventory weight + structure HP) | Medium | Medium | Surface assumptions in HUD + docs | Replace with true loot value, facility power, and survivor-driven sieges |
+| Chunk streaming currently lives only in-memory | High | Medium | Deterministic seeds keep POIs/roads reproducible | Add save/load of chunk deltas + async IO |
+| Road network is visual-only | Medium | Medium | Display spline-like overlays for navigation cues | Hook roads into convoy AI, collisions, and barricade gameplay |
 
 ## Known Gaps
 - Mega-spec mechanics (crafting, advanced AI, factions, etc.) are not yet ported – this milestone focuses on architecture reset.
@@ -28,6 +30,8 @@
 - Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
 - Loot containers only exist in the starter biome for now and auto-open when in range; lockpicking, search times, and faction ownership modifiers remain TODO.
 - Alarm HUD + stealth tools exist, but reinforcements, power cuts, and POI ownership changes are deferred for the faction combat milestone.
+- Chunk POI overlays currently drive only visuals – no interior generation or container spawning is tied to them yet.
+- Road network does not yet constrain vehicle physics or convoy routing; it is a navigational overlay only.
 - Vehicle handling ignores collisions, damage, and trailer detach workflows for now; player can only drive the demo rigs.
 - Base heat currently treats backpack weight as "loot value" and structure HP as "defense"; hook into real storage/facility stats once those systems exist.
 

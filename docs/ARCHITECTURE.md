@@ -7,7 +7,7 @@
 - **Interface Layer** (`src/ui`, `src/inventory`) – renders overlays, HUD, and interacts with simulation state via controllers and transparent HUD components.
 
 ## Current Modules
-- `World` – deterministic chunk generation stub with biome rings.
+- `World` + `BiomeManager` + `POIManager` + `RoadNetwork` – lazy-loads deterministic chunks, assigns biomes via weighted distance/noise, scatters POIs per biome/category, and links major POIs with spline-like roads while maintaining active vs. cached chunk radii.
 - `ContentRegistry` – imports all JSON configs and exposes typed snapshots for systems.
 - `InventoryController` + `TransparentContainerHUD` – DOM overlays reflecting grid inventories and nested containers.
 - `CraftingController` + `CraftingPanel` – recipe book, skill-checked queue management, and DOM planner overlay backed by JSON definitions.

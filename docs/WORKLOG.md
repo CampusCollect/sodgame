@@ -1,5 +1,11 @@
 # WORKLOG
 
+# 2024-05-20 – Chunk Streaming, POIs, and Roads
+- Introduced JSON-backed biome + POI catalogs (`data/biomes.json`, `data/poi_spawns.json`) and extended `ContentRegistry` so world generation can stay data-driven.
+- Rebuilt `World` around `BiomeManager`, `POIManager`, and `RoadNetwork` to stream chunks lazily, keep a 3/5 chunk active/cache radius, and surface transparent POI overlays plus spline roads tying major POIs together.
+- Added deterministic POI scattering with overlap rejection, biome-weighted spawn chances, and a visual HUD label so QA can confirm loot/alarms per location.
+- ASSUMPTION: POIs currently render only as overlays; their interior tiles/containers will spawn in the dedicated POI pass.
+
 # 2024-05-19 – Progression, Base Heat, and Seasons
 - Implemented `ProgressionController` with difficulty scaler, base heat tracker, and season manager so distance + community stats retune zombie counts, update HUD meta text, and show a dedicated progression card.
 - Hooked the new controller into the engine loop plus zombies/HUD, added survivor/base metrics needed for the calculations, and layered in CSS for the always-on progression card.

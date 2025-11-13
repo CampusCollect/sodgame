@@ -29,3 +29,9 @@
 - Tile resolution will settle on 1m, so 128×128 tiles (~128m square) per chunk matches traversal pacing.
 - Saving JSON per chunk is acceptable for early milestones; binary compression can follow if IO becomes a bottleneck.
 - We will lazily compute biome audio cues using the same Voronoi weights rather than a separate system initially.
+
+## Implementation Notes – 2024-05-20
+- `BiomeManager` now approximates the Voronoi requirement using weighted radial preferences blended with deterministic noise so biomes transition gradually as in Minecraft/Terraria hybrids.
+- `POIManager` consumes the new JSON catalogs and runs a rejection sampling pass per chunk, mirroring Terraria's structure phase to prevent overlapping POIs and respecting biome-specific spawn weights.
+- `RoadNetwork` builds a Delaunay-lite graph by connecting each major POI to its three nearest neighbors, then renders quadratic curves to suggest multi-lane highways inspired by MGSV/Far Cry road graphs.
+- Streaming respects the 3-chunk active / 5-chunk cache radii, enabling Minecraft-style pop-in suppression and preparing us for chunk-level serialization work next.

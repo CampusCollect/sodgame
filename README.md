@@ -23,6 +23,7 @@ The development server will auto-open the canvas demo. Use **WASD** to move, **S
 ## Current Highlights
 
 - Grid-aware backpack inventory with rotation, stack merging, and live weight tracking shared across the player UI and transparent container HUDs.
+- Streaming chunked world backed by JSON biomes/POIs with Voronoi-inspired biome assignment, transparent POI callouts, and spline-like road overlays that stay deterministic as you roam.
 - Interactive crafting planner with station tabs, recipe requirements, skill gating, and live queue progress backed by the JSON recipe set.
 - Base building planner with live power tracking, placement previews, and collision-aware structure placement that consumes inventory resources.
 - Survivor management pass with morale tracking, relationship adjustments, and a job assignment board surfaced through the new **J** panel.

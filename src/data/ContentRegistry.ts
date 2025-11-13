@@ -18,6 +18,8 @@ import skillsData from "../../data/skills.json";
 import traitsData from "../../data/traits.json";
 import survivorsData from "../../data/survivors.json";
 import stealthToolsData from "../../data/stealth_tools.json";
+import biomesData from "../../data/biomes.json";
+import poiData from "../../data/poi_spawns.json";
 
 export interface ItemDefinition {
   id: string;
@@ -31,6 +33,35 @@ export interface ItemDefinition {
   description: string;
   attachments?: string[];
   freshness_hours?: number;
+}
+
+export interface BiomeDefinition {
+  id: string;
+  name: string;
+  palette: string[];
+  ideal_radius: number;
+  falloff: number;
+  weight: number;
+  zombie_density: number;
+  loot_tier_weights: Record<string, number>;
+  ambient: string;
+  poi_weights: Record<string, number>;
+}
+
+export interface PoiTypeDefinition {
+  id: string;
+  name: string;
+  category: string;
+  biomes: string[];
+  size: [number, number];
+  loot_table: string;
+  spawn_chance: number;
+  min_per_chunk: number;
+  max_per_chunk: number;
+  alarm: "silent" | "active";
+  respawn_days: [number, number];
+  is_major?: boolean;
+  zombie_density: number;
 }
 
 export interface ContainerDefinition {
@@ -273,6 +304,8 @@ export interface ContentSnapshot {
   skills: SkillDefinition[];
   traits: TraitDefinition[];
   survivors: SurvivorContentDefinition;
+  biomes: BiomeDefinition[];
+  poi_types: PoiTypeDefinition[];
 }
 
 export class ContentRegistry {
@@ -298,7 +331,9 @@ export class ContentRegistry {
       progression: progressionData,
       skills: skillsData.skills,
       traits: traitsData.traits,
-      survivors: survivorsData
+      survivors: survivorsData,
+      biomes: biomesData.biomes,
+      poi_types: poiData.poi_types
     };
   }
 }
