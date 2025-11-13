@@ -1,0 +1,14 @@
+{
+  "traits": [
+    { "id": "optimist", "name": "Optimist", "category": "positive", "description": "Gains morale faster and buffers group from stress." },
+    { "id": "fast_learner", "name": "Fast Learner", "category": "positive", "description": "Earns +25% skill XP from all actions." },
+    { "id": "brave", "name": "Brave", "category": "positive", "description": "Morale loss from combat events reduced by 30%." },
+    { "id": "pack_rat", "name": "Pack Rat", "category": "positive", "description": "Carry weight capacity increased by 10%." },
+    { "id": "pessimist", "name": "Pessimist", "category": "negative", "description": "Morale decays faster when resources are low." },
+    { "id": "injury_prone", "name": "Injury Prone", "category": "negative", "description": "Suffers lingering injuries more often." },
+    { "id": "cowardly", "name": "Cowardly", "category": "negative", "description": "Panics if morale falls below 30%." },
+    { "id": "night_owl", "name": "Night Owl", "category": "neutral", "description": "No penalties at night, slight fatigue during day shifts." },
+    { "id": "ex_military", "name": "Ex-Military", "category": "neutral", "description": "Starts with higher combat and leadership skills." },
+    { "id": "vegetarian", "name": "Vegetarian", "category": "neutral", "description": "Prefers plant-based meals; morale penalty if only meat is available." }
+  ]
+}

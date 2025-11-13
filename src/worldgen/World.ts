@@ -1,32 +1,33 @@
-import { Chunk, CHUNK_SIZE, TILE_SIZE, type BiomeId } from "./Chunk";
+import { Chunk, CHUNK_SIZE, TILE_SIZE } from "./Chunk";
 import type { Vector2 } from "../entities/Player";
+import { ContentRegistry } from "../data/ContentRegistry";
+import { BiomeManager } from "./BiomeManager";
+import { POIManager } from "./POIManager";
+import { RoadNetwork } from "./RoadNetwork";
 
-const WORLD_RADIUS = 4; // generates 9x9 chunks around origin
-
-const BIOME_RING: { radius: number; biome: BiomeId }[] = [
-  { radius: 1, biome: "urban" },
-  { radius: 2, biome: "suburban" },
-  { radius: 3, biome: "industrial" },
-  { radius: 4, biome: "rural" }
-];
+const ACTIVE_RADIUS = 3;
+const CACHE_RADIUS = 5;
 
 function hash(x: number, y: number): number {
   return Math.abs(Math.floor(Math.sin(x * 928371 + y * 123189) * 100000));
 }
 
+interface ChunkCoordinates {
+  x: number;
+  y: number;
+}
+
 export class World {
   private readonly chunks = new Map<string, Chunk>();
+  private readonly biomeManager: BiomeManager;
+  private readonly poiManager: POIManager;
+  private readonly roadNetwork: RoadNetwork;
 
   constructor() {
-    this.generateInitialWorld();
-  }
-
-  private generateInitialWorld(): void {
-    for (let cx = -WORLD_RADIUS; cx <= WORLD_RADIUS; cx += 1) {
-      for (let cy = -WORLD_RADIUS; cy <= WORLD_RADIUS; cy += 1) {
-        this.getOrCreateChunk(cx, cy);
-      }
-    }
+    const content = ContentRegistry.load();
+    this.biomeManager = new BiomeManager(content.biomes);
+    this.poiManager = new POIManager(content.poi_types);
+    this.roadNetwork = new RoadNetwork();
   }
 
   private getOrCreateChunk(cx: number, cy: number): Chunk {
@@ -39,47 +40,75 @@ export class World {
       x: cx * CHUNK_SIZE * TILE_SIZE,
       y: cy * CHUNK_SIZE * TILE_SIZE
     };
-    const biome = this.pickBiome(cx, cy);
-    const chunk = new Chunk({ id: key, biome, worldPosition, seed });
+    const biome = this.biomeManager.getBiome(cx, cy);
+    const pois = this.poiManager.generateForChunk(cx, cy, biome, seed, worldPosition);
+    const chunk = new Chunk({
+      id: key,
+      biome: biome.id,
+      worldPosition,
+      seed,
+      palette: biome.palette,
+      pois
+    });
     this.chunks.set(key, chunk);
+    this.roadNetwork.registerChunk(key, pois);
     return chunk;
   }
 
-  private pickBiome(cx: number, cy: number): BiomeId {
-    const distance = Math.max(Math.abs(cx), Math.abs(cy));
-    for (const ring of BIOME_RING) {
-      if (distance <= ring.radius) {
-        return ring.biome;
-      }
-    }
-    return "rural";
+  update(_dt: number, playerPosition: Vector2): void {
+    this.streamChunks(playerPosition);
   }
 
-  update(_dt: number): void {
-    // placeholder for chunk streaming, POI updates, etc.
-  }
-
-  draw(ctx: CanvasRenderingContext2D, playerPosition: Vector2): void {
+  draw(ctx: CanvasRenderingContext2D, playerPosition: Vector2, viewport: { width: number; height: number }): void {
     const chunkX = Math.floor(playerPosition.x / (CHUNK_SIZE * TILE_SIZE));
     const chunkY = Math.floor(playerPosition.y / (CHUNK_SIZE * TILE_SIZE));
+    const offset: Vector2 = {
+      x: playerPosition.x - viewport.width / 2,
+      y: playerPosition.y - viewport.height / 2
+    };
 
-    for (let cx = chunkX - 2; cx <= chunkX + 2; cx += 1) {
-      for (let cy = chunkY - 2; cy <= chunkY + 2; cy += 1) {
+    for (let cx = chunkX - ACTIVE_RADIUS; cx <= chunkX + ACTIVE_RADIUS; cx += 1) {
+      for (let cy = chunkY - ACTIVE_RADIUS; cy <= chunkY + ACTIVE_RADIUS; cy += 1) {
         const chunk = this.getOrCreateChunk(cx, cy);
-        const offset: Vector2 = {
-          x: playerPosition.x - (window.innerWidth / 2),
-          y: playerPosition.y - (window.innerHeight / 2)
-        };
         chunk.draw(ctx, offset);
       }
     }
+
+    this.roadNetwork.draw(ctx, offset, viewport);
   }
 
-  constrainToWorld(position: Vector2, size: number): Vector2 {
-    const limit = WORLD_RADIUS * CHUNK_SIZE * TILE_SIZE;
+  constrainToWorld(position: Vector2, _size: number): Vector2 {
+    return { x: position.x, y: position.y };
+  }
+
+  private streamChunks(playerPosition: Vector2): void {
+    const { x: chunkX, y: chunkY } = this.worldToChunk(playerPosition);
+
+    for (let cx = chunkX - CACHE_RADIUS; cx <= chunkX + CACHE_RADIUS; cx += 1) {
+      for (let cy = chunkY - CACHE_RADIUS; cy <= chunkY + CACHE_RADIUS; cy += 1) {
+        this.getOrCreateChunk(cx, cy);
+      }
+    }
+
+    for (const key of Array.from(this.chunks.keys())) {
+      const coords = this.parseKey(key);
+      if (Math.abs(coords.x - chunkX) > CACHE_RADIUS || Math.abs(coords.y - chunkY) > CACHE_RADIUS) {
+        this.roadNetwork.removeChunk(key);
+        this.chunks.delete(key);
+      }
+    }
+  }
+
+  private worldToChunk(position: Vector2): ChunkCoordinates {
+    const chunkSize = CHUNK_SIZE * TILE_SIZE;
     return {
-      x: Math.min(Math.max(position.x, -limit + size), limit - size),
-      y: Math.min(Math.max(position.y, -limit + size), limit - size)
+      x: Math.floor(position.x / chunkSize),
+      y: Math.floor(position.y / chunkSize)
     };
+  }
+
+  private parseKey(key: string): ChunkCoordinates {
+    const [x, y] = key.split(":").map((value) => parseInt(value, 10));
+    return { x, y };
   }
 }
