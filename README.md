@@ -11,7 +11,7 @@ npm run dev
 
 > **Note:** The execution environment used for this milestone cannot reach the public npm registry (403). The repository already vendors a populated `node_modules` folder so `npm run dev`/`npm run build` continue to work; mirror the packages internally if you need a clean install.
 
-The development server will auto-open the canvas demo. Use **WASD** to move, **Shift** to sprint, **Ctrl** to crouch, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, **B** for the base building planner, **J** to open the survivor roster and job board, **R** to launch the raid/convoy planner, **Z/X** to cycle/use stealth tools, and **E** to interact with nearby loot containers.
+The development server will auto-open the canvas demo. Use **WASD** to move, **Shift** to sprint, **Ctrl** to crouch, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, **B** for the base building planner, **J** to open the survivor roster and job board, **R** to launch the raid/convoy planner, **Z/X** to cycle/use stealth tools, **E** to interact with containers **and** enter/exit vehicles, and **V** to open or close the transparent trailer cargo HUD when you are near a trailer or seated in a tractor.
 
 ## Tech Stack
 
@@ -29,10 +29,11 @@ The development server will auto-open the canvas demo. Use **WASD** to move, **S
 - Faction reputation + convoy raid planner (**R**) that surfaces intel windows, allows ambush simulations, and logs the resulting loot/reputation swings.
 - Looted world containers seeded around the starting area that use the transparent HUD, **E**-key interaction, and the new loot generator to stream weighted drops with respawn timers.
 - Stealth controller with a shared noise bus, ambient light/detection model, alarm scaffolding, and HUD widgets (noise meter + light badge) plus distraction tools mapped to **Z/X**.
+- Driveable vehicles with enter/exit prompts, simplified acceleration/turning, and a transparent trailer cargo HUD (**V**) that visualises the manifest grid/weight usage for the semi demo setup.
 
 ## Next Steps
 
-- Flesh out the placeholder directors (zombies, vehicles) with data-driven behavior.
+- Flesh out the remaining director stubs (zombies, vehicles) with full combat/AI, collisions, and convoy routing.
 - Port the research-backed mechanics into their dedicated modules.
 - Expand automated testing with Vitest as systems mature.
 - Wire survivor job output into facilities, sieges, and crafting speed bonuses.

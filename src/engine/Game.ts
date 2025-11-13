@@ -53,7 +53,7 @@ export class Game {
     this.hud = new Hud(this.player, this.inventory);
     this.stealth = new StealthController(this.player, this.input);
     this.zombies = new ZombieDirector(this.stealth.getNoise());
-    this.vehicles = new VehicleDirector();
+    this.vehicles = new VehicleDirector(this.player, this.input);
     this.crafting = new CraftingController(this.player.inventory, this.input);
     this.building = new BuildingController(this.player, this.input, options.canvas, {
       width: options.width,

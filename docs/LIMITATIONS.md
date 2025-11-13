@@ -7,7 +7,7 @@
 | No automated gameplay tests yet | Medium | Medium | Maintain manual smoke steps, plan Vitest harness | Add integration tests when mechanics land |
 | npm registry access restricted in container | Medium | Medium | Document issue, rely on cached deps/CI mirror | Configure private registry or vendored tarballs |
 | Data sets do not meet final breadth (50+ items, etc.) | Medium | High | Provide representative samples + JSON schemas | Expand catalogs alongside feature sprints |
-| Vehicle physics & AI not implemented | High | High | Stub hitch/cargo systems, document expectations | Implement driving, noise, maintenance loops |
+| Vehicle driving lacks collisions/damage + AI escorts | High | Medium | Added player-controlled driving, hints, and cargo HUD to unblock QA | Layer in collision volumes, damage, fuel, and NPC drivers |
 | Save/load, networking, and persistence missing | High | High | Flagged as future milestone | Design serialization + migration plan |
 | Survivor jobs not yet linked to facility throughput | Medium | Medium | Track assignments in controller, surface in UI | Apply production modifiers once facilities exist |
 | Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
@@ -27,5 +27,6 @@
 - Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
 - Loot containers only exist in the starter biome for now and auto-open when in range; lockpicking, search times, and faction ownership modifiers remain TODO.
 - Alarm HUD + stealth tools exist, but reinforcements, power cuts, and POI ownership changes are deferred for the faction combat milestone.
+- Vehicle handling ignores collisions, damage, and trailer detach workflows for now; player can only drive the demo rigs.
 
 Each milestone must update this register with fresh risks and mitigation status.

@@ -1,14 +1,11 @@
-import type { TrailerDefinition } from "../data/ContentRegistry";
-
-interface CargoCell {
-  label: string;
-  condition?: number;
-}
+import type { CargoRenderState } from "../vehicles/CargoManifest";
 
 export class TransparentCargoHUD {
   private readonly element: HTMLDivElement;
   private readonly title: HTMLHeadingElement;
   private readonly grid: HTMLDivElement;
+  private readonly actions: HTMLDivElement;
+  private readonly hint: HTMLParagraphElement;
 
   constructor(label: string) {
     this.element = document.createElement("div");
@@ -23,34 +20,82 @@ export class TransparentCargoHUD {
     this.grid = document.createElement("div");
     this.grid.className = "transparent-cargo__grid";
 
-    this.element.append(this.title, this.grid);
+    this.actions = document.createElement("div");
+    this.actions.className = "transparent-cargo__actions";
+    this.actions.style.display = "none";
+
+    this.hint = document.createElement("p");
+    this.hint.className = "transparent-cargo__hint";
+    this.hint.style.display = "none";
+
+    this.element.append(this.title, this.grid, this.actions, this.hint);
     document.body.append(this.element);
     this.hide();
   }
 
-  showForTrailer(trailer: TrailerDefinition, cells: CargoCell[]): void {
-    this.title.innerText = trailer.name;
-    this.grid.style.setProperty("--columns", trailer.grid[0].toString());
-    this.grid.style.setProperty("--rows", trailer.grid[1].toString());
-    this.grid.replaceChildren(...cells.map(cell => this.renderCell(cell)));
-    this.show();
+  syncFromManifest(state: CargoRenderState, label?: string): void {
+    if (label) {
+      this.title.innerText = label;
+    }
+    this.grid.style.setProperty("--columns", state.columns.toString());
+    this.grid.style.setProperty("--rows", state.rows.toString());
+    this.grid.innerHTML = "";
+
+    state.cells.forEach((cell, index) => {
+      if (cell.placement && !cell.isOrigin) {
+        return;
+      }
+      const slot = document.createElement("div");
+      slot.className = "transparent-cargo__cell";
+      const column = index % state.columns;
+      const row = Math.floor(index / state.columns);
+      slot.style.gridColumnStart = String(column + 1);
+      slot.style.gridRowStart = String(row + 1);
+      if (cell.placement && cell.isOrigin) {
+        slot.style.gridColumnEnd = `span ${cell.width}`;
+        slot.style.gridRowEnd = `span ${cell.height}`;
+        slot.innerText = `${cell.placement.entry.label}`;
+        slot.setAttribute("data-condition", cell.placement.entry.condition.toFixed(0));
+      }
+      this.grid.append(slot);
+    });
+  }
+
+  setActions(actions: { label: string; onClick: () => void; title?: string }[]): void {
+    this.actions.innerHTML = "";
+    if (actions.length === 0) {
+      this.actions.style.display = "none";
+      return;
+    }
+    this.actions.style.display = "flex";
+    actions.forEach(action => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "transparent-cargo__action";
+      button.innerText = action.label;
+      if (action.title) {
+        button.title = action.title;
+      }
+      button.addEventListener("click", action.onClick);
+      this.actions.append(button);
+    });
+  }
+
+  setHint(text?: string): void {
+    if (!text) {
+      this.hint.style.display = "none";
+      this.hint.innerText = "";
+      return;
+    }
+    this.hint.style.display = "block";
+    this.hint.innerText = text;
+  }
+
+  show(): void {
+    this.element.style.display = "flex";
   }
 
   hide(): void {
     this.element.style.display = "none";
-  }
-
-  private show(): void {
-    this.element.style.display = "flex";
-  }
-
-  private renderCell(cell: CargoCell): HTMLDivElement {
-    const div = document.createElement("div");
-    div.className = "transparent-cargo__cell";
-    div.innerText = cell.label;
-    if (typeof cell.condition === "number") {
-      div.setAttribute("data-condition", cell.condition.toFixed(0));
-    }
-    return div;
   }
 }

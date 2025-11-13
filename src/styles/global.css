@@ -314,13 +314,15 @@ select {
   grid-auto-flow: dense;
 }
 
-.transparent-container__actions {
+.transparent-container__actions,
+.transparent-cargo__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.transparent-container__action {
+.transparent-container__action,
+.transparent-cargo__action {
   background: rgba(34, 197, 94, 0.15);
   border: 1px solid rgba(34, 197, 94, 0.5);
   color: #bbf7d0;
@@ -332,7 +334,8 @@ select {
   cursor: pointer;
 }
 
-.transparent-container__hint {
+.transparent-container__hint,
+.transparent-cargo__hint {
   margin: 0;
   font-size: 12px;
   color: rgba(226, 232, 240, 0.85);
@@ -371,6 +374,20 @@ select {
   padding: 12px 16px;
   color: #f8fafc;
   max-width: 220px;
+  display: none;
+}
+
+.vehicle-hint {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #f8fafc;
+  font-size: 13px;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   display: none;
 }
 

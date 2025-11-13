@@ -5,6 +5,7 @@ type InputEventName =
   | "toggle-survivors"
   | "toggle-raids"
   | "interact"
+  | "toggle-vehicle-cargo"
   | "use-stealth-tool"
   | "cycle-stealth-tool"
   | "mouse-move";
@@ -27,6 +28,8 @@ const KEY_BINDINGS: Record<string, InputEventName> = {
   R: "toggle-raids",
   e: "interact",
   E: "interact",
+  v: "toggle-vehicle-cargo",
+  V: "toggle-vehicle-cargo",
   x: "use-stealth-tool",
   X: "use-stealth-tool",
   z: "cycle-stealth-tool",

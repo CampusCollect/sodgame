@@ -1,5 +1,11 @@
 # WORKLOG
 
+# 2024-05-18 – Vehicle Driving & Cargo HUD
+- Expanded `VehicleDirector` so the player can enter/exit demo vehicles with **E**, drive them with simplified acceleration/turning, and receive contextual hints via a DOM badge.
+- Wired the transparent cargo HUD (**V**) into the new `CargoManifest` grid renderer so the semi trailer surfaces stored vehicles/crates with live kg totals.
+- Added player movement locking, cargo manifest packing, HUD styles, and documentation/test updates covering the new controls and QA steps.
+- ASSUMPTION: Vehicles still ignore collisions/damage/fuel—documented in limitations until the physics pass.
+
 # 2024-05-17 – Stealth Controller, Noise HUD, and Tools
 - Moved the shared noise propagation layer into the stealth module, layered on visibility + alarm controllers, and exposed the bus to zombies so every system reacts to the same events.
 - Added sprint/crouch stances, distraction tools (cycle with **Z**, deploy with **X**), and DOM HUD widgets (noise meter + light indicator) so QA can validate stealth feedback loops without debug overlays.

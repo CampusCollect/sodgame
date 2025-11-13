@@ -24,12 +24,17 @@ export class Player {
   private movementIntensity = 0;
   private crouching = false;
   private sprinting = false;
+  private movementLocked = false;
 
   constructor({ x, y }: PlayerOptions) {
     this.position = { x, y };
   }
 
   update(deltaTime: number, input: InputManager, world: World): void {
+    if (this.movementLocked) {
+      this.movementIntensity = 0;
+      return;
+    }
     const velocity: Vector2 = { x: 0, y: 0 };
     if (input.isKeyPressed("w")) velocity.y -= 1;
     if (input.isKeyPressed("s")) velocity.y += 1;
@@ -80,5 +85,18 @@ export class Player {
     if (this.crouching) return "crouch";
     if (this.sprinting) return "sprint";
     return "walk";
+  }
+
+  lockMovement(): void {
+    this.movementLocked = true;
+    this.movementIntensity = 0;
+  }
+
+  unlockMovement(): void {
+    this.movementLocked = false;
+  }
+
+  syncToVehicle(position: Vector2): void {
+    this.position = { ...position };
   }
 }

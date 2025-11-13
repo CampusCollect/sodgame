@@ -13,8 +13,8 @@
 - `CraftingController` + `CraftingPanel` – recipe book, skill-checked queue management, and DOM planner overlay backed by JSON definitions.
 - `BuildingManager` + `BuildingController` – base building planner with collision checks, power balancing, and inventory-backed placement costs rendered in-canvas.
 - `ZombieDirector` – coordinates FSM zombies, noise propagation, and horde scaffolding for debug visualization.
-- `VehicleDirector` – instantiates vehicles/trailers from data definitions with hitch + cargo manifest scaffolds.
-- `TransparentCargoHUD` & `MaintenanceUI` – UI overlays for trailer cargo manifests and vehicle condition readouts.
+- `VehicleDirector` – instantiates vehicles/trailers from data definitions, handles enter/exit prompts, simplified driving physics, hitch offsets, and keeps the cargo manifest + hint overlays in sync with player input.
+- `TransparentCargoHUD` & `MaintenanceUI` – UI overlays for trailer cargo manifests (grid + weight readouts via **V**) and vehicle condition readouts.
 - `LootGenerator` + `WorldContainerManager` – rolls JSON loot tables into world containers, shows transparent HUD overlays, and manages respawn timers plus **E**-key loot actions.
 - `SurvivorManager` + `SurvivorController` + `SurvivorPanel` – maintains roster morale/relationships, job assignments, and exposes them via an accessible DOM dialog (`J`).
 - `FactionManager` + `ConvoyScheduler` + `RaidPlanner` + `RaidPlanningUI` – tracks reputation per faction, runs ticking convoy schedules, and drives the raid/convoy planner overlay triggered with `R`.
