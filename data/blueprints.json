@@ -1,0 +1,18 @@
+{
+  "blueprints": [
+    {
+      "id": "item_blueprint_turret",
+      "name": "Auto Turret Blueprint",
+      "unlocks": ["craft_turret"],
+      "rarity": "epic",
+      "sources": ["loot_military_t4", "trader_military", "convoy_tech"]
+    },
+    {
+      "id": "item_blueprint_workbench_t2",
+      "name": "Machine Shop Plans",
+      "unlocks": ["facility_workshop_t2"],
+      "rarity": "rare",
+      "sources": ["loot_industrial_t3", "quest_mechanic"]
+    }
+  ]
+}
