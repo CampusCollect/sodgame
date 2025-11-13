@@ -1,12 +1,21 @@
 # Research Journal
 
-This file will capture distilled learnings from reference titles before each major system implementation. For the reboot milestone the focus was architectural, so gameplay research entries are pending.
+This journal now summarizes the reference studies mandated by the mega-spec. Each section links to a deep-dive in `docs/research/` and captures high-level direction, design patterns, and open assumptions before implementation begins.
 
-## Upcoming Sections
-- Inventory & Containers – Unturned, Resident Evil 4, Escape from Tarkov, DayZ
-- Crafting & Workstations – Far Cry, 7 Days to Die, The Forest
-- Vehicles & Cargo – Mad Max, State of Decay 2, Euro Truck Simulator
-- Zombie AI & Noise – Project Zomboid, MGSV, The Last of Us
-- Base Building & Survivors – Fallout 4, Rimworld, XCOM
+| System | Status | Notes |
+|--------|--------|-------|
+| World Generation & Streaming | ✅ Documented | See `docs/research/WorldGen.md` for biome graph, chunk streaming, and road research. |
+| Inventory, Storage & Containers | ✅ Documented | Hybrid Unturned/Tarkov grid design captured in `docs/research/Inventory.md`. |
+| Crafting, Blueprints & Workstations | ✅ Documented | Tiered stations and queue plans in `docs/research/Crafting.md`. |
+| Zombie AI, Noise & Hordes | ✅ Documented | FSM + noise bus insights in `docs/research/ZombieAI.md`. |
+| Vehicles, Trailers & Cargo | ✅ Documented | Hitching, manifests, maintenance loops in `docs/research/Vehicles.md`. |
+| Base Building & Power | ✅ Documented | Placement, facilities, power routing in `docs/research/BaseBuilding.md`. |
+| Survivors, Skills & Morale | ✅ Documented | Trait, morale, relationships in `docs/research/Survivors.md`. |
+| Factions, Convoys & Raids | ✅ Documented | Intel, planners, reputation loops in `docs/research/Raids.md`. |
+| Loot Economy & Traders | ✅ Documented | Tiering, barter, blueprint drops in `docs/research/Loot.md`. |
+| Stealth, Noise & Alarms | ✅ Documented | Noise bus and alarm controller in `docs/research/Stealth.md`. |
+| Progression & Endgame | ✅ Documented | Power score, heat, seasonal modifiers in `docs/research/Progression.md`. |
 
-Each section will follow the mandate: **Findings → Patterns → Implementation Plan → Assumptions**.
+## Next Steps
+- Incorporate research findings into module scaffolds and data models.
+- Validate assumptions during prototyping; log deviations in `WORKLOG.md`.
