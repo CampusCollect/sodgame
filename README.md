@@ -1,4 +1,4 @@
-# State of Decay Sandbox – Modular Reboot
+# outbroken – Modular Reboot (Ubisoft x unturned x state of decay)
 
 This repository now ships a clean-room TypeScript/Vite foundation for the large-scale 2D survival sandbox. The previous monolithic HTML dump has been replaced by a modular runtime with clear seams for each system (world gen, inventory, AI, vehicles, etc.).
 
