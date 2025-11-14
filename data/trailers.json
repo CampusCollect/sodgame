@@ -1,0 +1,38 @@
+{
+  "trailers": [
+    {
+      "id": "trailer_box",
+      "name": "Box Trailer",
+      "grid": [12, 20],
+      "weight_limit_kg": 5000,
+      "enclosed": true,
+      "lockable": true,
+      "can_store_vehicles": true,
+      "vehicle_slots": [
+        { "size": [3, 6], "max_weight_kg": 1500 }
+      ]
+    },
+    {
+      "id": "trailer_flatbed",
+      "name": "Flatbed Trailer",
+      "grid": [10, 18],
+      "weight_limit_kg": 4000,
+      "enclosed": false,
+      "lockable": false,
+      "can_store_vehicles": true,
+      "vehicle_slots": [
+        { "size": [3, 6], "max_weight_kg": 1600 }
+      ]
+    },
+    {
+      "id": "trailer_tanker",
+      "name": "Tanker Trailer",
+      "grid": [3, 3],
+      "weight_limit_kg": 12000,
+      "enclosed": true,
+      "lockable": true,
+      "can_store_vehicles": false,
+      "fuel_capacity_l": 10000
+    }
+  ]
+}
