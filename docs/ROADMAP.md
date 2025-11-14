@@ -2,6 +2,20 @@
 
 This roadmap decomposes the mega-spec for the 2D zombie survival sandbox into incremental, Git-friendly work packages. Each package is designed to be completed via short-lived feature branches and reviewed pull requests, following the "plan → implement → self-test → harden → log" loop described in the specification.
 
+## MLP Readiness (Current Gap Analysis)
+The world now streams deterministically, inventories/crafting/base-building loops are interactive, and POIs spawn modular loot scenes. To ship a **minimum lovable product** on the current finite world map, the following work items must land:
+
+| Area | Status | Delta to MLP |
+| --- | --- | --- |
+| **Persistence & saves** | ⚠️ Single-slot quick-save | Extend the existing F5/F9 slot into chunk-delta saves, multi-slot UI, and migration scaffolding. |
+| **Combat-ready zombies & AI** | ⚠️ Player combat online | Zombies now take projectile/melee damage, but zombie attacks, survivor damage, and siege behaviors still need to tie into health/morale plus base heat. |
+| **Vehicle physics & convoys** | ⚠️ Player-only driving | Add collisions, damage, fuel, and convoy escorts that physically travel the road graph for ambush gameplay. |
+| **Facilities & survivor jobs** | ⚠️ Production online | Facilities now build/produce with job buffs; next tie-ins are morale events, upkeep, and survivor fatigue. |
+| **POI interiors & encounters** | ✅ Loot scenes online | Expand templates with barricades, alarms, and faction ownership; spawn zombies/containers per POI. |
+| **Economy & sieges** | ⚠️ Heuristic | Replace proxy heat metrics with true stockpile values, trigger sieges + trader pricing off that data. |
+
+Once those rows are green the build will support the full loop (spawn → scavenge → craft → recruit → raid → defend) even before we swap the finite map for the endless worldgen variant.
+
 ## Phase 0 – Foundations & Tooling
 1. **Repository Scaffolding**
    - Convert the monolithic `main` HTML file into a structured project (`src/`, `assets/`, `data/`, `docs/`).
