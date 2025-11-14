@@ -1,5 +1,10 @@
 # WORKLOG
 
+# 2024-05-23 – Grenade Loop & Weapon Modding
+- Repurposed **g/G** bindings for grenade throws and type cycling, added grenade entries to `data/items.json`, and built fuse/physics/noise handling so explosions damage zombies and surface status on the HUD.
+- Introduced the `WeaponModController` (**T** key) plus DOM modding panel that lets QA install/detach optics, suppressors, or extended magazines, applies stat deltas in combat, and exposes safe disassembly for equipped weapons.
+- Seeded the starter inventory with grenades + attachment items, updated the tooltip/docs, and documented the new workflows across README/testing/limitations so future sprints can build on the accessory system.
+
 # 2024-05-22 – Save/Load Spine & POI Persistence
 - Added inventory serialization helpers + player/building/container/progression snapshots so the new `SaveManager` can capture state, bind to F5/F9, and hydrate the runtime when QA reloads a session.
 - Extended `WorldContainerManager` to persist POI scenes (loot grids, respawn timers, nested containers) even when chunks unload so scavenged sites stay empty until their timer expires across saves.

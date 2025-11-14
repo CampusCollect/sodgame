@@ -26,7 +26,7 @@ export class Hud {
     this.tooltip = document.createElement("div");
     this.tooltip.className = "hud-tooltip";
     this.tooltip.innerText =
-      "WASD – Move | Shift – Sprint | Ctrl – Crouch | Tab – Inventory | C – Crafting | B – Building | J – Survivors | R – Raids | Z – Cycle Decoy | X – Use Decoy | E – Interact/Drive | V – Trailer Cargo | Mouse1 – Fire | Q – Melee | F – Reload | 1 – Cycle Weapon | G – Disassemble";
+      "WASD – Move | Shift – Sprint | Ctrl – Crouch | Tab – Inventory | C – Crafting | B – Building | J – Survivors | R – Raids | Z – Cycle Decoy | X – Use Decoy | E – Interact/Drive | V – Trailer Cargo | Mouse1 – Fire | Q – Melee | F – Reload | 1 – Cycle Weapon | g – Throw Grenade | G – Cycle Grenade | T – Weapon Mods";
 
     this.container.append(this.statusLine, this.metaLine, this.weaponLine, this.tooltip);
     document.body.append(this.container);

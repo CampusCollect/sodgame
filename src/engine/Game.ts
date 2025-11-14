@@ -14,6 +14,7 @@ import { StealthController } from "../stealth/StealthController";
 import { ProgressionController } from "../progression/ProgressionController";
 import { SaveManager } from "../persistence/SaveManager";
 import { CombatController } from "../combat/CombatController";
+import { WeaponModController } from "../combat/WeaponModController";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -39,6 +40,7 @@ export class Game {
   readonly progression: ProgressionController;
   readonly saves: SaveManager;
   readonly combat: CombatController;
+  readonly weaponMods: WeaponModController;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -85,6 +87,7 @@ export class Game {
       input: this.input
     });
     this.combat = new CombatController(this.player, this.input, this.zombies, this.stealth);
+    this.weaponMods = new WeaponModController(this.player, this.input, this.combat);
 
     this.configureInput();
     this.saves.tryResume();
@@ -128,6 +131,7 @@ export class Game {
     this.factions.update(deltaTime);
     this.containers.update(deltaTime);
     this.combat.update(deltaTime, { width: this.options.width, height: this.options.height });
+    this.weaponMods.update();
     const progressionSummary = this.progression.update(deltaTime);
     this.hud.update(deltaTime, progressionSummary, this.combat.getWeaponStatus());
   }

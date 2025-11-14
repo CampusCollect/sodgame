@@ -167,6 +167,61 @@
       "description": "12-gauge buckshot rounds for pump and semi-auto shotguns."
     },
     {
+      "id": "item_grenade_frag",
+      "name": "Frag Grenade",
+      "size": [1, 1],
+      "weight_kg": 0.4,
+      "stack_max": 3,
+      "durability_max": 1,
+      "tags": ["grenade", "explosive"],
+      "actions": ["equip", "drop"],
+      "description": "Timed explosive; devastates tight zombie clusters.",
+      "grenade": {
+        "damage": 160,
+        "radius": 120,
+        "fuse_seconds": 1.2,
+        "throw_speed": 420,
+        "noise_class": "noise_explosion"
+      }
+    },
+    {
+      "id": "item_grenade_molotov",
+      "name": "Molotov Cocktail",
+      "size": [1, 1],
+      "weight_kg": 0.3,
+      "stack_max": 4,
+      "durability_max": 1,
+      "tags": ["grenade", "fire"],
+      "actions": ["equip", "drop"],
+      "description": "Creates a fireball that lingers and damages the undead.",
+      "grenade": {
+        "damage": 110,
+        "radius": 140,
+        "fuse_seconds": 0.6,
+        "throw_speed": 360,
+        "noise_class": "noise_explosion",
+        "status_effect": "burn"
+      }
+    },
+    {
+      "id": "item_grenade_flash",
+      "name": "Flashbang",
+      "size": [1, 1],
+      "weight_kg": 0.25,
+      "stack_max": 4,
+      "durability_max": 1,
+      "tags": ["grenade", "utility"],
+      "actions": ["equip", "drop"],
+      "description": "Stuns zombies and alerts factions with a bright flash.",
+      "grenade": {
+        "damage": 30,
+        "radius": 160,
+        "fuse_seconds": 0.8,
+        "throw_speed": 400,
+        "noise_class": "noise_explosion"
+      }
+    },
+    {
       "id": "item_rucksack_food",
       "name": "Food Rucksack",
       "size": [2, 2],
@@ -253,6 +308,42 @@
       "tags": ["material", "fabric"],
       "actions": ["combine", "drop"],
       "description": "Basic fabric harvested from clothing; used for bandages."
+    },
+    {
+      "id": "item_mod_reflex",
+      "name": "Reflex Sight",
+      "size": [1, 1],
+      "weight_kg": 0.3,
+      "stack_max": 2,
+      "durability_max": 100,
+      "tags": ["attachment", "optic"],
+      "attachment_slot": "optic",
+      "actions": ["install", "drop"],
+      "description": "Tactical optic that tightens spread and boosts range."
+    },
+    {
+      "id": "item_mod_suppressor",
+      "name": "Rifle Suppressor",
+      "size": [1, 2],
+      "weight_kg": 0.5,
+      "stack_max": 2,
+      "durability_max": 100,
+      "tags": ["attachment", "suppressor"],
+      "attachment_slot": "suppressor",
+      "actions": ["install", "drop"],
+      "description": "Reduces muzzle report at the cost of a slight damage loss."
+    },
+    {
+      "id": "item_mod_extmag",
+      "name": "Extended Magazine",
+      "size": [1, 2],
+      "weight_kg": 0.6,
+      "stack_max": 2,
+      "durability_max": 100,
+      "tags": ["attachment", "magazine"],
+      "attachment_slot": "magazine",
+      "actions": ["install", "drop"],
+      "description": "Adds rounds at the expense of additional weight and bulk."
     },
     {
       "id": "material_gunpowder",

@@ -8,10 +8,12 @@ type InputEventName =
   | "toggle-vehicle-cargo"
   | "use-stealth-tool"
   | "cycle-stealth-tool"
+  | "use-grenade"
+  | "cycle-grenade"
   | "reload-weapon"
   | "melee-attack"
   | "cycle-weapon"
-  | "disassemble-weapon"
+  | "toggle-weapon-mods"
   | "quick-save"
   | "quick-load"
   | "mouse-move";
@@ -40,12 +42,14 @@ const KEY_BINDINGS: Record<string, InputEventName> = {
   X: "use-stealth-tool",
   z: "cycle-stealth-tool",
   Z: "cycle-stealth-tool",
+  g: "use-grenade",
+  G: "cycle-grenade",
   f: "reload-weapon",
   F: "reload-weapon",
   q: "melee-attack",
   Q: "melee-attack",
-  g: "disassemble-weapon",
-  G: "disassemble-weapon",
+  t: "toggle-weapon-mods",
+  T: "toggle-weapon-mods",
   "1": "cycle-weapon",
   F5: "quick-save",
   F9: "quick-load"

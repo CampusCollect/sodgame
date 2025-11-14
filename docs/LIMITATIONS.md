@@ -29,7 +29,8 @@
 - Base building placements are instantaneous; survivor construction jobs, build timers, and structural integrity checks are deferred.
 - Survivor morale events are manual triggers only for now; tie them to gameplay events (sieges, loot runs, deaths) during combat/AI integration.
 - Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
-- Weapons now fire projectiles and damage zombies, but the player still cannot take damage, there are no weapon attachments/jams, and projectiles ignore cover; those hooks land with the upcoming health + collision passes.
+- Weapons now fire projectiles and damage zombies, but the player still cannot take damage, weapons never jam, and bullets ignore cover; hook up health/damage + collision volumes in the combat/physics pass.
+- Grenade simulation is limited to zombie damage + HUD cues; there is no terrain destruction, friendly-fire, or fire propagation yet and explosions do not affect faction AI beyond noise.
 - Containers spawn per POI template but still open instantly and lack lockpicking/search time mechanics.
 - Alarm HUD + stealth tools exist, but reinforcements, power cuts, and POI ownership changes are deferred for the faction combat milestone.
 - POI templates do not yet include collision tiles, barricades, or faction NPC spawns; they currently place loot containers only.

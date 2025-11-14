@@ -1067,3 +1067,83 @@ select {
   opacity: 1;
   transform: translateY(0);
 }
+
+.weapon-mod-panel {
+  position: fixed;
+  top: 72px;
+  right: 32px;
+  width: 360px;
+  background: rgba(15, 23, 42, 0.95);
+  color: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  z-index: 45;
+}
+
+.weapon-mod-panel.hidden {
+  display: none;
+}
+
+.weapon-mod-panel__title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.weapon-mod-panel__slots {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.weapon-mod-panel__slot {
+  background: rgba(15, 118, 110, 0.25);
+  border: 1px solid rgba(20, 184, 166, 0.35);
+  border-radius: 8px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.weapon-mod-panel__slot-label {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  color: #99f6e4;
+}
+
+.weapon-mod-panel__slot-status {
+  font-size: 0.9rem;
+  color: #e0f2fe;
+}
+
+.weapon-mod-panel__slot-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.weapon-mod-panel__slot-controls select,
+.weapon-mod-panel__slot-controls button {
+  flex: 1;
+  font-size: 0.85rem;
+}
+
+.weapon-mod-panel__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.weapon-mod-panel__message {
+  margin-top: 8px;
+  min-height: 20px;
+  font-size: 0.85rem;
+  color: #fcd34d;
+}

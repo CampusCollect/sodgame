@@ -40,6 +40,15 @@ export interface WeaponDefinition {
   noise_class?: string;
 }
 
+export interface GrenadeDefinition {
+  damage: number;
+  radius: number;
+  fuse_seconds: number;
+  throw_speed: number;
+  noise_class: string;
+  status_effect?: string;
+}
+
 export interface ItemDefinition {
   id: string;
   name: string;
@@ -51,8 +60,10 @@ export interface ItemDefinition {
   actions: string[];
   description: string;
   attachments?: string[];
+  attachment_slot?: string;
   freshness_hours?: number;
   weapon?: WeaponDefinition;
+  grenade?: GrenadeDefinition;
   disassembly_yield?: { item: string; qty: number }[];
 }
 

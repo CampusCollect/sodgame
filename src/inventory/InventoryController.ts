@@ -28,6 +28,11 @@ export class InventoryController {
     this.inventory.add(createStack("item_melee_bat", 1));
     this.inventory.add(createStack("item_ammo_9mm", 60));
     this.inventory.add(createStack("item_ammo_762", 60));
+    this.inventory.add(createStack("item_grenade_frag", 2));
+    this.inventory.add(createStack("item_grenade_molotov", 1));
+    this.inventory.add(createStack("item_mod_reflex", 1));
+    this.inventory.add(createStack("item_mod_suppressor", 1));
+    this.inventory.add(createStack("item_mod_extmag", 1));
   }
 
   toggle(): void {
