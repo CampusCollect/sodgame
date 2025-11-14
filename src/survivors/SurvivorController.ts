@@ -2,6 +2,7 @@ import type { InputManager } from "../engine/Input";
 import { SurvivorManager, type SurvivorSummary } from "./SurvivorManager";
 import { SurvivorPanel } from "../ui/SurvivorPanel";
 import type { MoraleEventType } from "./MoraleSystem";
+import type { JobStatMap } from "../types/JobStats";
 
 const HOURS_PER_SECOND = 1 / 60; // 1 in-game hour per real-time minute
 
@@ -91,5 +92,9 @@ export class SurvivorController {
     const jobAssignments = roster.filter(survivor => survivor.job).length;
     const score = averageSkill + moraleAverage / 20 + jobAssignments;
     return Number(score.toFixed(2));
+  }
+
+  getJobStats(): JobStatMap {
+    return this.manager.getJobStats();
   }
 }

@@ -410,6 +410,28 @@
       "tags": ["material", "metal"],
       "actions": ["combine", "drop"],
       "description": "General purpose scrap used in facility upgrades."
+    },
+    {
+      "id": "material_seed",
+      "name": "Seed Packet",
+      "size": [1, 1],
+      "weight_kg": 0.2,
+      "stack_max": 15,
+      "durability_max": 100,
+      "tags": ["material", "agriculture"],
+      "actions": ["deposit", "drop"],
+      "description": "Mixed heirloom seeds required to spin up farm facilities."
+    },
+    {
+      "id": "material_electronics",
+      "name": "Electronics Crate",
+      "size": [1, 2],
+      "weight_kg": 1.5,
+      "stack_max": 8,
+      "durability_max": 100,
+      "tags": ["material", "electronics"],
+      "actions": ["deposit", "drop"],
+      "description": "Bundled circuits, capacitors, and fuses used by radio towers and garages."
     }
   ]
 }

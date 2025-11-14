@@ -9,12 +9,12 @@
 | Data sets do not meet final breadth (50+ items, etc.) | Medium | High | Provide representative samples + JSON schemas | Expand catalogs alongside feature sprints |
 | Vehicle driving lacks collisions/damage + AI escorts | High | Medium | Added player-controlled driving, hints, and cargo HUD to unblock QA | Layer in collision volumes, damage, fuel, and NPC drivers |
 | Persistence limited to a single quick-save slot (no chunk delta migrations) | Medium | Medium | Added F5/F9 quick-save tied to player/base/container state | Extend to multi-slot saves, chunk deltas, and survivor mission logs |
-| Survivor jobs not yet linked to facility throughput | Medium | Medium | Track assignments in controller, surface in UI | Apply production modifiers once facilities exist |
+| Survivor jobs not yet linked to facility throughput | Low | Low | Facilities now read job stats to accelerate builds/production and push output into the shared stockpile | Extend to morale/fatigue penalties and survivor scheduling |
 | Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
 | POI templates spawn loot scenes only (no walls/alarms yet) | Medium | Medium | Containers now sync to POIs with template data | Expand templates with interior tiles, locks, and faction state |
 | Alarm controller does not yet drive faction reinforcements | Medium | Medium | Trigger placeholder alarms off extreme noise | Wire alarms into faction AI + POI state machines |
 | Player/zombie combat still lacks cover/collision handling | High | Medium | Player vitals + zombie melee damage + quick-heal loop now live | Add projectile obstacles, weapon jamming, and knockback |
-| Progression/heat scoring uses heuristic proxies (inventory weight + structure HP) | Medium | Medium | Surface assumptions in HUD + docs | Replace with true loot value, facility power, and survivor-driven sieges |
+| Progression/heat scoring uses heuristic proxies (inventory weight + structure HP) | Medium | Medium | Heat model now ingests the base stockpile value + defense score | Tie sieges/reinforcements directly to resource categories and facility uptime |
 | Chunk streaming currently lives only in-memory | High | Medium | Deterministic seeds keep POIs/roads reproducible | Add save/load of chunk deltas + async IO |
 | Road network is visual-only | Medium | Medium | Display spline-like overlays for navigation cues | Hook roads into convoy AI, collisions, and barricade gameplay |
 
@@ -26,6 +26,7 @@
 - Inventory weight checks currently reject entire stacks when capacity is exceeded rather than splitting or queuing overflow.
 - Crafting assumes the player inventory doubles as both input and output storage; dedicated workstation inventories and survivor job hand-offs are still TODO.
 - Crafting output currently fails silently into the void when inventories are full; hook up ground drops or station storage in the next sprint.
+- Facility production does not yet consume upkeep/fuel or respect blueprint gating beyond tier data; integrate blueprint unlocks and survivor fatigue in a future pass.
 - Base building placements are instantaneous; survivor construction jobs, build timers, and structural integrity checks are deferred.
 - Survivor morale events are manual triggers only for now; tie them to gameplay events (sieges, loot runs, deaths) during combat/AI integration.
 - Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.

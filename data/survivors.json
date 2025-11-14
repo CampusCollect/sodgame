@@ -23,11 +23,12 @@
     }
   ],
   "job_catalog": [
-    { "id": "builder", "name": "Builder", "description": "Constructs and repairs base structures." },
-    { "id": "guard", "name": "Guard", "description": "Patrols walls and repels threats." },
-    { "id": "farmer", "name": "Farmer", "description": "Tends crops and manages food stores." },
-    { "id": "medic", "name": "Medic", "description": "Runs infirmary treatments and triage." },
-    { "id": "mechanic", "name": "Mechanic", "description": "Maintains vehicles, generators, and tools." },
-    { "id": "scavenger", "name": "Scavenger", "description": "Runs supply runs to nearby POIs." }
+    { "id": "builder", "name": "Builder", "description": "Constructs and repairs base structures.", "skill": "mechanics" },
+    { "id": "guard", "name": "Guard", "description": "Patrols walls and repels threats.", "skill": "combat" },
+    { "id": "farmer", "name": "Farmer", "description": "Tends crops and manages food stores.", "skill": "scavenging" },
+    { "id": "medic", "name": "Medic", "description": "Runs infirmary treatments and triage.", "skill": "medicine" },
+    { "id": "mechanic", "name": "Mechanic", "description": "Maintains vehicles, generators, and tools.", "skill": "mechanics" },
+    { "id": "scavenger", "name": "Scavenger", "description": "Runs supply runs to nearby POIs.", "skill": "scavenging" },
+    { "id": "leader", "name": "Leader", "description": "Coordinates diplomacy, radio ops, and morale.", "skill": "leadership" }
   ]
 }

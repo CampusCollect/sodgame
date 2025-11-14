@@ -5,6 +5,7 @@ import type { ZombieDirector } from "../ai/ZombieDirector";
 import { DifficultyScaler, type DifficultySnapshot } from "./DifficultyScaler";
 import { BaseHeatTracker, type HeatSnapshot } from "./BaseHeatTracker";
 import { SeasonManager, type SeasonSnapshot, type SeasonState } from "./SeasonManager";
+import type { FacilityController } from "../building/FacilityController";
 
 const SECONDS_PER_DAY = 600; // 10 real minutes per in-game day
 
@@ -40,7 +41,8 @@ export class ProgressionController {
     private readonly player: Player,
     private readonly building: BuildingController,
     private readonly survivors: SurvivorController,
-    private readonly zombies: ZombieDirector
+    private readonly zombies: ZombieDirector,
+    private readonly facilities: FacilityController
   ) {
     this.panel = document.createElement("div");
     this.panel.className = "progression-panel";
@@ -60,7 +62,7 @@ export class ProgressionController {
     const difficulty = this.difficulty.evaluate(distanceMeters, communityPower);
     this.zombies.applyDifficulty(difficulty.spawnTarget, difficulty.spawnMix);
 
-    const lootScore = this.player.inventory.getCurrentWeight() * 5; // ASSUMPTION: weight approximates loot value
+    const lootScore = Math.max(this.facilities.getStockpileValue(), this.player.inventory.getCurrentWeight() * 2);
     const defenseScore = this.building.getDefenseScore();
     const heat = this.heat.evaluate({ lootScore, defenseScore, daysSurvived: this.elapsedDays });
     const season = this.seasons.advance(deltaSeconds / SECONDS_PER_DAY);
@@ -89,7 +91,7 @@ export class ProgressionController {
     const distanceMeters = Math.hypot(this.player.position.x, this.player.position.y);
     const communityPower = this.survivors.getCommunityPowerScore();
     const difficulty = this.difficulty.evaluate(distanceMeters, communityPower);
-    const lootScore = this.player.inventory.getCurrentWeight() * 5;
+    const lootScore = Math.max(this.facilities.getStockpileValue(), this.player.inventory.getCurrentWeight() * 2);
     const defenseScore = this.building.getDefenseScore();
     const heat = this.heat.evaluate({ lootScore, defenseScore, daysSurvived: this.elapsedDays });
     const season = this.seasons.getSnapshot();

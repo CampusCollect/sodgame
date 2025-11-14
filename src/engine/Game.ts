@@ -7,6 +7,7 @@ import { ZombieDirector } from "../ai/ZombieDirector";
 import { VehicleDirector } from "../vehicles/VehicleDirector";
 import { CraftingController } from "../crafting/CraftingController";
 import { BuildingController } from "../building/BuildingController";
+import { FacilityController } from "../building/FacilityController";
 import { SurvivorController } from "../survivors/SurvivorController";
 import { FactionController } from "../factions/FactionController";
 import { WorldContainerManager } from "../loot/WorldContainerManager";
@@ -35,6 +36,7 @@ export class Game {
   readonly vehicles: VehicleDirector;
   readonly crafting: CraftingController;
   readonly building: BuildingController;
+  readonly facilities: FacilityController;
   readonly survivors: SurvivorController;
   readonly factions: FactionController;
   readonly containers: WorldContainerManager;
@@ -71,6 +73,7 @@ export class Game {
       height: options.height
     });
     this.survivors = new SurvivorController(this.input);
+    this.facilities = new FacilityController(this.player, this.building, this.survivors, this.input);
     this.factions = new FactionController(this.input);
     this.containers = new WorldContainerManager(
       this.player,
@@ -81,10 +84,17 @@ export class Game {
       },
       this.world
     );
-    this.progression = new ProgressionController(this.player, this.building, this.survivors, this.zombies);
+    this.progression = new ProgressionController(
+      this.player,
+      this.building,
+      this.survivors,
+      this.zombies,
+      this.facilities
+    );
     this.saves = new SaveManager({
       player: this.player,
       building: this.building,
+      facilities: this.facilities,
       containers: this.containers,
       progression: this.progression,
       input: this.input,
@@ -132,13 +142,20 @@ export class Game {
     this.vehicles.update(deltaTime, this.world, this.player);
     this.crafting.update(deltaTime);
     this.building.update();
+    this.facilities.update(deltaTime);
     this.survivors.update(deltaTime);
     this.factions.update(deltaTime);
     this.containers.update(deltaTime);
     this.combat.update(deltaTime, { width: this.options.width, height: this.options.height });
     this.weaponMods.update();
     const progressionSummary = this.progression.update(deltaTime);
-    this.hud.update(deltaTime, progressionSummary, this.combat.getWeaponStatus(), this.vitals.getHudState());
+    this.hud.update(
+      deltaTime,
+      progressionSummary,
+      this.combat.getWeaponStatus(),
+      this.vitals.getHudState(),
+      this.facilities.getStockpileTotals()
+    );
   }
 
   private draw(): void {

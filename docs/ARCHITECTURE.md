@@ -12,6 +12,7 @@
 - `InventoryController` + `TransparentContainerHUD` – DOM overlays reflecting grid inventories and nested containers.
 - `CraftingController` + `CraftingPanel` – recipe book, skill-checked queue management, and DOM planner overlay backed by JSON definitions.
 - `BuildingManager` + `BuildingController` – base building planner with collision checks, power balancing, and inventory-backed placement costs rendered in-canvas.
+- `FacilityManager` + `FacilityController` + `FacilityPanel` + `BaseStockpile` – facility blueprint/upgrade queue, job-influenced construction/production, shared stockpile tracking, and HUD/heat integration exposed via the **N** panel.
 - `ZombieDirector` – coordinates FSM zombies, noise propagation, and horde scaffolding for debug visualization.
 - `VehicleDirector` – instantiates vehicles/trailers from data definitions, handles enter/exit prompts, simplified driving physics, hitch offsets, and keeps the cargo manifest + hint overlays in sync with player input.
 - `TransparentCargoHUD` & `MaintenanceUI` – UI overlays for trailer cargo manifests (grid + weight readouts via **V**) and vehicle condition readouts.

@@ -2,6 +2,7 @@ type InputEventName =
   | "toggle-inventory"
   | "toggle-crafting"
   | "toggle-building"
+  | "toggle-facilities"
   | "toggle-survivors"
   | "toggle-raids"
   | "interact"
@@ -31,6 +32,8 @@ const KEY_BINDINGS: Record<string, InputEventName> = {
   C: "toggle-crafting",
   b: "toggle-building",
   B: "toggle-building",
+  n: "toggle-facilities",
+  N: "toggle-facilities",
   j: "toggle-survivors",
   J: "toggle-survivors",
   r: "toggle-raids",

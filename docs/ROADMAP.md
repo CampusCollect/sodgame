@@ -10,7 +10,7 @@ The world now streams deterministically, inventories/crafting/base-building loop
 | **Persistence & saves** | ⚠️ Single-slot quick-save | Extend the existing F5/F9 slot into chunk-delta saves, multi-slot UI, and migration scaffolding. |
 | **Combat-ready zombies & AI** | ⚠️ Player combat online | Zombies now take projectile/melee damage, but zombie attacks, survivor damage, and siege behaviors still need to tie into health/morale plus base heat. |
 | **Vehicle physics & convoys** | ⚠️ Player-only driving | Add collisions, damage, fuel, and convoy escorts that physically travel the road graph for ambush gameplay. |
-| **Facilities & survivor jobs** | ⚠️ UI stubbed | Connect jobs to facility throughput, add build timers/power costs, and surface morale events tied to gameplay. |
+| **Facilities & survivor jobs** | ⚠️ Production online | Facilities now build/produce with job buffs; next tie-ins are morale events, upkeep, and survivor fatigue. |
 | **POI interiors & encounters** | ✅ Loot scenes online | Expand templates with barricades, alarms, and faction ownership; spawn zombies/containers per POI. |
 | **Economy & sieges** | ⚠️ Heuristic | Replace proxy heat metrics with true stockpile values, trigger sieges + trader pricing off that data. |
 

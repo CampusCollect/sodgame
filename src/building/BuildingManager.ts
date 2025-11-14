@@ -17,6 +17,7 @@ export interface PowerSummary {
   availableKw: number;
   consumptionKw: number;
   deficitKw: number;
+  facilityKw: number;
 }
 
 export interface PlacementResult {
@@ -41,7 +42,10 @@ export class BuildingManager {
   private readonly structures = new Map<string, StructureDefinition>();
   private placed: PlacedStructure[] = [];
   private nextId = 1;
-  private power: PowerSummary = { availableKw: 0, consumptionKw: 0, deficitKw: 0 };
+  private power: PowerSummary = { availableKw: 0, consumptionKw: 0, deficitKw: 0, facilityKw: 0 };
+  private facilityLoadKw = 0;
+  private generatorKw = 0;
+  private structureKw = 0;
 
   constructor() {
     content.structures.forEach(def => this.structures.set(def.id, def));
@@ -57,6 +61,14 @@ export class BuildingManager {
 
   getPowerSummary(): PowerSummary {
     return this.power;
+  }
+
+  getPowerBreakdown(): { generatorKw: number; structureKw: number; facilityKw: number } {
+    return {
+      generatorKw: this.generatorKw,
+      structureKw: this.structureKw,
+      facilityKw: this.facilityLoadKw
+    };
   }
 
   getDefinition(structureId: string): StructureDefinition | undefined {
@@ -157,6 +169,11 @@ export class BuildingManager {
     this.recomputePower();
   }
 
+  setFacilityLoad(loadKw: number): void {
+    this.facilityLoadKw = Math.max(0, Number(loadKw.toFixed(3)));
+    this.recomputePower();
+  }
+
   private toRequirements(def: StructureDefinition): { itemId: string; quantity: number }[] {
     return Object.entries(def.cost).map(([itemId, quantity]) => ({ itemId, quantity }));
   }
@@ -166,11 +183,14 @@ export class BuildingManager {
       return total + (structure.definition.power_output_kw ?? 0);
     }, 0);
     const consumers = this.placed.filter(placed => (placed.definition.power_required_kw ?? 0) > 0);
-    const totalConsumption = consumers.reduce((total, structure) => {
+    const structureConsumption = consumers.reduce((total, structure) => {
       return total + (structure.definition.power_required_kw ?? 0);
     }, 0);
 
-    let remaining = available;
+    let remaining = available - this.facilityLoadKw;
+    if (remaining < 0) {
+      remaining = 0;
+    }
     this.placed = this.placed.map(placed => {
       const required = placed.definition.power_required_kw ?? 0;
       if (required <= 0) {
@@ -183,10 +203,14 @@ export class BuildingManager {
       return { ...placed, powered: false };
     });
 
+    const totalConsumption = structureConsumption + this.facilityLoadKw;
+    this.generatorKw = Number(available.toFixed(2));
+    this.structureKw = Number(structureConsumption.toFixed(2));
     this.power = {
-      availableKw: Number(available.toFixed(2)),
+      availableKw: this.generatorKw,
       consumptionKw: Number(totalConsumption.toFixed(2)),
-      deficitKw: Number(Math.max(0, totalConsumption - available).toFixed(2))
+      deficitKw: Number(Math.max(0, totalConsumption - available).toFixed(2)),
+      facilityKw: Number(this.facilityLoadKw.toFixed(2))
     };
   }
 }

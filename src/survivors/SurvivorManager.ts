@@ -3,6 +3,7 @@ import type { SurvivorJobDefinition } from "../data/ContentRegistry";
 import { MoraleSystem, type MoraleEvent } from "./MoraleSystem";
 import { RelationshipGraph } from "./RelationshipGraph";
 import { SkillProgression, type SkillState } from "./SkillProgression";
+import type { JobStatMap } from "../types/JobStats";
 
 export interface Survivor {
   id: string;
@@ -85,6 +86,27 @@ export class SurvivorManager {
 
   getJobs(): SurvivorJobDefinition[] {
     return [...this.jobs.values()];
+  }
+
+  getJobStats(): JobStatMap {
+    const aggregates = new Map<string, { count: number; totalSkill: number }>();
+    this.survivors.forEach(survivor => {
+      if (!survivor.job || survivor.status === "dead") {
+        return;
+      }
+      const job = this.jobs.get(survivor.job);
+      const skillId = job?.skill ?? survivor.job;
+      const skill = survivor.skills[skillId]?.level ?? 0;
+      const current = aggregates.get(survivor.job) ?? { count: 0, totalSkill: 0 };
+      current.count += 1;
+      current.totalSkill += skill;
+      aggregates.set(survivor.job, current);
+    });
+    const summary: JobStatMap = {};
+    aggregates.forEach((value, jobId) => {
+      summary[jobId] = { count: value.count, avgSkill: value.count ? value.totalSkill / value.count : 0 };
+    });
+    return summary;
   }
 
   assignJob(id: string, jobId: string | null): boolean {

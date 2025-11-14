@@ -1,16 +1,19 @@
 import type { Player, PlayerStateSnapshot } from "../entities/Player";
 import type { BuildingController } from "../building/BuildingController";
+import type { FacilityController } from "../building/FacilityController";
 import type { WorldContainerManager, PersistedPoiState } from "../loot/WorldContainerManager";
 import type { ProgressionController, ProgressionPersistenceState } from "../progression/ProgressionController";
 import type { SerializedStructurePlacement } from "../building/BuildingManager";
 import type { InputManager } from "../engine/Input";
 import type { PlayerVitals, PlayerVitalsSnapshot } from "../combat/PlayerVitals";
+import type { FacilityPersistenceState } from "../building/FacilityManager";
 
 interface SavePayload {
   version: number;
   timestamp: number;
   player: PlayerStateSnapshot;
   structures: SerializedStructurePlacement[];
+  facilities?: FacilityPersistenceState;
   containers: PersistedPoiState[];
   progression: ProgressionPersistenceState;
   vitals?: PlayerVitalsSnapshot;
@@ -22,6 +25,7 @@ const TOAST_DURATION_MS = 3500;
 interface SaveManagerDeps {
   player: Player;
   building: BuildingController;
+  facilities: FacilityController;
   containers: WorldContainerManager;
   progression: ProgressionController;
   input: InputManager;
@@ -79,6 +83,7 @@ export class SaveManager {
         timestamp: Date.now(),
         player: this.deps.player.serialize(),
         structures: this.deps.building.exportState(),
+        facilities: this.deps.facilities.exportState(),
         containers: this.deps.containers.exportState(),
         progression: this.deps.progression.exportState(),
         vitals: this.deps.vitals.serialize()
@@ -92,6 +97,7 @@ export class SaveManager {
   private apply(payload: SavePayload): void {
     this.deps.player.load(payload.player);
     this.deps.building.importState(payload.structures ?? []);
+    this.deps.facilities.importState(payload.facilities);
     this.deps.containers.importState(payload.containers ?? []);
     if (payload.progression) {
       this.deps.progression.loadState(payload.progression);

@@ -1,5 +1,10 @@
 # WORKLOG
 
+# 2024-05-25 – Facility & Stockpile Pass
+- Introduced a facility manager/controller + DOM panel (**N**) so QA can queue workshops/infirmaries/farms, monitor power draw, and watch job-staffed production tick resources into the shared base stockpile.
+- Added BaseStockpile serialization, facility persistence, and HUD stockpile line while letting the progression heat model read actual resource value instead of backpack weight heuristics.
+- Wired survivor jobs into facility throughput (builder speed boosts, farmer/mechanic output), updated save/load flows, refreshed docs/tooltips, and logged the new risk mitigations/tests for the facilities milestone.
+
 # 2024-05-24 – Player Vitals & Zombie Damage
 - Wired a new `PlayerVitals` controller into the engine so HP/stamina/bleed/infection persist through saves, feed a dedicated HUD card, and lock the player when downed.
 - Updated `ZombieDirector` to track melee cooldowns and apply damage/infection to the player, while the HUD + docs gained the **H** quick-heal workflow that consumes bandages/medkits.

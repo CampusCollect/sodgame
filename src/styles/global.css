@@ -479,6 +479,13 @@ select {
   color: rgba(148, 163, 184, 0.9);
 }
 
+.build-panel__power-detail {
+  font-size: 11px;
+  color: #cbd5f5;
+  display: inline-block;
+  margin-left: 8px;
+}
+
 .build-panel__structures {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1096,6 +1103,133 @@ select {
 .save-toast.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.facility-panel {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 320px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 12px;
+  padding: 16px;
+  color: #e2e8f0;
+  z-index: 90;
+}
+
+.facility-panel.hidden {
+  display: none;
+}
+
+.facility-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.facility-panel__stockpile h4,
+.facility-panel__available h4,
+.facility-panel__list h4 {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #cbd5f5;
+}
+
+.facility-panel__stockpile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.facility-panel__stockpile-cell {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.facility-panel__available-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.facility-panel__available-row button {
+  align-self: flex-start;
+}
+
+.facility-panel__costs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  color: #cbd5f5;
+}
+
+.facility-panel__facility {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.facility-panel__facility header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.facility-panel__status {
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.facility-panel__output {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #86efac;
+}
+
+.facility-panel__upgrade {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.facility-panel__message {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.facility-panel__message[data-state="error"] {
+  color: #f87171;
+}
+
+.facility-panel__message[data-state="ok"] {
+  color: #86efac;
+}
+
+.hud-resources {
+  font-size: 13px;
+  color: #cbd5f5;
+  margin-bottom: 4px;
 }
 
 .weapon-mod-panel {

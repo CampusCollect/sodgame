@@ -158,6 +158,7 @@ export class BuildingController {
       <span class="build-panel__power">Power ${power.availableKw.toFixed(2)} kW / ${power.consumptionKw.toFixed(2)} kW${
         power.deficitKw > 0 ? ` (Deficit ${power.deficitKw.toFixed(2)} kW)` : ""
       }</span>
+      ${power.facilityKw > 0 ? `<span class="build-panel__power-detail">Facilities ${power.facilityKw.toFixed(2)} kW</span>` : ""}
       <span>Left click to place. Press B to close.</span>
     `;
 

@@ -245,6 +245,11 @@ export interface StructureDefinition {
   power_output_kw?: number;
 }
 
+export interface FacilityProductionDefinition {
+  resource: string;
+  amount: number;
+}
+
 export interface FacilityTierDefinition {
   tier: number;
   slots: number;
@@ -253,6 +258,7 @@ export interface FacilityTierDefinition {
   build_cost: Record<string, number>;
   build_time_seconds: number;
   requires_blueprint?: string;
+  production_per_hour?: FacilityProductionDefinition[];
 }
 
 export interface FacilityDefinition {
@@ -315,6 +321,7 @@ export interface SurvivorJobDefinition {
   id: string;
   name: string;
   description: string;
+  skill?: string;
 }
 
 export interface SurvivorContentDefinition {
