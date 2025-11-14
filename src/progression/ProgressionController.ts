@@ -4,7 +4,7 @@ import type { SurvivorController } from "../survivors/SurvivorController";
 import type { ZombieDirector } from "../ai/ZombieDirector";
 import { DifficultyScaler, type DifficultySnapshot } from "./DifficultyScaler";
 import { BaseHeatTracker, type HeatSnapshot } from "./BaseHeatTracker";
-import { SeasonManager, type SeasonSnapshot } from "./SeasonManager";
+import { SeasonManager, type SeasonSnapshot, type SeasonState } from "./SeasonManager";
 
 const SECONDS_PER_DAY = 600; // 10 real minutes per in-game day
 
@@ -21,6 +21,11 @@ export interface ProgressionSummary {
   seasonEffects: string[];
   seasonDaysRemaining: number;
   warnings: string[];
+}
+
+export interface ProgressionPersistenceState {
+  elapsedDays: number;
+  season: SeasonState;
 }
 
 export class ProgressionController {
@@ -67,6 +72,29 @@ export class ProgressionController {
 
   getSummary(): ProgressionSummary {
     return this.summary;
+  }
+
+  exportState(): ProgressionPersistenceState {
+    return {
+      elapsedDays: this.elapsedDays,
+      season: this.seasons.serialize()
+    };
+  }
+
+  loadState(state: ProgressionPersistenceState): void {
+    this.elapsedDays = state.elapsedDays ?? 0;
+    if (state.season) {
+      this.seasons.load(state.season);
+    }
+    const distanceMeters = Math.hypot(this.player.position.x, this.player.position.y);
+    const communityPower = this.survivors.getCommunityPowerScore();
+    const difficulty = this.difficulty.evaluate(distanceMeters, communityPower);
+    const lootScore = this.player.inventory.getCurrentWeight() * 5;
+    const defenseScore = this.building.getDefenseScore();
+    const heat = this.heat.evaluate({ lootScore, defenseScore, daysSurvived: this.elapsedDays });
+    const season = this.seasons.getSnapshot();
+    this.summary = this.composeSummary({ difficulty, heat, season });
+    this.render();
   }
 
   private composeSummary(params: {

@@ -8,6 +8,8 @@ type InputEventName =
   | "toggle-vehicle-cargo"
   | "use-stealth-tool"
   | "cycle-stealth-tool"
+  | "quick-save"
+  | "quick-load"
   | "mouse-move";
 
 type InputListener = () => void;
@@ -33,7 +35,9 @@ const KEY_BINDINGS: Record<string, InputEventName> = {
   x: "use-stealth-tool",
   X: "use-stealth-tool",
   z: "cycle-stealth-tool",
-  Z: "cycle-stealth-tool"
+  Z: "cycle-stealth-tool",
+  F5: "quick-save",
+  F9: "quick-load"
 };
 
 export class InputManager {

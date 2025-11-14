@@ -2,7 +2,7 @@ import type { Player, Vector2 } from "../entities/Player";
 import type { InputManager } from "../engine/Input";
 import { content } from "../data";
 import type { ContainerDefinition, PoiTemplateDefinition } from "../data/ContentRegistry";
-import { Inventory } from "../inventory/Inventory";
+import { Inventory, type SerializedInventory } from "../inventory/Inventory";
 import type { ItemStack } from "../inventory/Item";
 import { TransparentContainerHUD } from "../ui/TransparentContainerHUD";
 import { LootGenerator } from "./LootGenerator";
@@ -20,6 +20,20 @@ interface SpawnedContainer {
   respawnTimer: number;
 }
 
+export interface PersistedContainerState {
+  definitionId: string;
+  position: Vector2;
+  lootTableId: string;
+  respawnSeconds: number;
+  respawnTimer: number;
+  inventory: SerializedInventory;
+}
+
+export interface PersistedPoiState {
+  poiId: string;
+  containers: PersistedContainerState[];
+}
+
 const INTERACTION_RANGE = 140;
 const POI_SYNC_RADIUS = 2;
 const SECONDS_PER_IN_GAME_DAY = 60;
@@ -32,6 +46,8 @@ export class WorldContainerManager {
   private readonly loot = new LootGenerator();
   private active: SpawnedContainer | null = null;
   private readonly poiScenes = new Map<string, string[]>();
+  private readonly poiStates = new Map<string, PersistedPoiState>();
+  private readonly containerToPoi = new Map<string, string>();
   private readonly templates: PoiTemplateDefinition[] = content.poi_templates;
 
   constructor(
@@ -98,7 +114,9 @@ export class WorldContainerManager {
     definitionId: string,
     position: Vector2,
     lootTableId: string,
-    respawnSeconds: number
+    respawnSeconds: number,
+    initialInventory?: SerializedInventory,
+    respawnTimerOverride?: number
   ): SpawnedContainer | null {
     const definition = content.containers.find(container => container.id === definitionId);
     if (!definition) {
@@ -119,10 +137,14 @@ export class WorldContainerManager {
       position,
       lootTableId,
       respawnSeconds,
-      respawnTimer: respawnSeconds
+      respawnTimer: respawnTimerOverride ?? respawnSeconds
     };
     this.containers.push(container);
-    this.refill(container);
+    if (initialInventory) {
+      container.inventory.load(initialInventory);
+    } else {
+      this.refill(container);
+    }
     return container;
   }
 
@@ -165,6 +187,10 @@ export class WorldContainerManager {
       this.hud.setHint(`Transferred ${moved} stacks · Press E again if space remains`);
     }
     this.syncHud();
+    const poiId = this.active ? this.containerToPoi.get(this.active.id) : null;
+    if (poiId) {
+      this.capturePoiState(poiId);
+    }
   }
 
   private syncHud(): void {
@@ -195,6 +221,31 @@ export class WorldContainerManager {
       }
     });
     container.respawnTimer = container.respawnSeconds;
+    const poiId = this.containerToPoi.get(container.id);
+    if (poiId) {
+      this.capturePoiState(poiId);
+    }
+  }
+
+  private capturePoiState(poiId: string): void {
+    const containerIds = this.poiScenes.get(poiId);
+    if (!containerIds) {
+      return;
+    }
+    const containers = containerIds
+      .map(id => this.containers.find(container => container.id === id))
+      .filter((container): container is SpawnedContainer => Boolean(container))
+      .map(container => ({
+        definitionId: container.definition.id,
+        position: { ...container.position },
+        lootTableId: container.lootTableId,
+        respawnSeconds: container.respawnSeconds,
+        respawnTimer: container.respawnTimer,
+        inventory: container.inventory.serialize()
+      }));
+    if (containers.length > 0) {
+      this.poiStates.set(poiId, { poiId, containers });
+    }
   }
 
   private syncPoiScenes(): void {
@@ -218,9 +269,24 @@ export class WorldContainerManager {
     const template = this.resolveTemplate(poi);
     const respawnSeconds = this.convertRespawnToSeconds(poi.respawnDays);
     const spawnedIds: string[] = [];
+    const persisted = this.poiStates.get(poi.id);
 
-    if (template) {
-      template.containers.forEach((placement) => {
+    if (persisted) {
+      persisted.containers.forEach(containerState => {
+        const container = this.spawnContainer(
+          containerState.definitionId,
+          containerState.position,
+          containerState.lootTableId,
+          containerState.respawnSeconds,
+          containerState.inventory,
+          containerState.respawnTimer
+        );
+        if (container) {
+          spawnedIds.push(container.id);
+        }
+      });
+    } else if (template) {
+      template.containers.forEach(placement => {
         const position = this.offsetToWorld(poi, placement.offset);
         const container = this.spawnContainer(
           placement.container_id,
@@ -248,12 +314,15 @@ export class WorldContainerManager {
 
     if (spawnedIds.length > 0) {
       this.poiScenes.set(poi.id, spawnedIds);
+      spawnedIds.forEach(id => this.containerToPoi.set(id, poi.id));
+      this.capturePoiState(poi.id);
     }
   }
 
   private destroyScene(poiId: string): void {
     const containerIds = this.poiScenes.get(poiId);
     if (!containerIds) return;
+    this.capturePoiState(poiId);
     containerIds.forEach((id) => this.removeContainerById(id));
     this.poiScenes.delete(poiId);
   }
@@ -262,6 +331,7 @@ export class WorldContainerManager {
     const index = this.containers.findIndex((container) => container.id === id);
     if (index === -1) return;
     this.containers.splice(index, 1);
+    this.containerToPoi.delete(id);
     if (this.active?.id === id) {
       this.active = null;
       this.hud.hide();
@@ -292,5 +362,60 @@ export class WorldContainerManager {
   private convertRespawnToSeconds(range: [number, number]): number {
     const avgDays = (range[0] + range[1]) / 2;
     return Math.max(90, avgDays * SECONDS_PER_IN_GAME_DAY);
+  }
+
+  exportState(): PersistedPoiState[] {
+    this.poiScenes.forEach((_value, poiId) => this.capturePoiState(poiId));
+    return [...this.poiStates.values()].map(state => ({
+      poiId: state.poiId,
+      containers: state.containers.map(container => ({
+        definitionId: container.definitionId,
+        position: { ...container.position },
+        lootTableId: container.lootTableId,
+        respawnSeconds: container.respawnSeconds,
+        respawnTimer: container.respawnTimer,
+        inventory: this.cloneInventory(container.inventory)
+      }))
+    }));
+  }
+
+  importState(states: PersistedPoiState[]): void {
+    this.clearRuntimeContainers();
+    this.poiStates.clear();
+    states.forEach(state => {
+      this.poiStates.set(state.poiId, {
+        poiId: state.poiId,
+        containers: state.containers.map(container => ({
+          definitionId: container.definitionId,
+          position: { ...container.position },
+          lootTableId: container.lootTableId,
+          respawnSeconds: container.respawnSeconds,
+          respawnTimer: container.respawnTimer,
+          inventory: this.cloneInventory(container.inventory)
+        }))
+      });
+    });
+  }
+
+  private clearRuntimeContainers(): void {
+    this.containers.splice(0, this.containers.length);
+    this.poiScenes.clear();
+    this.containerToPoi.clear();
+    this.active = null;
+    this.hud.hide();
+  }
+
+  private cloneInventory(inventory: SerializedInventory): SerializedInventory {
+    return {
+      ...inventory,
+      items: inventory.items.map(item => ({
+        stack: {
+          ...item.stack,
+          attachments: item.stack.attachments ? { ...item.stack.attachments } : undefined
+        },
+        position: { ...item.position },
+        rotated: item.rotated
+      }))
+    };
   }
 }

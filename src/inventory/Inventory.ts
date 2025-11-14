@@ -1,4 +1,4 @@
-import { GridInventory, type GridRenderState, type PlacedItem } from "./GridInventory";
+import { GridInventory, type GridRenderState, type GridPosition, type PlacedItem } from "./GridInventory";
 import { resolveItemDefinition, type ItemStack } from "./Item";
 
 export interface InventoryOptions {
@@ -7,6 +7,21 @@ export interface InventoryOptions {
   weightLimitKg: number;
   allowRotation: boolean;
   label?: string;
+}
+
+export interface SerializedInventoryItem {
+  stack: ItemStack;
+  position: GridPosition;
+  rotated: boolean;
+}
+
+export interface SerializedInventory {
+  columns: number;
+  rows: number;
+  weightLimitKg: number;
+  allowRotation: boolean;
+  label: string;
+  items: SerializedInventoryItem[];
 }
 
 const DEFAULT_OPTIONS: InventoryOptions = {
@@ -88,6 +103,44 @@ export class Inventory {
 
   getRenderState(): GridRenderState {
     return this.grid.getRenderState();
+  }
+
+  serialize(): SerializedInventory {
+    return {
+      columns: this.grid.columns,
+      rows: this.grid.rows,
+      weightLimitKg: this.weightLimitKg,
+      allowRotation: this.allowRotation,
+      label: this.label,
+      items: this.grid.getPlacedItems().map(item => ({
+        stack: {
+          ...item.stack,
+          attachments: item.stack.attachments ? { ...item.stack.attachments } : undefined
+        },
+        position: { ...item.position },
+        rotated: item.rotated
+      }))
+    };
+  }
+
+  load(state: SerializedInventory): void {
+    if (state.columns !== this.grid.columns || state.rows !== this.grid.rows) {
+      console.warn(
+        `Inventory size mismatch during load (saved ${state.columns}x${state.rows}, current ${this.grid.columns}x${this.grid.rows})`
+      );
+    }
+    this.grid.clear();
+    state.items.forEach(item => {
+      const stack: ItemStack = {
+        ...item.stack,
+        attachments: item.stack.attachments ? { ...item.stack.attachments } : undefined
+      };
+      const success = this.grid.restoreStack(stack, item.position, item.rotated);
+      if (!success) {
+        console.warn(`Failed to restore stack ${item.stack.itemId} at (${item.position.x},${item.position.y})`);
+        this.add(stack);
+      }
+    });
   }
 
   private hasCapacityFor(weight: number): boolean {

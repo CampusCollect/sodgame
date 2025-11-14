@@ -1,5 +1,11 @@
 # WORKLOG
 
+# 2024-05-22 – Save/Load Spine & POI Persistence
+- Added inventory serialization helpers + player/building/container/progression snapshots so the new `SaveManager` can capture state, bind to F5/F9, and hydrate the runtime when QA reloads a session.
+- Extended `WorldContainerManager` to persist POI scenes (loot grids, respawn timers, nested containers) even when chunks unload so scavenged sites stay empty until their timer expires across saves.
+- Introduced a DOM toast for save/load feedback, wired the Input manager to emit new quick-save/load events, and refreshed README/testing/limitations/worklog docs with the persistence workflow plus single-slot constraints.
+- ASSUMPTION: Quick-save currently stores one slot in `localStorage` only; chunk delta files, survivor missions, and multi-slot UIs remain out-of-scope for this pass.
+
 # 2024-05-21 – POI Templates, Loot Scenes, and MLP Plan
 - Authored `data/poi_templates.json` plus new world container definitions so every generated POI now instantiates a deterministic loot scene (fridges, lockers, duffles, crates) when the player approaches.
 - Reworked `WorldContainerManager` to sync with streamed chunks instead of demo coordinates, driving container respawns from each POI’s loot timer and cleaning up scenes when the player leaves the area.

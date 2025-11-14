@@ -8,7 +8,7 @@
 | npm registry access restricted in container | Medium | Medium | Document issue, rely on cached deps/CI mirror | Configure private registry or vendored tarballs |
 | Data sets do not meet final breadth (50+ items, etc.) | Medium | High | Provide representative samples + JSON schemas | Expand catalogs alongside feature sprints |
 | Vehicle driving lacks collisions/damage + AI escorts | High | Medium | Added player-controlled driving, hints, and cargo HUD to unblock QA | Layer in collision volumes, damage, fuel, and NPC drivers |
-| Save/load, networking, and persistence missing | High | High | Flagged as future milestone | Design serialization + migration plan |
+| Persistence limited to a single quick-save slot (no chunk delta migrations) | Medium | Medium | Added F5/F9 quick-save tied to player/base/container state | Extend to multi-slot saves, chunk deltas, and survivor mission logs |
 | Survivor jobs not yet linked to facility throughput | Medium | Medium | Track assignments in controller, surface in UI | Apply production modifiers once facilities exist |
 | Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
 | POI templates spawn loot scenes only (no walls/alarms yet) | Medium | Medium | Containers now sync to POIs with template data | Expand templates with interior tiles, locks, and faction state |
@@ -20,7 +20,7 @@
 ## Known Gaps
 - Mega-spec mechanics (crafting, advanced AI, factions, etc.) are not yet ported – this milestone focuses on architecture reset.
 - Asset pipeline (sprites, audio) not wired; demo uses simple vector rendering.
-- Save/load, networking, and persistence are unimplemented.
+- Persistence exists only as a single-slot quick-save; there is no slot management, survivor mission logging, or chunk-level delta streaming yet.
 - UI overlays are DOM-based; controller support and accessibility testing remain TODO.
 - Inventory weight checks currently reject entire stacks when capacity is exceeded rather than splitting or queuing overflow.
 - Crafting assumes the player inventory doubles as both input and output storage; dedicated workstation inventories and survivor job hand-offs are still TODO.

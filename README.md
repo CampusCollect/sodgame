@@ -11,7 +11,7 @@ npm run dev
 
 > **Note:** The execution environment used for this milestone cannot reach the public npm registry (403). The repository already vendors a populated `node_modules` folder so `npm run dev`/`npm run build` continue to work; mirror the packages internally if you need a clean install.
 
-The development server will auto-open the canvas demo. Use **WASD** to move, **Shift** to sprint, **Ctrl** to crouch, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, **B** for the base building planner, **J** to open the survivor roster and job board, **R** to launch the raid/convoy planner, **Z/X** to cycle/use stealth tools, **E** to interact with containers **and** enter/exit vehicles, and **V** to open or close the transparent trailer cargo HUD when you are near a trailer or seated in a tractor.
+The development server will auto-open the canvas demo. Use **WASD** to move, **Shift** to sprint, **Ctrl** to crouch, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, **B** for the base building planner, **J** to open the survivor roster and job board, **R** to launch the raid/convoy planner, **Z/X** to cycle/use stealth tools, **E** to interact with containers **and** enter/exit vehicles, and **V** to open or close the transparent trailer cargo HUD when you are near a trailer or seated in a tractor. Press **F5** at any time to quick-save and **F9** to reload the latest session snapshot.
 
 ## Tech Stack
 
@@ -33,12 +33,14 @@ The development server will auto-open the canvas demo. Use **WASD** to move, **S
 - Stealth controller with a shared noise bus, ambient light/detection model, alarm scaffolding, and HUD widgets (noise meter + light badge) plus distraction tools mapped to **Z/X**.
 - Driveable vehicles with enter/exit prompts, simplified acceleration/turning, and a transparent trailer cargo HUD (**V**) that visualises the manifest grid/weight usage for the semi demo setup.
 - Progression controller that scales rings by distance, visualises base heat + siege warnings, rotates seasonal modifiers, and retunes zombie populations + loot tiers automatically.
+- Single-slot quick-save/quick-load loop (**F5/F9**) that serializes the player inventory, placed structures, POI loot scenes, and progression state so QA can hop between builds without losing progress.
 
 ## Next Steps
 
-- Close the gaps called out in the new "MLP readiness" table inside [docs/ROADMAP.md](docs/ROADMAP.md) – persistence, convoy encounters, and facilities/jobs wiring are the remaining blockers to a playable loop.
+- Close the gaps called out in the new "MLP readiness" table inside [docs/ROADMAP.md](docs/ROADMAP.md) – convoy encounters and facilities/jobs wiring are the remaining blockers to a playable loop now that baseline persistence exists.
 - Flesh out the remaining director stubs (zombies, vehicles) with full combat/AI, collisions, and convoy routing.
 - Expand automated testing with Vitest as systems mature.
 - Wire survivor job output and new heat/siege cues into facilities, sieges, and crafting speed bonuses.
+- Extend persistence from a single-slot quick-save to chunk-delta serialization with multiple manual save slots and survivor mission state.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) and [docs/WORKLOG.md](docs/WORKLOG.md) for milestone planning and day-to-day execution notes.

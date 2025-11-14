@@ -1,6 +1,6 @@
 import { InputManager } from "../engine/Input";
 import { World } from "../worldgen/World";
-import { Inventory } from "../inventory/Inventory";
+import { Inventory, type SerializedInventory } from "../inventory/Inventory";
 
 const BASE_SPEED = 150; // units per second
 
@@ -12,6 +12,11 @@ export interface Vector2 {
 export interface PlayerOptions {
   x: number;
   y: number;
+}
+
+export interface PlayerStateSnapshot {
+  position: Vector2;
+  inventory: SerializedInventory;
 }
 
 export class Player {
@@ -98,5 +103,17 @@ export class Player {
 
   syncToVehicle(position: Vector2): void {
     this.position = { ...position };
+  }
+
+  serialize(): PlayerStateSnapshot {
+    return {
+      position: { ...this.position },
+      inventory: this.inventory.serialize()
+    };
+  }
+
+  load(state: PlayerStateSnapshot): void {
+    this.position = { ...state.position };
+    this.inventory.load(state.inventory);
   }
 }

@@ -12,6 +12,7 @@ import { FactionController } from "../factions/FactionController";
 import { WorldContainerManager } from "../loot/WorldContainerManager";
 import { StealthController } from "../stealth/StealthController";
 import { ProgressionController } from "../progression/ProgressionController";
+import { SaveManager } from "../persistence/SaveManager";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -35,6 +36,7 @@ export class Game {
   readonly factions: FactionController;
   readonly containers: WorldContainerManager;
   readonly progression: ProgressionController;
+  readonly saves: SaveManager;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -73,8 +75,16 @@ export class Game {
       this.world
     );
     this.progression = new ProgressionController(this.player, this.building, this.survivors, this.zombies);
+    this.saves = new SaveManager({
+      player: this.player,
+      building: this.building,
+      containers: this.containers,
+      progression: this.progression,
+      input: this.input
+    });
 
     this.configureInput();
+    this.saves.tryResume();
   }
 
   private configureInput(): void {

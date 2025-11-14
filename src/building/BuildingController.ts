@@ -1,7 +1,7 @@
 import type { Player } from "../entities/Player";
 import type { InputManager } from "../engine/Input";
 import { TILE_SIZE } from "../worldgen/Chunk";
-import { BuildingManager, type PlacedStructure } from "./BuildingManager";
+import { BuildingManager, type PlacedStructure, type SerializedStructurePlacement } from "./BuildingManager";
 
 interface GhostState {
   tile: { x: number; y: number } | null;
@@ -282,5 +282,18 @@ export class BuildingController {
       return total + hp * weighting;
     }, 0);
     return Number(score.toFixed(1));
+  }
+
+  exportState(): SerializedStructurePlacement[] {
+    return this.manager.serializePlacements();
+  }
+
+  importState(state: SerializedStructurePlacement[]): void {
+    this.manager.loadPlacements(state);
+    this.render();
+  }
+
+  getManager(): BuildingManager {
+    return this.manager;
   }
 }

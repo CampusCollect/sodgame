@@ -25,6 +25,11 @@ export interface PlacementResult {
   structure?: PlacedStructure;
 }
 
+export interface SerializedStructurePlacement {
+  structureId: string;
+  tilePosition: { x: number; y: number };
+}
+
 function rectsOverlap(
   a: { x: number; y: number; w: number; h: number },
   b: { x: number; y: number; w: number; h: number }
@@ -116,6 +121,40 @@ export class BuildingManager {
     this.placed = [...this.placed, placed];
     this.recomputePower();
     return { success: true, structure: placed };
+  }
+
+  serializePlacements(): SerializedStructurePlacement[] {
+    return this.placed.map(placed => ({
+      structureId: placed.definition.id,
+      tilePosition: { ...placed.tilePosition }
+    }));
+  }
+
+  loadPlacements(placements: SerializedStructurePlacement[]): void {
+    this.placed = placements
+      .map((placement, index) => {
+        const definition = this.structures.get(placement.structureId);
+        if (!definition) {
+          console.warn(`Unknown structure ${placement.structureId} in save data`);
+          return null;
+        }
+        const tile = { ...placement.tilePosition };
+        const worldPosition: Vector2 = {
+          x: tile.x * TILE_SIZE,
+          y: tile.y * TILE_SIZE
+        };
+        return {
+          id: `structure_${index + 1}`,
+          definition,
+          tilePosition: tile,
+          worldPosition,
+          size: definition.size,
+          powered: true
+        } satisfies PlacedStructure;
+      })
+      .filter((structure): structure is PlacedStructure => structure !== null);
+    this.nextId = this.placed.length + 1;
+    this.recomputePower();
   }
 
   private toRequirements(def: StructureDefinition): { itemId: string; quantity: number }[] {

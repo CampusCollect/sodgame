@@ -155,6 +155,25 @@ export class GridInventory {
     return placed;
   }
 
+  clear(): void {
+    this.items.clear();
+    for (const cell of this.cells) {
+      cell.occupant = null;
+      cell.isOrigin = false;
+    }
+  }
+
+  restoreStack(stack: ItemStack, position: GridPosition, rotated: boolean): boolean {
+    const definition = resolveItemDefinition(stack.itemId);
+    const { width, height } = computeDimensions(definition, rotated);
+    if (!this.canPlaceAt(position, width, height)) {
+      return false;
+    }
+    stack.rotation = rotated ? 90 : 0;
+    this.placeStack(stack, definition, position, rotated);
+    return true;
+  }
+
   moveItem(id: string, position: GridPosition, rotated: boolean): boolean {
     const item = this.items.get(id);
     if (!item) {
