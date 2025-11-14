@@ -45,6 +45,108 @@ export class ZombieDirector {
       ctx.arc(event.position.x - offset.x, event.position.y - offset.y, event.range, 0, Math.PI * 2);
       ctx.stroke();
     });
+
+    this.noise.getActiveEvents().forEach(event => {
+      ctx.strokeStyle = "rgba(239, 68, 68, 0.35)";
+      ctx.beginPath();
+      ctx.arc(event.position.x - offset.x, event.position.y - offset.y, event.range, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    this.noise.getActiveEvents().forEach(event => {
+      ctx.strokeStyle = "rgba(239, 68, 68, 0.35)";
+      ctx.beginPath();
+      ctx.arc(event.position.x - offset.x, event.position.y - offset.y, event.range, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+  }
+
+  private getColorForState(state: ZombieStateId): string {
+    switch (state) {
+      case "idle":
+        return "#f97316";
+      case "investigating":
+      case "frantic":
+        return "#facc15";
+      case "aggro":
+      case "aggro-search":
+        return "#ef4444";
+      case "feeding":
+        return "#22d3ee";
+      default:
+        return "#f97316";
+    }
+  }
+
+  private getGlyph(state: ZombieStateId): string {
+    switch (state) {
+      case "idle":
+        return "·";
+      case "investigating":
+        return "?";
+      case "frantic":
+        return "!";
+      case "aggro":
+        return "⚠";
+      case "aggro-search":
+        return "✦";
+      case "feeding":
+        return "✚";
+      default:
+        return "·";
+    }
+  }
+
+  applyDifficulty(targetCount: number, mix: Record<string, number>): void {
+    this.fsm.applySpawnPlan(targetCount, mix);
+  }
+
+  private getColorForState(state: ZombieStateId): string {
+    switch (state) {
+      case "idle":
+        return "#f97316";
+      case "investigating":
+      case "frantic":
+        return "#facc15";
+      case "aggro":
+      case "aggro-search":
+        return "#ef4444";
+      case "feeding":
+        return "#22d3ee";
+      default:
+        return "#f97316";
+    }
+  }
+
+  private getGlyph(state: ZombieStateId): string {
+    switch (state) {
+      case "idle":
+        return "·";
+      case "investigating":
+        return "?";
+      case "frantic":
+        return "!";
+      case "aggro":
+        return "⚠";
+      case "aggro-search":
+        return "✦";
+      case "feeding":
+        return "✚";
+      default:
+        return "·";
+    }
+  }
+
+  applyDifficulty(targetCount: number, mix: Record<string, number>): void {
+    this.fsm.applySpawnPlan(targetCount, mix);
+  }
+
+  getZombies(): readonly ZombieInstance[] {
+    return this.fsm.activeZombies;
+  }
+
+  applyDamage(id: string, damage: number): boolean {
+    return this.fsm.applyDamage(id, damage);
   }
 
   private getColorForState(state: ZombieStateId): string {
