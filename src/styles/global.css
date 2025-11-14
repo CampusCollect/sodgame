@@ -310,6 +310,25 @@ select {
   text-transform: uppercase;
 }
 
+.hud-tooltip__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.hud-tooltip__row strong {
+  color: #e2e8f0;
+  font-weight: 600;
+  min-width: 92px;
+}
+
+.hud-tooltip__row span {
+  text-transform: none;
+  font-size: 11px;
+  letter-spacing: normal;
+}
+
 .transparent-container,
 .transparent-cargo {
   position: fixed;
@@ -813,6 +832,14 @@ select {
   color: #feb2b2;
 }
 
+.raid-panel__hint {
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+  color: #a5b4fc;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .raid-panel__columns {
   display: flex;
   gap: 12px;
@@ -840,10 +867,54 @@ select {
   font-size: 0.95rem;
   padding: 6px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  width: 100%;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 
 .raid-panel__faction:last-child {
   border-bottom: none;
+}
+
+.raid-panel__faction[data-active="true"] {
+  color: #f6ad55;
+}
+
+.raid-panel__controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.raid-panel__search {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(15, 23, 42, 0.7);
+  color: #f8fafc;
+}
+
+.raid-panel__search::placeholder {
+  color: rgba(248, 250, 252, 0.4);
+}
+
+.raid-panel__clear-filter {
+  background: rgba(248, 250, 252, 0.08);
+  border: 1px solid rgba(248, 250, 252, 0.25);
+  color: #e2e8f0;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.raid-panel__clear-filter:hover,
+.raid-panel__clear-filter:focus-visible {
+  background: rgba(248, 250, 252, 0.18);
 }
 
 .raid-panel__convoys {
@@ -862,6 +933,11 @@ select {
   gap: 6px;
 }
 
+.raid-panel__convoy[data-tracked="true"] {
+  border-color: #f472b6;
+  box-shadow: 0 0 12px rgba(244, 114, 182, 0.4);
+}
+
 .raid-panel__convoy header {
   font-size: 0.95rem;
   display: flex;
@@ -873,6 +949,28 @@ select {
 .raid-panel__convoy-status {
   font-size: 0.8rem;
   color: #cbd5f5;
+}
+
+.raid-panel__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.raid-panel__track {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.6);
+  color: #bfdbfe;
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.raid-panel__track[data-active="true"] {
+  background: rgba(236, 72, 153, 0.25);
+  border-color: rgba(236, 72, 153, 0.8);
+  color: #fbcfe8;
 }
 
 .raid-panel__convoy-button {

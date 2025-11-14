@@ -10,7 +10,7 @@
 | Vehicle driving lacks collisions/damage + AI escorts | High | Medium | Added player-controlled driving, hints, and cargo HUD to unblock QA | Layer in collision volumes, damage, fuel, and NPC drivers |
 | Persistence limited to a single quick-save slot (no chunk delta migrations) | Medium | Medium | Added F5/F9 quick-save tied to player/base/container state | Extend to multi-slot saves, chunk deltas, and survivor mission logs |
 | Survivor jobs not yet linked to facility throughput | Low | Low | Facilities now read job stats to accelerate builds/production and push output into the shared stockpile | Extend to morale/fatigue penalties and survivor scheduling |
-| Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
+| Raid planner resolves combat abstractly | Medium | Medium | Added search/filter/track UI plus tooltip feedback so intel clicks always respond | Integrate world encounters + vehicle combat |
 | POI templates spawn loot scenes only (no walls/alarms yet) | Medium | Medium | Containers now sync to POIs with template data | Expand templates with interior tiles, locks, and faction state |
 | Alarm controller does not yet drive faction reinforcements | Medium | Medium | Trigger placeholder alarms off extreme noise | Wire alarms into faction AI + POI state machines |
 | Player/zombie combat still lacks cover/collision handling | High | Medium | Player vitals + zombie melee damage + quick-heal loop now live | Add projectile obstacles, weapon jamming, and knockback |

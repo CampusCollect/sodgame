@@ -13,7 +13,8 @@ export class FactionController {
 
   constructor(private readonly input: InputManager) {
     this.panel = new RaidPlanningUI({
-      onAmbush: convoyId => this.handleAmbush(convoyId)
+      onAmbush: convoyId => this.handleAmbush(convoyId),
+      onTrack: convoyId => this.handleTrack(convoyId)
     });
 
     this.input.on("toggle-raids", () => this.toggle());
@@ -40,6 +41,14 @@ export class FactionController {
 
   private syncPanel(): void {
     this.panel.setData(this.planner.getSnapshot());
+  }
+
+  private handleTrack(convoyId: string | null): void {
+    const result = this.planner.trackConvoy(convoyId);
+    this.panel.setStatus(result.message, !result.success);
+    if (result.success) {
+      this.syncPanel();
+    }
   }
 
   private handleAmbush(convoyId: string): void {

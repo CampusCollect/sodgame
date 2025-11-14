@@ -27,6 +27,7 @@ export interface ConvoyView {
   state: ConvoyState;
   intelRevealed: boolean;
   canAmbush: boolean;
+  blockedReason?: string;
 }
 
 export interface ConvoyAmbushResult {
@@ -76,9 +77,32 @@ export class ConvoyScheduler {
         etaHours: this.getEta(runtime),
         state: runtime.state,
         intelRevealed: runtime.intelRevealed,
-        canAmbush: runtime.intelRevealed && runtime.state !== "cooldown" && runtime.state !== "enroute"
+        canAmbush: runtime.intelRevealed && runtime.state !== "cooldown" && runtime.state !== "enroute",
+        blockedReason: this.getBlockedReason(runtime)
       };
     });
+  }
+
+  getConvoy(id: string): ConvoyView | undefined {
+    const runtime = this.convoys.get(id);
+    if (!runtime) {
+      return undefined;
+    }
+    const faction = this.factions.getFaction(runtime.definition.faction);
+    return {
+      id: runtime.definition.id,
+      factionId: runtime.definition.faction,
+      factionName: faction?.name ?? runtime.definition.faction,
+      route: runtime.definition.route,
+      cargo: runtime.definition.cargo,
+      guards: runtime.definition.guards,
+      escortVehicles: runtime.definition.escort_vehicles,
+      etaHours: this.getEta(runtime),
+      state: runtime.state,
+      intelRevealed: runtime.intelRevealed,
+      canAmbush: runtime.intelRevealed && runtime.state !== "cooldown" && runtime.state !== "enroute",
+      blockedReason: this.getBlockedReason(runtime)
+    };
   }
 
   interceptConvoy(convoyId: string): ConvoyAmbushResult {
@@ -152,5 +176,18 @@ export class ConvoyScheduler {
       default:
         return Math.max(0, runtime.nextDepartureHours);
     }
+  }
+
+  private getBlockedReason(runtime: ConvoyRuntime): string | undefined {
+    if (runtime.state === "enroute") {
+      return "Already left the depot";
+    }
+    if (runtime.state === "cooldown") {
+      return "Cooling down after ambush";
+    }
+    if (!runtime.intelRevealed) {
+      return "Intel not intercepted";
+    }
+    return undefined;
   }
 }

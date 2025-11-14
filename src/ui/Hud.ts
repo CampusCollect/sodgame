@@ -33,8 +33,7 @@ export class Hud {
     this.weaponLine.className = "hud-weapon";
     this.tooltip = document.createElement("div");
     this.tooltip.className = "hud-tooltip";
-    this.tooltip.innerText =
-      "WASD – Move | Shift – Sprint | Ctrl – Crouch | Tab – Inventory | C – Crafting | B – Building | N – Facilities | J – Survivors | R – Raids | Z – Cycle Decoy | X – Use Decoy | E – Interact/Drive | V – Trailer Cargo | Mouse1 – Fire | Q – Melee | F – Reload | 1 – Cycle Weapon | g – Throw Grenade | G – Cycle Grenade | T – Weapon Mods | H – Quick Heal";
+    this.buildKeyLegend();
 
     this.container.append(
       this.statusLine,
@@ -115,5 +114,26 @@ export class Hud {
 
   drawOverlay(_ctx: CanvasRenderingContext2D, _options: GameOptions): void {
     // Canvas overlay reserved for later (health bars, noise meter, etc.)
+  }
+
+  private buildKeyLegend(): void {
+    const groups: { label: string; text: string }[] = [
+      { label: "Movement", text: "WASD Move · Shift Sprint · Ctrl Crouch" },
+      { label: "Systems", text: "Tab Inventory · C Crafting · B Build · N Facilities · J Survivors · R Raids" },
+      { label: "Gear", text: "Z Cycle Decoy · X Use Decoy · V Trailer Cargo · T Weapon Mods" },
+      { label: "Combat", text: "Mouse1 Fire · Q Melee · F Reload · 1 Cycle Weapon · g Throw Grenade · G Cycle Grenade" },
+      { label: "Support", text: "E Interact/Drive · H Quick Heal · F5 Save · F9 Load" }
+    ];
+    this.tooltip.replaceChildren();
+    groups.forEach(group => {
+      const row = document.createElement("div");
+      row.className = "hud-tooltip__row";
+      const strong = document.createElement("strong");
+      strong.textContent = group.label;
+      const span = document.createElement("span");
+      span.textContent = group.text;
+      row.append(strong, span);
+      this.tooltip.append(row);
+    });
   }
 }

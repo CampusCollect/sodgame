@@ -1,5 +1,11 @@
 # WORKLOG
 
+# 2024-05-26 – Raid Planner Polish & Hotkey Guard
+- Hardened the input layer so keyboard shortcuts ignore focused text/selection fields (raid search, survivor notes, etc.), preventing panels from closing or actions firing while QA types.
+- Rebuilt the raid planner overlay with faction filters, a search bar, convoy tracking badges, tooltips for blocked ambushes, and refreshed CSS so intel clicks always provide feedback.
+- Updated the HUD tooltip into a multi-row key legend and refreshed README/TESTING/LIMITATIONS entries to document the new workflows and mitigations.
+- ASSUMPTION: Convoy tracking is a UI workflow only for now—world markers/waypoints will hook in during the convoy combat milestone.
+
 # 2024-05-25 – Facility & Stockpile Pass
 - Introduced a facility manager/controller + DOM panel (**N**) so QA can queue workshops/infirmaries/farms, monitor power draw, and watch job-staffed production tick resources into the shared base stockpile.
 - Added BaseStockpile serialization, facility persistence, and HUD stockpile line while letting the progression heat model read actual resource value instead of backpack weight heuristics.

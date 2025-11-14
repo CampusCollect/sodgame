@@ -14,6 +14,7 @@ const browserGlobals = {
   HTMLSpanElement: "readonly",
   HTMLHeadingElement: "readonly",
   HTMLSelectElement: "readonly",
+  HTMLInputElement: "readonly",
   HTMLParagraphElement: "readonly",
   HTMLButtonElement: "readonly",
   HTMLUListElement: "readonly",

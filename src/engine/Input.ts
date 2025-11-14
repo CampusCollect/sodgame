@@ -117,6 +117,9 @@ export class InputManager {
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
+    if (this.shouldIgnoreHotkey(event)) {
+      return;
+    }
     this.keys.add(event.key.toLowerCase());
     const binding = KEY_BINDINGS[event.key];
     if (binding) {
@@ -146,5 +149,23 @@ export class InputManager {
 
   private handleMouseUp(event: MouseEvent): void {
     this.mouseButtons.delete(event.button);
+  }
+
+  private shouldIgnoreHotkey(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      return false;
+    }
+    const tagName = target.tagName?.toLowerCase();
+    if (tagName === "input" || tagName === "textarea" || tagName === "select") {
+      return true;
+    }
+    if (target.isContentEditable) {
+      return true;
+    }
+    if (target.closest("[data-hotkeys='ignore']")) {
+      return true;
+    }
+    return false;
   }
 }

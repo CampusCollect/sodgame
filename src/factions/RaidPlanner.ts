@@ -4,6 +4,7 @@ import type { ConvoyAmbushResult, ConvoyView, ConvoyScheduler } from "./ConvoySc
 export interface RaidPlannerSnapshot {
   factions: FactionStanding[];
   convoys: ConvoyView[];
+  trackedConvoyId: string | null;
 }
 
 export interface RaidOutcome {
@@ -15,12 +16,31 @@ export interface RaidOutcome {
 }
 
 export class RaidPlanner {
+  private trackedConvoyId: string | null = null;
+
   constructor(private readonly factions: FactionManager, private readonly convoys: ConvoyScheduler) {}
 
   getSnapshot(): RaidPlannerSnapshot {
     return {
       factions: this.factions.getFactions(),
-      convoys: this.convoys.getConvoys()
+      convoys: this.convoys.getConvoys(),
+      trackedConvoyId: this.trackedConvoyId
+    };
+  }
+
+  trackConvoy(convoyId: string | null): { success: boolean; message: string } {
+    if (convoyId === null) {
+      this.trackedConvoyId = null;
+      return { success: true, message: "Stopped tracking convoy" };
+    }
+    const convoy = this.convoys.getConvoy(convoyId);
+    if (!convoy) {
+      return { success: false, message: "Unknown convoy" };
+    }
+    this.trackedConvoyId = convoyId;
+    return {
+      success: true,
+      message: convoy.intelRevealed ? `Tracking ${convoy.factionName} convoy` : "Tracking set – intel pending"
     };
   }
 
@@ -44,10 +64,14 @@ export class RaidPlanner {
       };
     }
 
-    return {
+    const outcome: RaidOutcome = {
       success: true,
       message: result.message,
       loot: result.loot
     };
+    if (this.trackedConvoyId === convoyId) {
+      this.trackedConvoyId = null;
+    }
+    return outcome;
   }
 }

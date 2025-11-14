@@ -2,6 +2,7 @@ import type { RaidPlannerSnapshot } from "../factions/RaidPlanner";
 
 interface RaidPlanningUIOptions {
   onAmbush: (convoyId: string) => void;
+  onTrack: (convoyId: string | null) => void;
 }
 
 interface LogEntry {
@@ -25,10 +26,16 @@ export class RaidPlanningUI {
   private readonly factionList: HTMLDivElement;
   private readonly convoyList: HTMLDivElement;
   private readonly status: HTMLDivElement;
+  private readonly hint: HTMLDivElement;
   private readonly logList: HTMLUListElement;
+  private readonly filterInput: HTMLInputElement;
+  private readonly clearFilterButton: HTMLButtonElement;
   private open = false;
   private snapshot: RaidPlannerSnapshot | null = null;
   private logs: LogEntry[] = [];
+  private selectedFactionId: string | null = null;
+  private searchTerm = "";
+  private trackedConvoyId: string | null = null;
 
   constructor(private readonly options: RaidPlanningUIOptions) {
     this.root = document.createElement("div");
@@ -44,11 +51,39 @@ export class RaidPlanningUI {
     this.status.className = "raid-panel__status";
     this.status.setAttribute("aria-live", "polite");
 
+    this.hint = document.createElement("div");
+    this.hint.className = "raid-panel__hint";
+    this.hint.innerText = "Click a faction to filter, search intel below, and track a convoy to pin it.";
+
     this.factionList = document.createElement("div");
     this.factionList.className = "raid-panel__factions";
 
     this.convoyList = document.createElement("div");
     this.convoyList.className = "raid-panel__convoys";
+
+    this.filterInput = document.createElement("input");
+    this.filterInput.type = "search";
+    this.filterInput.placeholder = "Filter by cargo, route, or faction";
+    this.filterInput.className = "raid-panel__search";
+    this.filterInput.setAttribute("aria-label", "Filter convoys");
+    this.filterInput.setAttribute("data-hotkeys", "ignore");
+    this.filterInput.addEventListener("input", () => {
+      this.searchTerm = this.filterInput.value.trim().toLowerCase();
+      this.renderConvoys();
+      this.updateHint();
+    });
+
+    this.clearFilterButton = document.createElement("button");
+    this.clearFilterButton.type = "button";
+    this.clearFilterButton.className = "raid-panel__clear-filter";
+    this.clearFilterButton.textContent = "Clear filters";
+    this.clearFilterButton.addEventListener("click", () => {
+      this.selectedFactionId = null;
+      this.searchTerm = "";
+      this.filterInput.value = "";
+      this.render();
+      this.updateHint();
+    });
 
     const logWrapper = document.createElement("div");
     logWrapper.className = "raid-panel__log";
@@ -60,7 +95,7 @@ export class RaidPlanningUI {
     this.logList.setAttribute("aria-live", "polite");
 
     logWrapper.append(logHeading, this.logList);
-    this.root.append(title, this.status, this.buildSplitColumns(), logWrapper);
+    this.root.append(title, this.status, this.hint, this.buildSplitColumns(), logWrapper);
     document.body.append(this.root);
   }
 
@@ -80,6 +115,7 @@ export class RaidPlanningUI {
 
   setData(snapshot: RaidPlannerSnapshot): void {
     this.snapshot = snapshot;
+    this.trackedConvoyId = snapshot.trackedConvoyId;
     if (this.open) {
       this.render();
     }
@@ -112,7 +148,10 @@ export class RaidPlanningUI {
     convoyCol.className = "raid-panel__column";
     const convoyHeading = document.createElement("h3");
     convoyHeading.textContent = "Convoys";
-    convoyCol.append(convoyHeading, this.convoyList);
+    const controls = document.createElement("div");
+    controls.className = "raid-panel__controls";
+    controls.append(this.filterInput, this.clearFilterButton);
+    convoyCol.append(convoyHeading, controls, this.convoyList);
 
     wrapper.append(factionCol, convoyCol);
     return wrapper;
@@ -125,6 +164,7 @@ export class RaidPlanningUI {
     this.renderFactions();
     this.renderConvoys();
     this.renderLogs();
+    this.updateHint();
   }
 
   private renderFactions(): void {
@@ -138,9 +178,17 @@ export class RaidPlanningUI {
     }
 
     for (const faction of this.snapshot.factions) {
-      const row = document.createElement("div");
+      const row = document.createElement("button");
+      row.type = "button";
       row.className = "raid-panel__faction";
       row.innerHTML = `<strong>${faction.name}</strong><span>${faction.reputation} (${faction.standing})</span>`;
+      if (this.selectedFactionId === faction.id) {
+        row.dataset.active = "true";
+      }
+      row.addEventListener("click", () => {
+        this.selectedFactionId = this.selectedFactionId === faction.id ? null : faction.id;
+        this.render();
+      });
       this.factionList.append(row);
     }
   }
@@ -150,14 +198,27 @@ export class RaidPlanningUI {
       return;
     }
     this.convoyList.replaceChildren();
-    if (this.snapshot.convoys.length === 0) {
-      this.convoyList.textContent = "No convoys detected.";
+    let convoys = [...this.snapshot.convoys];
+    if (this.selectedFactionId) {
+      convoys = convoys.filter(convoy => convoy.factionId === this.selectedFactionId);
+    }
+    if (this.searchTerm) {
+      convoys = convoys.filter(convoy => {
+        const haystack = `${convoy.factionName} ${convoy.cargo.join(" ")} ${convoy.route.join(" ")}`.toLowerCase();
+        return haystack.includes(this.searchTerm);
+      });
+    }
+    if (convoys.length === 0) {
+      this.convoyList.textContent = "No convoys match your filters.";
       return;
     }
 
-    for (const convoy of this.snapshot.convoys) {
+    for (const convoy of convoys) {
       const card = document.createElement("div");
       card.className = `raid-panel__convoy raid-panel__convoy--${convoy.state}`;
+      if (this.trackedConvoyId && this.trackedConvoyId === convoy.id) {
+        card.dataset.tracked = "true";
+      }
 
       const header = document.createElement("header");
       header.innerHTML = `<strong>${convoy.factionName}</strong> · ${convoy.route.join(" → ")}`;
@@ -174,12 +235,30 @@ export class RaidPlanningUI {
       statusLine.textContent = `ETA: ${formatHours(convoy.etaHours)} · ${intel}`;
       card.append(statusLine);
 
+      const actions = document.createElement("div");
+      actions.className = "raid-panel__actions";
+
+      const trackButton = document.createElement("button");
+      trackButton.type = "button";
+      trackButton.className = "raid-panel__track";
+      const isTracked = this.trackedConvoyId === convoy.id;
+      trackButton.textContent = isTracked ? "Untrack" : "Track";
+      trackButton.dataset.active = isTracked ? "true" : "false";
+      trackButton.addEventListener("click", () => this.options.onTrack(isTracked ? null : convoy.id));
+      actions.append(trackButton);
+
       const button = document.createElement("button");
+      button.type = "button";
       button.className = "raid-panel__convoy-button";
       button.textContent = convoy.canAmbush ? "Ambush" : "Await intel";
       button.disabled = !convoy.canAmbush;
+      if (convoy.blockedReason) {
+        button.title = convoy.blockedReason;
+      }
       button.addEventListener("click", () => this.options.onAmbush(convoy.id));
-      card.append(button);
+      actions.append(button);
+
+      card.append(actions);
 
       this.convoyList.append(card);
     }
@@ -197,6 +276,24 @@ export class RaidPlanningUI {
       const li = document.createElement("li");
       li.textContent = entry.message;
       this.logList.append(li);
+    }
+  }
+
+  private updateHint(): void {
+    const filters: string[] = [];
+    if (this.selectedFactionId && this.snapshot) {
+      const faction = this.snapshot.factions.find(f => f.id === this.selectedFactionId);
+      if (faction) {
+        filters.push(`Faction: ${faction.name}`);
+      }
+    }
+    if (this.searchTerm) {
+      filters.push(`Search: ${this.searchTerm}`);
+    }
+    if (filters.length === 0) {
+      this.hint.textContent = "Click a faction to filter, search intel below, and track a convoy to pin it.";
+    } else {
+      this.hint.textContent = `Filters active – ${filters.join(" · ")}`;
     }
   }
 }
