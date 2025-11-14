@@ -20,6 +20,7 @@
 - `FactionManager` + `ConvoyScheduler` + `RaidPlanner` + `RaidPlanningUI` – tracks reputation per faction, runs ticking convoy schedules, and drives the raid/convoy planner overlay triggered with `R`.
 - `StealthController` + `NoiseBus` + `VisibilitySystem` – aggregates noise events for all systems, computes ambient light/visibility, feeds HUD meters, and surfaces alarm states plus distraction tools bound to `Z/X`.
 - `CombatController` – centralizes firearm + melee definitions, tracks magazine state/reload timers, spawns projectiles, emits stealth-aware noise events, and feeds the HUD weapon line with ammo/reserve/reload state while exposing disassembly hooks.
+- `PlayerVitals` – tracks player HP/stamina/bleed/infection, listens for the **H** quick-heal binding (consuming bandages/medkits), serializes into the save system, and feeds the HUD vitals card while letting `ZombieDirector` apply melee damage.
 - `ProgressionController` + `DifficultyScaler` + `BaseHeatTracker` + `SeasonManager` – consume the JSON progression curve, compute region rings/difficulty based on player distance + community power, retune zombie spawn mixes, track base heat and siege thresholds, and render the HUD/side panel with season effects.
 
 Each system now consumes shared data definitions, enabling iteration on balance via JSON instead of code edits. Subsequent milestones will replace stubs with full mechanics while respecting the same module boundaries.

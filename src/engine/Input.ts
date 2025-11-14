@@ -14,6 +14,7 @@ type InputEventName =
   | "melee-attack"
   | "cycle-weapon"
   | "toggle-weapon-mods"
+  | "quick-heal"
   | "quick-save"
   | "quick-load"
   | "mouse-move";
@@ -44,6 +45,8 @@ const KEY_BINDINGS: Record<string, InputEventName> = {
   Z: "cycle-stealth-tool",
   g: "use-grenade",
   G: "cycle-grenade",
+  h: "quick-heal",
+  H: "quick-heal",
   f: "reload-weapon",
   F: "reload-weapon",
   q: "melee-attack",

@@ -11,7 +11,7 @@ npm run dev
 
 > **Note:** The execution environment used for this milestone cannot reach the public npm registry (403). The repository already vendors a populated `node_modules` folder so `npm run dev`/`npm run build` continue to work; mirror the packages internally if you need a clean install.
 
-The development server will auto-open the canvas demo. Use **WASD** to move, **Shift** to sprint, **Ctrl** to crouch, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, **B** for the base building planner, **J** to open the survivor roster and job board, **R** to launch the raid/convoy planner, **Z/X** to cycle/use stealth tools, **E** to interact with containers **and** enter/exit vehicles, and **V** to open or close the transparent trailer cargo HUD when you are near a trailer or seated in a tractor. Combat bindings: **Mouse1** fires the equipped firearm toward your cursor, **Q** swings the current melee weapon, **F** reloads, **1** cycles through carried weapons, **g** throws the selected grenade while **G** cycles grenade types, and **T** opens the new weapon modding bench so you can attach optics/suppressors or dismantle the equipped firearm. Press **F5** at any time to quick-save and **F9** to reload the latest session snapshot.
+The development server will auto-open the canvas demo. Use **WASD** to move, **Shift** to sprint, **Ctrl** to crouch, **Tab** to toggle the inventory overlay, **C** to open the crafting planner, **B** for the base building planner, **J** to open the survivor roster and job board, **R** to launch the raid/convoy planner, **Z/X** to cycle/use stealth tools, **E** to interact with containers **and** enter/exit vehicles, and **V** to open or close the transparent trailer cargo HUD when you are near a trailer or seated in a tractor. Combat bindings: **Mouse1** fires the equipped firearm toward your cursor, **Q** swings the current melee weapon, **F** reloads, **1** cycles through carried weapons, **g** throws the selected grenade while **G** cycles grenade types, **T** opens the weapon modding bench, and **H** consumes a bandage or medkit for a quick heal. Press **F5** at any time to quick-save and **F9** to reload the latest session snapshot.
 
 ## Tech Stack
 
@@ -35,6 +35,7 @@ The development server will auto-open the canvas demo. Use **WASD** to move, **S
 - Progression controller that scales rings by distance, visualises base heat + siege warnings, rotates seasonal modifiers, and retunes zombie populations + loot tiers automatically.
 - Single-slot quick-save/quick-load loop (**F5/F9**) that serializes the player inventory, placed structures, POI loot scenes, and progression state so QA can hop between builds without losing progress.
 - Weapon/combat layer with JSON-defined firearms/melee stats, projectile simulation, ammo + reload management, melee arcs, attachment-aware stat tweaks, grenade throwing/cycling, stealth-aware muzzle noise, and HUD readouts for ammo/reserve/reload progress.
+- Player vitals + zombie melee damage pass that tracks HP/stamina/bleed/infection, feeds the new HUD vitals card, lets zombies chip the player down in melee, and exposes an **H** quick-heal action that burns bandages/medkits.
 
 ## Next Steps
 

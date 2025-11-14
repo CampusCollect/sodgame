@@ -15,6 +15,7 @@ import { ProgressionController } from "../progression/ProgressionController";
 import { SaveManager } from "../persistence/SaveManager";
 import { CombatController } from "../combat/CombatController";
 import { WeaponModController } from "../combat/WeaponModController";
+import { PlayerVitals } from "../combat/PlayerVitals";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -41,6 +42,7 @@ export class Game {
   readonly saves: SaveManager;
   readonly combat: CombatController;
   readonly weaponMods: WeaponModController;
+  readonly vitals: PlayerVitals;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -59,8 +61,9 @@ export class Game {
     this.input = new InputManager(options.canvas);
     this.inventory = new InventoryController(this.player.inventory, this.input);
     this.hud = new Hud(this.player, this.inventory);
+    this.vitals = new PlayerVitals(this.player, this.player.inventory, this.input);
     this.stealth = new StealthController(this.player, this.input);
-    this.zombies = new ZombieDirector(this.stealth.getNoise());
+    this.zombies = new ZombieDirector(this.vitals, this.stealth.getNoise());
     this.vehicles = new VehicleDirector(this.player, this.input);
     this.crafting = new CraftingController(this.player.inventory, this.input);
     this.building = new BuildingController(this.player, this.input, options.canvas, {
@@ -84,7 +87,8 @@ export class Game {
       building: this.building,
       containers: this.containers,
       progression: this.progression,
-      input: this.input
+      input: this.input,
+      vitals: this.vitals
     });
     this.combat = new CombatController(this.player, this.input, this.zombies, this.stealth);
     this.weaponMods = new WeaponModController(this.player, this.input, this.combat);
@@ -122,6 +126,7 @@ export class Game {
     this.input.update();
     this.world.update(deltaTime, this.player.position);
     this.player.update(deltaTime, this.input, this.world);
+    this.vitals.update(deltaTime);
     this.stealth.update(deltaTime);
     this.zombies.update(deltaTime, this.world, this.player);
     this.vehicles.update(deltaTime, this.world, this.player);
@@ -133,7 +138,7 @@ export class Game {
     this.combat.update(deltaTime, { width: this.options.width, height: this.options.height });
     this.weaponMods.update();
     const progressionSummary = this.progression.update(deltaTime);
-    this.hud.update(deltaTime, progressionSummary, this.combat.getWeaponStatus());
+    this.hud.update(deltaTime, progressionSummary, this.combat.getWeaponStatus(), this.vitals.getHudState());
   }
 
   private draw(): void {

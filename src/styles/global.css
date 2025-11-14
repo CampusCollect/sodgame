@@ -273,6 +273,36 @@ select {
   max-width: 280px;
 }
 
+.hud-vitals {
+  background: rgba(15, 15, 15, 0.65);
+  border-radius: 10px;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  padding: 10px 14px;
+  color: #fee2e2;
+  font-size: 13px;
+  position: relative;
+}
+
+.hud-vitals::after {
+  content: attr(data-message);
+  display: block;
+  font-size: 11px;
+  color: #fef3c7;
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+
+.hud-vitals[data-state="critical"] {
+  border-color: rgba(248, 113, 113, 0.65);
+  box-shadow: 0 0 8px rgba(248, 113, 113, 0.35);
+}
+
+.hud-vitals[data-state="downed"] {
+  border-color: rgba(248, 250, 252, 0.6);
+  background: rgba(15, 23, 42, 0.85);
+  color: #fef9c3;
+}
+
 .hud-tooltip {
   color: #94a3b8;
   font-size: 12px;

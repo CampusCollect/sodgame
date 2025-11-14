@@ -1,5 +1,10 @@
 # WORKLOG
 
+# 2024-05-24 – Player Vitals & Zombie Damage
+- Wired a new `PlayerVitals` controller into the engine so HP/stamina/bleed/infection persist through saves, feed a dedicated HUD card, and lock the player when downed.
+- Updated `ZombieDirector` to track melee cooldowns and apply damage/infection to the player, while the HUD + docs gained the **H** quick-heal workflow that consumes bandages/medkits.
+- Refreshed README/testing/limitations/architecture notes to cover the new vitals workflow and highlight remaining combat gaps (no projectile cover, no knockback yet).
+
 # 2024-05-23 – Grenade Loop & Weapon Modding
 - Repurposed **g/G** bindings for grenade throws and type cycling, added grenade entries to `data/items.json`, and built fuse/physics/noise handling so explosions damage zombies and surface status on the HUD.
 - Introduced the `WeaponModController` (**T** key) plus DOM modding panel that lets QA install/detach optics, suppressors, or extended magazines, applies stat deltas in combat, and exposes safe disassembly for equipped weapons.

@@ -4,6 +4,7 @@ import type { WorldContainerManager, PersistedPoiState } from "../loot/WorldCont
 import type { ProgressionController, ProgressionPersistenceState } from "../progression/ProgressionController";
 import type { SerializedStructurePlacement } from "../building/BuildingManager";
 import type { InputManager } from "../engine/Input";
+import type { PlayerVitals, PlayerVitalsSnapshot } from "../combat/PlayerVitals";
 
 interface SavePayload {
   version: number;
@@ -12,6 +13,7 @@ interface SavePayload {
   structures: SerializedStructurePlacement[];
   containers: PersistedPoiState[];
   progression: ProgressionPersistenceState;
+  vitals?: PlayerVitalsSnapshot;
 }
 
 const STORAGE_KEY = "sodgame.save.v1";
@@ -23,6 +25,7 @@ interface SaveManagerDeps {
   containers: WorldContainerManager;
   progression: ProgressionController;
   input: InputManager;
+  vitals: PlayerVitals;
 }
 
 export class SaveManager {
@@ -77,7 +80,8 @@ export class SaveManager {
         player: this.deps.player.serialize(),
         structures: this.deps.building.exportState(),
         containers: this.deps.containers.exportState(),
-        progression: this.deps.progression.exportState()
+        progression: this.deps.progression.exportState(),
+        vitals: this.deps.vitals.serialize()
       };
     } catch (error) {
       console.error("Failed to capture save payload", error);
@@ -92,6 +96,7 @@ export class SaveManager {
     if (payload.progression) {
       this.deps.progression.loadState(payload.progression);
     }
+    this.deps.vitals.load(payload.vitals);
   }
 
   private write(payload: SavePayload): void {
