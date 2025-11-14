@@ -15,6 +15,7 @@ export interface ZombieInstance {
   type: ZombieTypeDefinition;
   position: Vector2;
   state: ZombieState;
+  hp: number;
 }
 
 export class ZombieFSM {
@@ -48,6 +49,7 @@ export class ZombieFSM {
     }
     this.zombies.forEach(zombie => {
       zombie.type = this.pickType(distribution);
+      zombie.hp = zombie.type.hp;
     });
   }
 
@@ -124,8 +126,30 @@ export class ZombieFSM {
       id: `z_${Math.random().toString(36).slice(2, 7)}`,
       type,
       position: randomSpawnPosition(),
-      state: { state: "idle", timer: 0 }
+      state: { state: "idle", timer: 0 },
+      hp: type.hp
     };
+  }
+
+  applyDamage(id: string, damage: number): boolean {
+    const index = this.zombies.findIndex(zombie => zombie.id === id);
+    if (index === -1) {
+      return false;
+    }
+    const zombie = this.zombies[index];
+    zombie.hp -= damage;
+    if (zombie.hp <= 0) {
+      this.respawnZombie(index);
+      return true;
+    }
+    zombie.state = { state: "aggro", target: zombie.state.state === "aggro" ? zombie.state.target : zombie.position, timer: 5 };
+    return false;
+  }
+
+  private respawnZombie(index: number): void {
+    const distribution = this.buildDistribution(this.defaultWeights);
+    this.zombies.splice(index, 1);
+    this.zombies.push(this.spawnZombie(distribution));
   }
 
   private buildDistribution(weights: Record<string, number>): WeightedType[] {

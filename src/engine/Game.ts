@@ -13,6 +13,7 @@ import { WorldContainerManager } from "../loot/WorldContainerManager";
 import { StealthController } from "../stealth/StealthController";
 import { ProgressionController } from "../progression/ProgressionController";
 import { SaveManager } from "../persistence/SaveManager";
+import { CombatController } from "../combat/CombatController";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -37,6 +38,7 @@ export class Game {
   readonly containers: WorldContainerManager;
   readonly progression: ProgressionController;
   readonly saves: SaveManager;
+  readonly combat: CombatController;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -82,6 +84,7 @@ export class Game {
       progression: this.progression,
       input: this.input
     });
+    this.combat = new CombatController(this.player, this.input, this.zombies, this.stealth);
 
     this.configureInput();
     this.saves.tryResume();
@@ -124,8 +127,9 @@ export class Game {
     this.survivors.update(deltaTime);
     this.factions.update(deltaTime);
     this.containers.update(deltaTime);
+    this.combat.update(deltaTime, { width: this.options.width, height: this.options.height });
     const progressionSummary = this.progression.update(deltaTime);
-    this.hud.update(deltaTime, progressionSummary);
+    this.hud.update(deltaTime, progressionSummary, this.combat.getWeaponStatus());
   }
 
   private draw(): void {
@@ -139,6 +143,7 @@ export class Game {
     this.vehicles.draw(this.ctx, this.player.position);
     this.player.draw(this.ctx, this.options.width, this.options.height);
     this.zombies.draw(this.ctx, this.player.position);
+    this.combat.draw(this.ctx, this.player.position, { width: this.options.width, height: this.options.height });
     this.hud.drawOverlay(this.ctx, this.options);
   }
 }

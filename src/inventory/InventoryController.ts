@@ -24,6 +24,10 @@ export class InventoryController {
     this.inventory.add(createStack("material_metal", 10));
     this.inventory.add(createStack("material_steel", 8));
     this.inventory.add(createStack("item_component_circuit", 2));
+    this.inventory.add(createStack("item_pistol_9mm", 1));
+    this.inventory.add(createStack("item_melee_bat", 1));
+    this.inventory.add(createStack("item_ammo_9mm", 60));
+    this.inventory.add(createStack("item_ammo_762", 60));
   }
 
   toggle(): void {

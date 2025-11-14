@@ -32,7 +32,20 @@
       "durability_max": 80,
       "tags": ["weapon", "melee"],
       "actions": ["equip", "drop", "repair"],
-      "description": "Reliable melee weapon with moderate knockback."
+      "description": "Reliable melee weapon with moderate knockback.",
+      "weapon": {
+        "category": "melee",
+        "damage": 35,
+        "range": 65,
+        "attack_cooldown_s": 0.9,
+        "swing_arc_deg": 90,
+        "swing_time_s": 0.35,
+        "noise_class": "noise_melee_hit"
+      },
+      "disassembly_yield": [
+        { "item": "material_metal", "qty": 2 },
+        { "item": "material_wood", "qty": 1 }
+      ]
     },
     {
       "id": "item_rifle_ak47",
@@ -44,7 +57,24 @@
       "attachments": ["optic", "magazine", "suppressor"],
       "tags": ["weapon", "firearm", "loud"],
       "actions": ["equip", "drop", "inspect"],
-      "description": "Rugged 7.62mm rifle with high noise signature."
+      "description": "Rugged 7.62mm rifle with high noise signature.",
+      "weapon": {
+        "category": "firearm",
+        "damage": 45,
+        "range": 850,
+        "attack_cooldown_s": 0.12,
+        "magazine_size": 30,
+        "ammo_type": "item_ammo_762",
+        "reload_seconds": 2.8,
+        "projectile_speed": 1100,
+        "projectile_spread_deg": 2,
+        "fire_mode": "auto",
+        "noise_class": "noise_gunshot_unsuppressed"
+      },
+      "disassembly_yield": [
+        { "item": "material_metal", "qty": 6 },
+        { "item": "material_steel", "qty": 2 }
+      ]
     },
     {
       "id": "item_ammo_762",
@@ -56,6 +86,85 @@
       "tags": ["ammo"],
       "actions": ["combine", "split", "drop"],
       "description": "Standard rifle ammunition compatible with AK platform."
+    },
+    {
+      "id": "item_pistol_9mm",
+      "name": "Service Pistol",
+      "size": [2, 2],
+      "weight_kg": 1.1,
+      "stack_max": 1,
+      "durability_max": 90,
+      "tags": ["weapon", "firearm"],
+      "actions": ["equip", "drop", "inspect"],
+      "description": "Reliable sidearm with quick handling and lower noise.",
+      "weapon": {
+        "category": "firearm",
+        "damage": 28,
+        "range": 450,
+        "attack_cooldown_s": 0.22,
+        "magazine_size": 15,
+        "ammo_type": "item_ammo_9mm",
+        "reload_seconds": 1.6,
+        "projectile_speed": 750,
+        "projectile_spread_deg": 4,
+        "fire_mode": "semi",
+        "noise_class": "noise_gunshot_suppressed"
+      },
+      "disassembly_yield": [
+        { "item": "material_metal", "qty": 3 },
+        { "item": "item_component_circuit", "qty": 1 }
+      ]
+    },
+    {
+      "id": "item_ammo_9mm",
+      "name": "9mm FMJ",
+      "size": [1, 1],
+      "weight_kg": 0.015,
+      "stack_max": 80,
+      "durability_max": 100,
+      "tags": ["ammo"],
+      "actions": ["combine", "split", "drop"],
+      "description": "Common pistol ammunition for sidearms and SMGs."
+    },
+    {
+      "id": "item_shotgun_pump",
+      "name": "Pump Shotgun",
+      "size": [2, 4],
+      "weight_kg": 3.8,
+      "stack_max": 1,
+      "durability_max": 95,
+      "tags": ["weapon", "firearm", "loud"],
+      "actions": ["equip", "drop"],
+      "description": "Close-range monster; devastating but loud and slow to cycle.",
+      "weapon": {
+        "category": "firearm",
+        "damage": 18,
+        "range": 350,
+        "attack_cooldown_s": 0.9,
+        "magazine_size": 6,
+        "ammo_type": "item_ammo_shell",
+        "reload_seconds": 0.8,
+        "projectile_speed": 600,
+        "projectile_spread_deg": 12,
+        "projectile_count": 8,
+        "fire_mode": "semi",
+        "noise_class": "noise_shotgun"
+      },
+      "disassembly_yield": [
+        { "item": "material_metal", "qty": 5 },
+        { "item": "material_wood", "qty": 2 }
+      ]
+    },
+    {
+      "id": "item_ammo_shell",
+      "name": "12g Shells",
+      "size": [1, 1],
+      "weight_kg": 0.035,
+      "stack_max": 32,
+      "durability_max": 100,
+      "tags": ["ammo"],
+      "actions": ["combine", "split", "drop"],
+      "description": "12-gauge buckshot rounds for pump and semi-auto shotguns."
     },
     {
       "id": "item_rucksack_food",

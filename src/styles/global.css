@@ -1001,6 +1001,15 @@ select {
   margin-top: 2px;
 }
 
+.hud-weapon {
+  font-size: 13px;
+  color: #fcd34d;
+  background: rgba(15, 15, 15, 0.55);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(252, 211, 77, 0.35);
+}
+
 .progression-panel {
   position: fixed;
   top: 12px;

@@ -13,6 +13,7 @@
 | Raid planner resolves combat abstractly | Medium | Medium | Provide loot/reputation deltas + intel logs in UI | Integrate world encounters + vehicle combat |
 | POI templates spawn loot scenes only (no walls/alarms yet) | Medium | Medium | Containers now sync to POIs with template data | Expand templates with interior tiles, locks, and faction state |
 | Alarm controller does not yet drive faction reinforcements | Medium | Medium | Trigger placeholder alarms off extreme noise | Wire alarms into faction AI + POI state machines |
+| Player/zombie combat lacks player health + collision cover | High | Medium | Weapons now track mags, reloads, and kill zombies | Add player HP, zombie attacks, and obstacle-aware ballistics |
 | Progression/heat scoring uses heuristic proxies (inventory weight + structure HP) | Medium | Medium | Surface assumptions in HUD + docs | Replace with true loot value, facility power, and survivor-driven sieges |
 | Chunk streaming currently lives only in-memory | High | Medium | Deterministic seeds keep POIs/roads reproducible | Add save/load of chunk deltas + async IO |
 | Road network is visual-only | Medium | Medium | Display spline-like overlays for navigation cues | Hook roads into convoy AI, collisions, and barricade gameplay |
@@ -28,6 +29,7 @@
 - Base building placements are instantaneous; survivor construction jobs, build timers, and structural integrity checks are deferred.
 - Survivor morale events are manual triggers only for now; tie them to gameplay events (sieges, loot runs, deaths) during combat/AI integration.
 - Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
+- Weapons now fire projectiles and damage zombies, but the player still cannot take damage, there are no weapon attachments/jams, and projectiles ignore cover; those hooks land with the upcoming health + collision passes.
 - Containers spawn per POI template but still open instantly and lack lockpicking/search time mechanics.
 - Alarm HUD + stealth tools exist, but reinforcements, power cuts, and POI ownership changes are deferred for the faction combat milestone.
 - POI templates do not yet include collision tiles, barricades, or faction NPC spawns; they currently place loot containers only.

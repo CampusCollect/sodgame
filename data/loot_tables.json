@@ -6,7 +6,9 @@
       "items": [
         { "id": "item_canned_food", "weight": 30, "qty_range": [1, 3] },
         { "id": "item_bandage", "weight": 20, "qty_range": [1, 2] },
-        { "id": "item_melee_bat", "weight": 5, "condition_range": [40, 80] }
+        { "id": "item_melee_bat", "weight": 5, "condition_range": [40, 80] },
+        { "id": "item_pistol_9mm", "weight": 6, "condition_range": [50, 100] },
+        { "id": "item_ammo_9mm", "weight": 18, "qty_range": [15, 45] }
       ]
     },
     {
@@ -15,6 +17,8 @@
       "items": [
         { "id": "item_rifle_ak47", "weight": 8, "condition_range": [60, 100] },
         { "id": "item_ammo_762", "weight": 20, "qty_range": [20, 60] },
+        { "id": "item_shotgun_pump", "weight": 5, "condition_range": [50, 95] },
+        { "id": "item_ammo_shell", "weight": 15, "qty_range": [6, 18] },
         { "id": "item_blueprint_turret", "weight": 3, "qty_range": [1, 1] }
       ]
     },

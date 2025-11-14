@@ -30,6 +30,12 @@
 - Added player movement locking, cargo manifest packing, HUD styles, and documentation/test updates covering the new controls and QA steps.
 - ASSUMPTION: Vehicles still ignore collisions/damage/fuel—documented in limitations until the physics pass.
 
+# 2024-05-18 – Combat Stack, Weapons, and HUD
+- Introduced `CombatController` with firearm/melee definitions, projectile simulation, magazine tracking, reload timers, noise emission, and weapon HUD readouts tied to the stealth bus.
+- Extended the content registry + item data with weapon metadata (stats, ammo, disassembly yields) and updated the input/HUD/tooltip bindings for firing (**Mouse1**), melee (**Q**), reload (**F**), weapon cycling (**1**), and disassembly (**G**).
+- Zombies now track hit points inside the FSM so projectiles/melee hits remove them (and respawn replacements), and the README/testing/limitations docs outline the new combat workflow plus remaining gaps (player HP, cover, zombie attacks).
+- ASSUMPTION: Projectile collision currently ignores walls/cover and the player still cannot take damage—hook those into the health/vehicle passes alongside zombie attack animations.
+
 # 2024-05-17 – Stealth Controller, Noise HUD, and Tools
 - Moved the shared noise propagation layer into the stealth module, layered on visibility + alarm controllers, and exposed the bus to zombies so every system reacts to the same events.
 - Added sprint/crouch stances, distraction tools (cycle with **Z**, deploy with **X**), and DOM HUD widgets (noise meter + light indicator) so QA can validate stealth feedback loops without debug overlays.

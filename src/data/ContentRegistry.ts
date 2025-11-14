@@ -22,6 +22,24 @@ import biomesData from "../../data/biomes.json";
 import poiData from "../../data/poi_spawns.json";
 import poiTemplatesData from "../../data/poi_templates.json";
 
+export interface WeaponDefinition {
+  category: "melee" | "firearm";
+  damage: number;
+  range: number;
+  attack_cooldown_s: number;
+  swing_arc_deg?: number;
+  swing_time_s?: number;
+  stamina_cost?: number;
+  magazine_size?: number;
+  ammo_type?: string;
+  reload_seconds?: number;
+  projectile_speed?: number;
+  projectile_spread_deg?: number;
+  projectile_count?: number;
+  fire_mode?: "semi" | "auto" | "burst";
+  noise_class?: string;
+}
+
 export interface ItemDefinition {
   id: string;
   name: string;
@@ -34,6 +52,8 @@ export interface ItemDefinition {
   description: string;
   attachments?: string[];
   freshness_hours?: number;
+  weapon?: WeaponDefinition;
+  disassembly_yield?: { item: string; qty: number }[];
 }
 
 export interface BiomeDefinition {

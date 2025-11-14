@@ -25,5 +25,8 @@
 17. Watch the top-right progression card + HUD meta line. Walk 200+ units away from the origin to push into ring 2 and confirm the readouts update (ring number, loot tiers, spawn target). Keep moving to ring 3 and note the zombie mix shifts toward runners.
 18. Loot both starter crates to raise backpack weight past 30kg and place a powered gate to raise defense. The base-heat row should jump above 30% and surface a yellow warning when a siege threshold is crossed; note the "Next Siege" percentage decreases as heat climbs.
 19. Let the server run for ~3 minutes (roughly half a day). Confirm the season row rotates (e.g., Spring → Summer) and the effects list updates; the HUD meta line should echo the same season/effect text.
+20. Firearms: ensure the pistol is selected (weapon HUD line shows "Service Pistol"), aim with the mouse, and hold **Mouse1**. Each shot should spawn a yellow tracer, decrement the magazine counter, and trigger a red noise ring that zombies path toward.
+21. Reload + reserve tracking: after emptying the pistol magazine press **F** – the weapon HUD should display a reload percentage, the magazine refills using 9mm ammo from the backpack, and reserve ammo drops by the same amount. Attempting to reload with no ammo should surface a HUD message.
+22. Melee + disassembly: press **Q** to swing the bat and verify the pink arc renders plus nearby zombies take damage. Press **1** to cycle to the AK, then hit **G** to disassemble it – the weapon disappears, the HUD reverts to the pistol, and metal/circuit stacks are added to the inventory.
 
 Future QA scenarios from the mega-spec will be added as systems come online.
