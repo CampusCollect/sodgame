@@ -1,0 +1,41 @@
+{
+  "facilities": [
+    {
+      "id": "facility_workshop",
+      "name": "Workshop",
+      "tiers": [
+        {
+          "tier": 1,
+          "slots": 1,
+          "power_kw": 0,
+          "jobs": ["mechanic"],
+          "build_cost": { "material_wood": 12, "material_metal": 6 },
+          "build_time_seconds": 120
+        },
+        {
+          "tier": 2,
+          "slots": 2,
+          "power_kw": 1,
+          "jobs": ["mechanic"],
+          "build_cost": { "material_metal": 12, "item_tool_kit": 1 },
+          "build_time_seconds": 180,
+          "requires_blueprint": "item_blueprint_workbench_t2"
+        }
+      ]
+    },
+    {
+      "id": "facility_infirmary",
+      "name": "Infirmary",
+      "tiers": [
+        {
+          "tier": 1,
+          "slots": 1,
+          "power_kw": 0.5,
+          "jobs": ["medic"],
+          "build_cost": { "material_wood": 8, "item_bandage": 2 },
+          "build_time_seconds": 150
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,22 @@
-type InputEventName = "toggle-inventory" | "mouse-move";
+type InputEventName =
+  | "toggle-inventory"
+  | "toggle-crafting"
+  | "toggle-building"
+  | "toggle-survivors"
+  | "toggle-raids"
+  | "interact"
+  | "toggle-vehicle-cargo"
+  | "use-stealth-tool"
+  | "cycle-stealth-tool"
+  | "use-grenade"
+  | "cycle-grenade"
+  | "reload-weapon"
+  | "melee-attack"
+  | "cycle-weapon"
+  | "toggle-weapon-mods"
+  | "quick-save"
+  | "quick-load"
+  | "mouse-move";
 
 type InputListener = () => void;
 
@@ -7,28 +25,62 @@ type ListenerMap = {
 };
 
 const KEY_BINDINGS: Record<string, InputEventName> = {
-  Tab: "toggle-inventory"
+  Tab: "toggle-inventory",
+  c: "toggle-crafting",
+  C: "toggle-crafting",
+  b: "toggle-building",
+  B: "toggle-building",
+  j: "toggle-survivors",
+  J: "toggle-survivors",
+  r: "toggle-raids",
+  R: "toggle-raids",
+  e: "interact",
+  E: "interact",
+  v: "toggle-vehicle-cargo",
+  V: "toggle-vehicle-cargo",
+  x: "use-stealth-tool",
+  X: "use-stealth-tool",
+  z: "cycle-stealth-tool",
+  Z: "cycle-stealth-tool",
+  g: "use-grenade",
+  G: "cycle-grenade",
+  f: "reload-weapon",
+  F: "reload-weapon",
+  q: "melee-attack",
+  Q: "melee-attack",
+  t: "toggle-weapon-mods",
+  T: "toggle-weapon-mods",
+  "1": "cycle-weapon",
+  F5: "quick-save",
+  F9: "quick-load"
 };
 
 export class InputManager {
   private readonly keys = new Set<string>();
   private readonly listeners: ListenerMap = {};
   private mousePosition = { x: 0, y: 0 };
+  private readonly mouseButtons = new Set<number>();
 
   constructor(private readonly element: HTMLElement) {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
 
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
     element.addEventListener("mousemove", this.handleMouseMove);
+    element.addEventListener("mousedown", this.handleMouseDown);
+    window.addEventListener("mouseup", this.handleMouseUp);
   }
 
   destroy(): void {
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("keyup", this.handleKeyUp);
     this.element.removeEventListener("mousemove", this.handleMouseMove);
+    this.element.removeEventListener("mousedown", this.handleMouseDown);
+    window.removeEventListener("mouseup", this.handleMouseUp);
   }
 
   update(): void {
@@ -41,6 +93,10 @@ export class InputManager {
 
   getMousePosition(): { x: number; y: number } {
     return this.mousePosition;
+  }
+
+  isMouseDown(button: number): boolean {
+    return this.mouseButtons.has(button);
   }
 
   on(event: InputEventName, listener: InputListener): void {
@@ -73,5 +129,16 @@ export class InputManager {
       x: event.clientX - rect.left,
       y: event.clientY - rect.top
     };
+  }
+
+  private handleMouseDown(event: MouseEvent): void {
+    this.mouseButtons.add(event.button);
+    if (event.button === 0) {
+      event.preventDefault();
+    }
+  }
+
+  private handleMouseUp(event: MouseEvent): void {
+    this.mouseButtons.delete(event.button);
   }
 }
