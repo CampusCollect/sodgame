@@ -1,0 +1,28 @@
+{
+  "traders": [
+    {
+      "id": "trader_union_medic",
+      "faction": "faction_union",
+      "stock_categories": ["medical", "food"],
+      "reputation_min": 25,
+      "restock_hours": 24
+    },
+    {
+      "id": "trader_military_quartermaster",
+      "faction": "faction_military",
+      "stock_categories": ["weapons", "ammo", "blueprints"],
+      "reputation_min": 75,
+      "restock_hours": 48
+    }
+  ],
+  "barter_values": {
+    "item_bandage": 8,
+    "item_canned_food": 6,
+    "item_rifle_ak47": 150,
+    "item_ammo_762": 2,
+    "item_fuel_can": 40,
+    "item_tool_kit": 60,
+    "item_component_circuit": 18,
+    "item_blueprint_turret": 220
+  }
+}

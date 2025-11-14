@@ -1,0 +1,88 @@
+{
+  "biomes": [
+    {
+      "id": "urban_core",
+      "name": "Urban Core",
+      "palette": ["#0f172a", "#1e293b", "#334155"],
+      "ideal_radius": 0,
+      "falloff": 5,
+      "weight": 1.6,
+      "zombie_density": 1.7,
+      "loot_tier_weights": {"1": 0.05, "2": 0.15, "3": 0.3, "4": 0.35, "5": 0.15},
+      "ambient": "sirens",
+      "poi_weights": {"residential": 1.4, "commercial": 1.8, "industrial": 1.1, "military": 0.6, "highway": 0.4, "special": 0.6, "faction": 0.4}
+    },
+    {
+      "id": "suburban",
+      "name": "Suburban",
+      "palette": ["#0f172a", "#1b2a41", "#233554"],
+      "ideal_radius": 6,
+      "falloff": 8,
+      "weight": 1.3,
+      "zombie_density": 1.2,
+      "loot_tier_weights": {"1": 0.2, "2": 0.35, "3": 0.25, "4": 0.15, "5": 0.05},
+      "ambient": "birds",
+      "poi_weights": {"residential": 1.9, "commercial": 1.1, "industrial": 0.6, "military": 0.2, "highway": 0.4, "special": 0.4, "faction": 0.5}
+    },
+    {
+      "id": "industrial",
+      "name": "Industrial",
+      "palette": ["#1f2937", "#374151", "#475569"],
+      "ideal_radius": 12,
+      "falloff": 10,
+      "weight": 1.2,
+      "zombie_density": 1.3,
+      "loot_tier_weights": {"1": 0.1, "2": 0.25, "3": 0.35, "4": 0.25, "5": 0.05},
+      "ambient": "machines",
+      "poi_weights": {"residential": 0.4, "commercial": 0.8, "industrial": 1.9, "military": 0.4, "highway": 0.6, "special": 0.5, "faction": 0.7}
+    },
+    {
+      "id": "rural",
+      "name": "Rural",
+      "palette": ["#064e3b", "#047857", "#10b981"],
+      "ideal_radius": 18,
+      "falloff": 12,
+      "weight": 1.0,
+      "zombie_density": 0.7,
+      "loot_tier_weights": {"1": 0.4, "2": 0.35, "3": 0.2, "4": 0.05, "5": 0},
+      "ambient": "wind",
+      "poi_weights": {"residential": 1.3, "commercial": 0.6, "industrial": 0.3, "military": 0.1, "highway": 0.7, "special": 0.4, "faction": 0.4}
+    },
+    {
+      "id": "highway",
+      "name": "Highway",
+      "palette": ["#1e1b4b", "#312e81", "#4338ca"],
+      "ideal_radius": 15,
+      "falloff": 6,
+      "weight": 0.8,
+      "zombie_density": 1.1,
+      "loot_tier_weights": {"1": 0.25, "2": 0.35, "3": 0.25, "4": 0.1, "5": 0.05},
+      "ambient": "traffic",
+      "poi_weights": {"residential": 0.3, "commercial": 0.6, "industrial": 0.8, "military": 0.2, "highway": 2.0, "special": 0.9, "faction": 0.6}
+    },
+    {
+      "id": "military_zone",
+      "name": "Military Zone",
+      "palette": ["#1c1917", "#292524", "#44403c"],
+      "ideal_radius": 24,
+      "falloff": 8,
+      "weight": 0.9,
+      "zombie_density": 1.8,
+      "loot_tier_weights": {"1": 0.05, "2": 0.1, "3": 0.2, "4": 0.4, "5": 0.25},
+      "ambient": "alarms",
+      "poi_weights": {"residential": 0.2, "commercial": 0.4, "industrial": 0.9, "military": 2.4, "highway": 0.7, "special": 0.8, "faction": 1.2}
+    },
+    {
+      "id": "wasteland",
+      "name": "Wasteland",
+      "palette": ["#422006", "#713f12", "#92400e"],
+      "ideal_radius": 32,
+      "falloff": 8,
+      "weight": 0.6,
+      "zombie_density": 2.0,
+      "loot_tier_weights": {"1": 0, "2": 0.05, "3": 0.15, "4": 0.3, "5": 0.5},
+      "ambient": "ash",
+      "poi_weights": {"residential": 0.1, "commercial": 0.2, "industrial": 0.6, "military": 1.5, "highway": 0.9, "special": 1.4, "faction": 0.7}
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "stealth_tools": [
+    {
+      "id": "tool_rock",
+      "name": "Thrown Rock",
+      "description": "Toss a rock toward the cursor to lure zombies.",
+      "noise_class": "noise_footstep_walk",
+      "range_m": 18,
+      "cooldown_s": 6
+    },
+    {
+      "id": "tool_boombox",
+      "name": "Boombox Lure",
+      "description": "Drop a noisy speaker that plays for a short time.",
+      "noise_class": "noise_decoy_loop",
+      "range_m": 30,
+      "cooldown_s": 25,
+      "duration_override_s": 8
+    }
+  ]
+}

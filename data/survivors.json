@@ -1,0 +1,34 @@
+{
+  "starting_roster": [
+    {
+      "id": "survivor_elena",
+      "name": "Elena Martinez",
+      "skills": { "medicine": 6, "scavenging": 4, "leadership": 3 },
+      "traits": ["optimist", "fast_learner"],
+      "background": "Former ER nurse who organized mutual aid shelters during the outbreak."
+    },
+    {
+      "id": "survivor_mateo",
+      "name": "Mateo Ruiz",
+      "skills": { "mechanics": 5, "driver": 4, "combat": 3 },
+      "traits": ["brave", "pack_rat"],
+      "background": "Auto shop owner who armored delivery vans for smuggling runs."
+    },
+    {
+      "id": "survivor_lina",
+      "name": "Lina Cho",
+      "skills": { "stealth": 5, "scavenging": 5, "combat": 2 },
+      "traits": ["night_owl", "pessimist"],
+      "background": "Former investigative journalist specializing in corporate espionage."
+    }
+  ],
+  "job_catalog": [
+    { "id": "builder", "name": "Builder", "description": "Constructs and repairs base structures.", "skill": "mechanics" },
+    { "id": "guard", "name": "Guard", "description": "Patrols walls and repels threats.", "skill": "combat" },
+    { "id": "farmer", "name": "Farmer", "description": "Tends crops and manages food stores.", "skill": "scavenging" },
+    { "id": "medic", "name": "Medic", "description": "Runs infirmary treatments and triage.", "skill": "medicine" },
+    { "id": "mechanic", "name": "Mechanic", "description": "Maintains vehicles, generators, and tools.", "skill": "mechanics" },
+    { "id": "scavenger", "name": "Scavenger", "description": "Runs supply runs to nearby POIs.", "skill": "scavenging" },
+    { "id": "leader", "name": "Leader", "description": "Coordinates diplomacy, radio ops, and morale.", "skill": "leadership" }
+  ]
+}
