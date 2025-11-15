@@ -5,6 +5,18 @@ import { Hud } from "../ui/Hud";
 import { InventoryController } from "../inventory/InventoryController";
 import { ZombieDirector } from "../ai/ZombieDirector";
 import { VehicleDirector } from "../vehicles/VehicleDirector";
+import { CraftingController } from "../crafting/CraftingController";
+import { BuildingController } from "../building/BuildingController";
+import { FacilityController } from "../building/FacilityController";
+import { SurvivorController } from "../survivors/SurvivorController";
+import { FactionController } from "../factions/FactionController";
+import { WorldContainerManager } from "../loot/WorldContainerManager";
+import { StealthController } from "../stealth/StealthController";
+import { ProgressionController } from "../progression/ProgressionController";
+import { SaveManager } from "../persistence/SaveManager";
+import { CombatController } from "../combat/CombatController";
+import { WeaponModController } from "../combat/WeaponModController";
+import { PlayerVitals } from "../combat/PlayerVitals";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -19,8 +31,20 @@ export class Game {
   readonly input: InputManager;
   readonly hud: Hud;
   readonly inventory: InventoryController;
+  readonly stealth: StealthController;
   readonly zombies: ZombieDirector;
   readonly vehicles: VehicleDirector;
+  readonly crafting: CraftingController;
+  readonly building: BuildingController;
+  readonly facilities: FacilityController;
+  readonly survivors: SurvivorController;
+  readonly factions: FactionController;
+  readonly containers: WorldContainerManager;
+  readonly progression: ProgressionController;
+  readonly saves: SaveManager;
+  readonly combat: CombatController;
+  readonly weaponMods: WeaponModController;
+  readonly vitals: PlayerVitals;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -39,10 +63,49 @@ export class Game {
     this.input = new InputManager(options.canvas);
     this.inventory = new InventoryController(this.player.inventory, this.input);
     this.hud = new Hud(this.player, this.inventory);
-    this.zombies = new ZombieDirector();
-    this.vehicles = new VehicleDirector();
+    this.vitals = new PlayerVitals(this.player, this.player.inventory, this.input);
+    this.stealth = new StealthController(this.player, this.input);
+    this.zombies = new ZombieDirector(this.vitals, this.stealth.getNoise());
+    this.vehicles = new VehicleDirector(this.player, this.input);
+    this.crafting = new CraftingController(this.player.inventory, this.input);
+    this.building = new BuildingController(this.player, this.input, options.canvas, {
+      width: options.width,
+      height: options.height
+    });
+    this.survivors = new SurvivorController(this.input);
+    this.facilities = new FacilityController(this.player, this.building, this.survivors, this.input);
+    this.factions = new FactionController(this.input);
+    this.containers = new WorldContainerManager(
+      this.player,
+      this.input,
+      {
+        width: options.width,
+        height: options.height
+      },
+      this.world,
+      this.stealth.getNoise()
+    );
+    this.progression = new ProgressionController(
+      this.player,
+      this.building,
+      this.survivors,
+      this.zombies,
+      this.facilities
+    );
+    this.saves = new SaveManager({
+      player: this.player,
+      building: this.building,
+      facilities: this.facilities,
+      containers: this.containers,
+      progression: this.progression,
+      input: this.input,
+      vitals: this.vitals
+    });
+    this.combat = new CombatController(this.player, this.input, this.zombies, this.stealth);
+    this.weaponMods = new WeaponModController(this.player, this.input, this.combat);
 
     this.configureInput();
+    this.saves.tryResume();
   }
 
   private configureInput(): void {
@@ -72,19 +135,42 @@ export class Game {
 
   private update(deltaTime: number): void {
     this.input.update();
-    this.world.update(deltaTime);
+    this.world.update(deltaTime, this.player.position);
     this.player.update(deltaTime, this.input, this.world);
+    this.vitals.update(deltaTime);
+    this.stealth.update(deltaTime);
     this.zombies.update(deltaTime, this.world, this.player);
     this.vehicles.update(deltaTime, this.world, this.player);
-    this.hud.update(deltaTime);
+    this.crafting.update(deltaTime);
+    this.building.update();
+    this.facilities.update(deltaTime);
+    this.survivors.update(deltaTime);
+    this.factions.update(deltaTime);
+    this.containers.update(deltaTime);
+    this.combat.update(deltaTime, { width: this.options.width, height: this.options.height });
+    this.weaponMods.update();
+    const progressionSummary = this.progression.update(deltaTime);
+    this.hud.update(
+      deltaTime,
+      progressionSummary,
+      this.combat.getWeaponStatus(),
+      this.vitals.getHudState(),
+      this.facilities.getStockpileTotals()
+    );
   }
 
   private draw(): void {
     this.ctx.clearRect(0, 0, this.options.width, this.options.height);
-    this.world.draw(this.ctx, this.player.position);
+    this.world.draw(this.ctx, this.player.position, {
+      width: this.options.width,
+      height: this.options.height
+    });
+    this.building.draw(this.ctx, this.player.position);
+    this.containers.draw(this.ctx, this.player.position);
     this.vehicles.draw(this.ctx, this.player.position);
     this.player.draw(this.ctx, this.options.width, this.options.height);
     this.zombies.draw(this.ctx, this.player.position);
+    this.combat.draw(this.ctx, this.player.position, { width: this.options.width, height: this.options.height });
     this.hud.drawOverlay(this.ctx, this.options);
   }
 }

@@ -1,0 +1,42 @@
+{
+  "recipes": [
+    {
+      "id": "craft_bandage",
+      "name": "Craft Bandage",
+      "station": "hand",
+      "skill_req": { "medicine": 0 },
+      "time_seconds": 10,
+      "inputs": [
+        { "item": "item_cloth_scrap", "qty": 2 }
+      ],
+      "output": { "item": "item_bandage", "qty": 1, "condition": 1 }
+    },
+    {
+      "id": "craft_ammo_762",
+      "name": "7.62mm Rounds (x30)",
+      "station": "workbench_t1",
+      "skill_req": { "mechanics": 2 },
+      "time_seconds": 45,
+      "inputs": [
+        { "item": "material_gunpowder", "qty": 5 },
+        { "item": "material_brass", "qty": 3 },
+        { "item": "material_lead", "qty": 2 }
+      ],
+      "output": { "item": "item_ammo_762", "qty": 30, "condition": 100 }
+    },
+    {
+      "id": "craft_turret",
+      "name": "Auto Turret",
+      "station": "electronics_t3",
+      "skill_req": { "electronics": 4 },
+      "time_seconds": 180,
+      "inputs": [
+        { "item": "item_component_circuit", "qty": 6 },
+        { "item": "item_tool_kit", "qty": 1 },
+        { "item": "material_steel", "qty": 10 }
+      ],
+      "output": { "item": "structure_turret_auto", "qty": 1, "condition": 100 },
+      "blueprint_required": "item_blueprint_turret"
+    }
+  ]
+}

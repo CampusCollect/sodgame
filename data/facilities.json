@@ -1,0 +1,126 @@
+{
+  "facilities": [
+    {
+      "id": "facility_workshop",
+      "name": "Workshop",
+      "tiers": [
+        {
+          "tier": 1,
+          "slots": 1,
+          "power_kw": 0.4,
+          "jobs": ["mechanic", "builder"],
+          "build_cost": { "material_wood": 12, "material_metal": 6 },
+          "build_time_seconds": 120,
+          "production_per_hour": [
+            { "resource": "parts", "amount": 1.5 },
+            { "resource": "materials", "amount": 1 }
+          ]
+        },
+        {
+          "tier": 2,
+          "slots": 2,
+          "power_kw": 1,
+          "jobs": ["mechanic", "builder"],
+          "build_cost": { "material_metal": 12, "item_tool_kit": 1 },
+          "build_time_seconds": 180,
+          "requires_blueprint": "item_blueprint_workbench_t2",
+          "production_per_hour": [
+            { "resource": "parts", "amount": 3 },
+            { "resource": "materials", "amount": 1.5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "facility_infirmary",
+      "name": "Infirmary",
+      "tiers": [
+        {
+          "tier": 1,
+          "slots": 1,
+          "power_kw": 0.5,
+          "jobs": ["medic"],
+          "build_cost": { "material_wood": 8, "item_bandage": 2 },
+          "build_time_seconds": 150,
+          "production_per_hour": [
+            { "resource": "meds", "amount": 0.5 }
+          ]
+        },
+        {
+          "tier": 2,
+          "slots": 2,
+          "power_kw": 1.2,
+          "jobs": ["medic"],
+          "build_cost": { "material_metal": 10, "item_medkit": 1 },
+          "build_time_seconds": 210,
+          "production_per_hour": [
+            { "resource": "meds", "amount": 1.2 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "facility_farm",
+      "name": "Hydro Farm",
+      "tiers": [
+        {
+          "tier": 1,
+          "slots": 2,
+          "power_kw": 0.6,
+          "jobs": ["farmer"],
+          "build_cost": { "material_wood": 10, "material_seed": 5 },
+          "build_time_seconds": 200,
+          "production_per_hour": [
+            { "resource": "food", "amount": 3 }
+          ]
+        },
+        {
+          "tier": 2,
+          "slots": 3,
+          "power_kw": 1.2,
+          "jobs": ["farmer"],
+          "build_cost": { "material_metal": 8, "material_seed": 8 },
+          "build_time_seconds": 260,
+          "production_per_hour": [
+            { "resource": "food", "amount": 5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "facility_radio",
+      "name": "Radio Tower",
+      "tiers": [
+        {
+          "tier": 1,
+          "slots": 1,
+          "power_kw": 0.8,
+          "jobs": ["scavenger", "leader"],
+          "build_cost": { "material_metal": 6, "material_electronics": 4 },
+          "build_time_seconds": 180,
+          "production_per_hour": [
+            { "resource": "intel", "amount": 0.5 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "facility_garage",
+      "name": "Garage Bay",
+      "tiers": [
+        {
+          "tier": 1,
+          "slots": 1,
+          "power_kw": 0.7,
+          "jobs": ["mechanic"],
+          "build_cost": { "material_metal": 10, "item_tool_kit": 1 },
+          "build_time_seconds": 220,
+          "production_per_hour": [
+            { "resource": "fuel", "amount": 1 },
+            { "resource": "parts", "amount": 0.8 }
+          ]
+        }
+      ]
+    }
+  ]
+}

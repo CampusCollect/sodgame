@@ -1,0 +1,15 @@
+{
+  "noise_classes": [
+    { "id": "noise_footstep_walk", "range_m": 5, "intensity": 20, "duration_s": 1 },
+    { "id": "noise_footstep_crouch", "range_m": 2, "intensity": 8, "duration_s": 1 },
+    { "id": "noise_melee_hit", "range_m": 10, "intensity": 35, "duration_s": 2 },
+    { "id": "noise_gunshot_suppressed", "range_m": 25, "intensity": 55, "duration_s": 3 },
+    { "id": "noise_gunshot_unsuppressed", "range_m": 80, "intensity": 85, "duration_s": 4 },
+    { "id": "noise_shotgun", "range_m": 100, "intensity": 90, "duration_s": 4 },
+    { "id": "noise_vehicle_idle", "range_m": 30, "intensity": 40, "duration_s": 5 },
+    { "id": "noise_vehicle_crash", "range_m": 150, "intensity": 95, "duration_s": 6 },
+    { "id": "noise_explosion", "range_m": 200, "intensity": 100, "duration_s": 8 },
+    { "id": "noise_decoy_loop", "range_m": 60, "intensity": 65, "duration_s": 6 },
+    { "id": "noise_container_force", "range_m": 45, "intensity": 70, "duration_s": 3 }
+  ]
+}
