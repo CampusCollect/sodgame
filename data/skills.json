@@ -1,0 +1,11 @@
+{
+  "skills": [
+    { "id": "combat", "name": "Combat", "description": "Improves weapon handling, recoil control, and melee efficiency." },
+    { "id": "mechanics", "name": "Mechanics", "description": "Accelerates vehicle repairs and crafting of mechanical parts." },
+    { "id": "medicine", "name": "Medicine", "description": "Boosts healing speed, injury recovery, and advanced treatment success." },
+    { "id": "stealth", "name": "Stealth", "description": "Reduces noise, improves lockpicking, and enables silent takedowns." },
+    { "id": "driver", "name": "Driver", "description": "Enhances vehicle handling, fuel efficiency, and crash mitigation." },
+    { "id": "scavenging", "name": "Scavenging", "description": "Increases loot quality, find hidden caches, and speeds search actions." },
+    { "id": "leadership", "name": "Leadership", "description": "Provides morale boosts, command actions, and squad coordination." }
+  ]
+}
