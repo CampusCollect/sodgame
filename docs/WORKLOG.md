@@ -1,5 +1,12 @@
 # WORKLOG
 
+## 2024-05-15 – Vehicle Maintenance + Raid Loot Pass
+- Added persistent vehicle state (fuel, condition, maintenance overlay) plus new **M**/**Y** bindings so testers can inspect health and refuel with fuel cans while the stealth noise bus now reflects engine activity.
+- Wired the SaveManager and content seeders to capture vehicle fuel/condition + added Maintenance UI hints so quick-loads resume the same wear/fuel levels.
+- Hooked convoy ambushes into tangible rewards: loot now flows into the backpack (with overflow crates spawned via the container manager) and the raid log reflects the payout.
+- Documented the new controls, QA steps, and risk deltas inside the README, TESTING playbook, and LIMITATIONS register.
+- ASSUMPTION: Vehicle collisions/damage reactions and live convoy combat remain future milestones even though fueling/maintenance are now active.
+
 # 2024-05-30 – Crafting Output Safeguards
 - Updated `CraftingStation` so completed recipes deposit outputs atomically, pause the queue with a "blocked" state when the backpack is full, and resume automatically once space frees up instead of destroying items.
 - Surfaced the new status and error reasons through the crafting controller + DOM panel (yellow row + tooltip text) so QA sees why a recipe stalled, and styled the queue entries accordingly.

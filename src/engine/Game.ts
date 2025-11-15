@@ -66,7 +66,7 @@ export class Game {
     this.vitals = new PlayerVitals(this.player, this.player.inventory, this.input);
     this.stealth = new StealthController(this.player, this.input);
     this.zombies = new ZombieDirector(this.vitals, this.stealth.getNoise());
-    this.vehicles = new VehicleDirector(this.player, this.input);
+    this.vehicles = new VehicleDirector(this.player, this.input, this.stealth.getNoise());
     this.crafting = new CraftingController(this.player.inventory, this.input);
     this.building = new BuildingController(this.player, this.input, options.canvas, {
       width: options.width,
@@ -74,7 +74,6 @@ export class Game {
     });
     this.survivors = new SurvivorController(this.input);
     this.facilities = new FacilityController(this.player, this.building, this.survivors, this.input);
-    this.factions = new FactionController(this.input);
     this.containers = new WorldContainerManager(
       this.player,
       this.input,
@@ -85,6 +84,7 @@ export class Game {
       this.world,
       this.stealth.getNoise()
     );
+    this.factions = new FactionController(this.input, this.player, this.containers);
     this.progression = new ProgressionController(
       this.player,
       this.building,
@@ -99,7 +99,8 @@ export class Game {
       containers: this.containers,
       progression: this.progression,
       input: this.input,
-      vitals: this.vitals
+      vitals: this.vitals,
+      vehicles: this.vehicles
     });
     this.combat = new CombatController(this.player, this.input, this.zombies, this.stealth);
     this.weaponMods = new WeaponModController(this.player, this.input, this.combat);

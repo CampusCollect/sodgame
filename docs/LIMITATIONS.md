@@ -7,7 +7,7 @@
 | No automated gameplay tests yet | Medium | Medium | Maintain manual smoke steps, plan Vitest harness | Add integration tests when mechanics land |
 | npm registry access restricted in container | Medium | Medium | Document issue, rely on cached deps/CI mirror | Configure private registry or vendored tarballs |
 | Data sets do not meet final breadth (50+ items, etc.) | Medium | High | Provide representative samples + JSON schemas | Expand catalogs alongside feature sprints |
-| Vehicle driving lacks collisions/damage + AI escorts | High | Medium | Added player-controlled driving, hints, and cargo HUD to unblock QA | Layer in collision volumes, damage, fuel, and NPC drivers |
+| Vehicle driving lacks collisions/damage + AI escorts | High | Medium | Added player-controlled driving, hints, cargo HUD, plus fuel burn/refueling + maintenance UI to unblock QA | Layer in collision volumes, damage, and NPC drivers |
 | Persistence limited to a single quick-save slot (no chunk delta migrations) | Medium | Medium | Added F5/F9 quick-save tied to player/base/container state | Extend to multi-slot saves, chunk deltas, and survivor mission logs |
 | Survivor jobs not yet linked to facility throughput | Low | Low | Facilities now read job stats to accelerate builds/production and push output into the shared stockpile | Extend to morale/fatigue penalties and survivor scheduling |
 | Raid planner resolves combat abstractly | Medium | Medium | Added search/filter/track UI plus tooltip feedback so intel clicks always respond | Integrate world encounters + vehicle combat |
@@ -28,14 +28,14 @@
 - Facility production does not yet consume upkeep/fuel or respect blueprint gating beyond tier data; integrate blueprint unlocks and survivor fatigue in a future pass.
 - Base building placements are instantaneous; survivor construction jobs, build timers, and structural integrity checks are deferred.
 - Survivor morale events are manual triggers only for now; tie them to gameplay events (sieges, loot runs, deaths) during combat/AI integration.
-- Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
+- Raid planner/convoy ambushes remain simulated via button presses – there are still no physical convoy spawns or combat loops even though loot now drops into the backpack (with overflow reward crates).
 - Weapons now fire projectiles and damage zombies; the player can take melee damage but bullets still ignore cover, weapons never jam, and zombie attacks lack knockback animations.
 - Grenade simulation is limited to zombie damage + HUD cues; there is no terrain destruction, friendly-fire, or fire propagation yet and explosions do not affect faction AI beyond noise.
 - Lockpicking/search timers now gate containers, but there is still no dedicated minigame, survivor skill bonus, or lockpick durability/failure state and forced entry emits a single generic noise event.
 - Alarm HUD + stealth tools exist, but reinforcements, power cuts, and POI ownership changes are deferred for the faction combat milestone.
 - POI templates do not yet include collision tiles, barricades, or faction NPC spawns; they currently place loot containers only.
 - Road network does not yet constrain vehicle physics or convoy routing; it is a navigational overlay only.
-- Vehicle handling ignores collisions, damage, and trailer detach workflows for now; player can only drive the demo rigs.
+- Vehicle handling still ignores collisions, heavy damage reactions, and trailer detach workflows even though fuel burn/refueling/maintenance are now online; player can only drive the demo rigs.
 - Base heat currently treats backpack weight as "loot value" and structure HP as "defense"; hook into real storage/facility stats once those systems exist.
 
 Each milestone must update this register with fresh risks and mitigation status.

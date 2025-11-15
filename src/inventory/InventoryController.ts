@@ -40,6 +40,7 @@ export class InventoryController {
     seedStack("item_mod_suppressor", 1);
     seedStack("item_mod_extmag", 1);
     seedStack("tool_lockpick", 2);
+    seedStack("item_fuel_can", 1);
   }
 
   toggle(): void {

@@ -61,6 +61,8 @@ const POI_SYNC_RADIUS = 2;
 const SECONDS_PER_IN_GAME_DAY = 60;
 const LOCKPICK_ITEM_ID = "tool_lockpick";
 const FORCE_NOISE_CLASS = "noise_container_force";
+const MANUAL_SCENE_PREFIX = "manual_scene_";
+const MANUAL_RESPAWN_SECONDS = SECONDS_PER_IN_GAME_DAY * 365;
 
 let nextContainerId = 0;
 
@@ -74,6 +76,8 @@ export class WorldContainerManager {
   private readonly containerToPoi = new Map<string, string>();
   private readonly templates: PoiTemplateDefinition[] = content.poi_templates;
   private readonly noise?: NoiseBus;
+  private readonly manualScenes = new Set<string>();
+  private manualSceneCounter = 0;
 
   constructor(
     private readonly player: Player,
@@ -471,6 +475,7 @@ export class WorldContainerManager {
   private syncPoiScenes(): void {
     const visiblePois = this.world.getPoisNear(this.player.position, POI_SYNC_RADIUS);
     const visibleIds = new Set(visiblePois.map((poi) => poi.id));
+    this.manualScenes.forEach(id => visibleIds.add(id));
 
     for (const poiId of Array.from(this.poiScenes.keys())) {
       if (!visibleIds.has(poiId)) {
@@ -555,6 +560,9 @@ export class WorldContainerManager {
     this.capturePoiState(poiId);
     containerIds.forEach((id) => this.removeContainerById(id));
     this.poiScenes.delete(poiId);
+    if (this.manualScenes.has(poiId)) {
+      this.manualScenes.delete(poiId);
+    }
   }
 
   private removeContainerById(id: string): void {
@@ -614,6 +622,7 @@ export class WorldContainerManager {
   importState(states: PersistedPoiState[]): void {
     this.clearRuntimeContainers();
     this.poiStates.clear();
+    this.manualScenes.clear();
     states.forEach(state => {
       this.poiStates.set(state.poiId, {
         poiId: state.poiId,
@@ -629,6 +638,11 @@ export class WorldContainerManager {
         }))
       });
     });
+    states.forEach(state => {
+      if (state.poiId.startsWith(MANUAL_SCENE_PREFIX)) {
+        this.instantiateManualScene(state.poiId);
+      }
+    });
   }
 
   private clearRuntimeContainers(): void {
@@ -637,6 +651,7 @@ export class WorldContainerManager {
     this.containerToPoi.clear();
     this.active = null;
     this.hud.hide();
+    this.manualScenes.clear();
   }
 
   private cloneInventory(inventory: SerializedInventory): SerializedInventory {
@@ -651,5 +666,82 @@ export class WorldContainerManager {
         rotated: item.rotated
       }))
     };
+  }
+
+  spawnRewardCache(stacks: ItemStack[], label = "Ambush Loot"): string | null {
+    if (stacks.length === 0) {
+      return null;
+    }
+    const dropPosition: Vector2 = {
+      x: this.player.position.x + 120,
+      y: this.player.position.y - 40
+    };
+    const sceneId = `${MANUAL_SCENE_PREFIX}${(this.manualSceneCounter += 1)}`;
+    const container = this.spawnContainer(
+      "container_world_crate_large",
+      dropPosition,
+      "loot_residential_t1",
+      MANUAL_RESPAWN_SECONDS,
+      {
+        locked: false,
+        initialLocked: false,
+        respawnTimer: MANUAL_RESPAWN_SECONDS,
+        isOpen: true
+      }
+    );
+    if (!container) {
+      return null;
+    }
+    container.inventory.grid.clear();
+    stacks.forEach(stack => {
+      const result = container.inventory.add({ ...stack });
+      if (result.accepted === 0) {
+        console.warn(`Reward cache full – unable to store ${stack.itemId}`);
+      } else if (!result.success) {
+        console.warn(`Reward cache trimmed ${result.remainder}x ${stack.itemId}`);
+      }
+    });
+    container.locked = false;
+    container.initialLocked = false;
+    container.searchSeconds = 0;
+    container.isOpen = true;
+    this.manualScenes.add(sceneId);
+    this.poiScenes.set(sceneId, [container.id]);
+    this.containerToPoi.set(container.id, sceneId);
+    this.capturePoiState(sceneId);
+    this.hud.setStatus(`${label} spawned nearby`);
+    this.hud.setHint("Approach crate and hold E to loot");
+    return sceneId;
+  }
+
+  private instantiateManualScene(poiId: string): void {
+    const state = this.poiStates.get(poiId);
+    if (!state) {
+      return;
+    }
+    const spawnedIds: string[] = [];
+    state.containers.forEach(containerState => {
+      const container = this.spawnContainer(
+        containerState.definitionId,
+        containerState.position,
+        containerState.lootTableId,
+        containerState.respawnSeconds,
+        {
+          inventory: containerState.inventory,
+          respawnTimer: containerState.respawnTimer,
+          locked: containerState.locked,
+          isOpen: containerState.isOpen,
+          initialLocked: containerState.locked
+        }
+      );
+      if (container) {
+        spawnedIds.push(container.id);
+      }
+    });
+    if (spawnedIds.length > 0) {
+      this.manualScenes.add(poiId);
+      this.poiScenes.set(poiId, spawnedIds);
+      spawnedIds.forEach(id => this.containerToPoi.set(id, poiId));
+    }
   }
 }
