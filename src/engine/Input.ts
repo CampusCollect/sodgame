@@ -1,4 +1,25 @@
-type InputEventName = "toggle-inventory" | "mouse-move";
+type InputEventName =
+  | "toggle-inventory"
+  | "toggle-crafting"
+  | "toggle-building"
+  | "toggle-facilities"
+  | "toggle-survivors"
+  | "toggle-raids"
+  | "interact"
+  | "toggle-vehicle-cargo"
+  | "use-stealth-tool"
+  | "cycle-stealth-tool"
+  | "use-grenade"
+  | "cycle-grenade"
+  | "reload-weapon"
+  | "melee-attack"
+  | "cycle-weapon"
+  | "toggle-weapon-mods"
+  | "quick-heal"
+  | "quick-save"
+  | "quick-load"
+  | "mouse-move"
+  | "lockpick";
 
 type InputListener = () => void;
 
@@ -7,28 +28,68 @@ type ListenerMap = {
 };
 
 const KEY_BINDINGS: Record<string, InputEventName> = {
-  Tab: "toggle-inventory"
+  Tab: "toggle-inventory",
+  c: "toggle-crafting",
+  C: "toggle-crafting",
+  b: "toggle-building",
+  B: "toggle-building",
+  n: "toggle-facilities",
+  N: "toggle-facilities",
+  j: "toggle-survivors",
+  J: "toggle-survivors",
+  r: "toggle-raids",
+  R: "toggle-raids",
+  e: "interact",
+  E: "interact",
+  v: "toggle-vehicle-cargo",
+  V: "toggle-vehicle-cargo",
+  x: "use-stealth-tool",
+  X: "use-stealth-tool",
+  z: "cycle-stealth-tool",
+  Z: "cycle-stealth-tool",
+  g: "use-grenade",
+  G: "cycle-grenade",
+  h: "quick-heal",
+  H: "quick-heal",
+  f: "reload-weapon",
+  F: "reload-weapon",
+  q: "melee-attack",
+  Q: "melee-attack",
+  t: "toggle-weapon-mods",
+  T: "toggle-weapon-mods",
+  "1": "cycle-weapon",
+  F5: "quick-save",
+  F9: "quick-load",
+  l: "lockpick",
+  L: "lockpick"
 };
 
 export class InputManager {
   private readonly keys = new Set<string>();
   private readonly listeners: ListenerMap = {};
   private mousePosition = { x: 0, y: 0 };
+  private readonly mouseButtons = new Set<number>();
 
   constructor(private readonly element: HTMLElement) {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
 
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
     element.addEventListener("mousemove", this.handleMouseMove);
+    element.addEventListener("mousedown", this.handleMouseDown);
+    window.addEventListener("mouseup", this.handleMouseUp);
   }
 
   destroy(): void {
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("keyup", this.handleKeyUp);
     this.element.removeEventListener("mousemove", this.handleMouseMove);
+    this.element.removeEventListener("mousedown", this.handleMouseDown);
+    window.removeEventListener("mouseup", this.handleMouseUp);
   }
 
   update(): void {
@@ -43,6 +104,10 @@ export class InputManager {
     return this.mousePosition;
   }
 
+  isMouseDown(button: number): boolean {
+    return this.mouseButtons.has(button);
+  }
+
   on(event: InputEventName, listener: InputListener): void {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
@@ -55,6 +120,9 @@ export class InputManager {
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
+    if (this.shouldIgnoreHotkey(event)) {
+      return;
+    }
     this.keys.add(event.key.toLowerCase());
     const binding = KEY_BINDINGS[event.key];
     if (binding) {
@@ -73,5 +141,34 @@ export class InputManager {
       x: event.clientX - rect.left,
       y: event.clientY - rect.top
     };
+  }
+
+  private handleMouseDown(event: MouseEvent): void {
+    this.mouseButtons.add(event.button);
+    if (event.button === 0) {
+      event.preventDefault();
+    }
+  }
+
+  private handleMouseUp(event: MouseEvent): void {
+    this.mouseButtons.delete(event.button);
+  }
+
+  private shouldIgnoreHotkey(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      return false;
+    }
+    const tagName = target.tagName?.toLowerCase();
+    if (tagName === "input" || tagName === "textarea" || tagName === "select") {
+      return true;
+    }
+    if (target.isContentEditable) {
+      return true;
+    }
+    if (target.closest("[data-hotkeys='ignore']")) {
+      return true;
+    }
+    return false;
   }
 }

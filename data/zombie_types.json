@@ -1,0 +1,64 @@
+{
+  "zombie_types": [
+    {
+      "id": "zombie_shambler",
+      "speed_ms": 1.5,
+      "hp": 100,
+      "damage": 10,
+      "sight_range_m": 20,
+      "hearing_multiplier": 1,
+      "spawn_weight": 70,
+      "abilities": []
+    },
+    {
+      "id": "zombie_runner",
+      "speed_ms": 4,
+      "hp": 80,
+      "damage": 12,
+      "sight_range_m": 18,
+      "hearing_multiplier": 1.5,
+      "spawn_weight": 20,
+      "abilities": ["lunge"]
+    },
+    {
+      "id": "zombie_brute",
+      "speed_ms": 1,
+      "hp": 300,
+      "damage": 25,
+      "sight_range_m": 18,
+      "hearing_multiplier": 0.8,
+      "spawn_weight": 5,
+      "abilities": ["armor_break"]
+    },
+    {
+      "id": "zombie_screamer",
+      "speed_ms": 2.5,
+      "hp": 60,
+      "damage": 8,
+      "sight_range_m": 22,
+      "hearing_multiplier": 1.2,
+      "spawn_weight": 3,
+      "abilities": ["scream"]
+    },
+    {
+      "id": "zombie_crawler",
+      "speed_ms": 0.8,
+      "hp": 50,
+      "damage": 6,
+      "sight_range_m": 10,
+      "hearing_multiplier": 1,
+      "spawn_weight": 2,
+      "abilities": ["ankle_grab"]
+    },
+    {
+      "id": "zombie_boss_bloater",
+      "speed_ms": 1,
+      "hp": 800,
+      "damage": 40,
+      "sight_range_m": 18,
+      "hearing_multiplier": 1.1,
+      "spawn_weight": 0.1,
+      "abilities": ["toxic_explosion", "gas_cloud"]
+    }
+  ]
+}

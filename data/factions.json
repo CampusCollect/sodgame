@@ -1,0 +1,28 @@
+{
+  "factions": [
+    {
+      "id": "faction_military",
+      "name": "Military Remnants",
+      "reputation_default": -50,
+      "outposts": ["poi_airbase", "poi_checkpoint_01"],
+      "convoy_frequency_hours": 8,
+      "trader_id": "trader_military_quartermaster"
+    },
+    {
+      "id": "faction_union",
+      "name": "Survivors Union",
+      "reputation_default": 25,
+      "outposts": ["poi_town_hall"],
+      "convoy_frequency_hours": 12,
+      "trader_id": "trader_union_medic"
+    },
+    {
+      "id": "faction_raiders",
+      "name": "Rust Skulls",
+      "reputation_default": -30,
+      "outposts": ["poi_raider_fort"],
+      "convoy_frequency_hours": 10,
+      "trader_id": null
+    }
+  ]
+}
