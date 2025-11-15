@@ -82,6 +82,9 @@ export class VehicleDirector {
     };
 
     this.vehicles.forEach(vehicle => {
+      const def = content.vehicles.find(v => v.id === vehicle.definitionId);
+      if (!def) return;
+
       ctx.save();
       ctx.translate(vehicle.position.x - offset.x, vehicle.position.y - offset.y);
       ctx.rotate(vehicle.facing);
