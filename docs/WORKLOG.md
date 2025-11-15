@@ -1,5 +1,10 @@
 # WORKLOG
 
+# 2024-05-30 – Crafting Output Safeguards
+- Updated `CraftingStation` so completed recipes deposit outputs atomically, pause the queue with a "blocked" state when the backpack is full, and resume automatically once space frees up instead of destroying items.
+- Surfaced the new status and error reasons through the crafting controller + DOM panel (yellow row + tooltip text) so QA sees why a recipe stalled, and styled the queue entries accordingly.
+- Added Vitest coverage for missing-material reasons and the new blocked-output flow, plus refreshed README/testing/limitations to document the workflow and remaining station-storage gaps.
+
 # 2024-05-29 – Weight-Aware Loot Transfers
 - Reworked `Inventory.add` to return structured results (accepted quantity + remainder) and auto-split stacks against the
   backpack weight limit so overweight pickups no longer reject the entire stack.

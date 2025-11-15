@@ -240,6 +240,10 @@ select {
   color: #e2e8f0;
 }
 
+.crafting-panel__queue-item[data-status="blocked"] span {
+  color: #fbbf24;
+}
+
 .crafting-panel__status {
   font-size: 12px;
   min-height: 18px;

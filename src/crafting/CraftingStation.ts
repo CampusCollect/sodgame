@@ -1,6 +1,7 @@
 import type { RecipeDefinition } from "../data/ContentRegistry";
 import type { Inventory } from "../inventory/Inventory";
 import type { StationId } from "./RecipeBook";
+import type { ItemStack } from "../inventory/Item";
 
 export interface CrafterProfile {
   id: string;
@@ -14,8 +15,9 @@ export interface CraftingTaskState {
   recipeName: string;
   remainingSeconds: number;
   totalSeconds: number;
-  status: "queued" | "active" | "completed";
+  status: "queued" | "active" | "completed" | "blocked";
   assignedCrafter: CrafterProfile | null;
+  blockedReason?: string;
 }
 
 let nextTaskId = 0;
@@ -33,7 +35,9 @@ interface InternalTask {
   remainingSeconds: number;
   totalSeconds: number;
   assignedCrafter: CrafterProfile | null;
-  status: "queued" | "active" | "completed";
+  status: "queued" | "active" | "completed" | "blocked";
+  pendingOutput?: ItemStack;
+  blockedReason?: string;
 }
 
 export class CraftingStation {
@@ -53,19 +57,22 @@ export class CraftingStation {
     this.outputInventory = options.outputInventory;
   }
 
-  enqueue(recipe: RecipeDefinition, crafter: CrafterProfile | null): boolean {
+  enqueue(
+    recipe: RecipeDefinition,
+    crafter: CrafterProfile | null
+  ): { success: boolean; reason?: string } {
     const meetsSkill = Object.entries(recipe.skill_req ?? {}).every(([skill, requiredLevel]) => {
       const level = crafter?.skills[skill] ?? 0;
       return level >= requiredLevel;
     });
     if (!meetsSkill) {
-      return false;
+      return { success: false, reason: "Skill requirement not met" };
     }
 
     const requirements = recipe.inputs.map(input => ({ itemId: input.item, quantity: input.qty }));
     const consumed = this.inputInventory.consumeItems(requirements);
     if (!consumed) {
-      return false;
+      return { success: false, reason: "Missing ingredients" };
     }
 
     const task: InternalTask = {
@@ -77,10 +84,19 @@ export class CraftingStation {
       status: "queued"
     };
     this.queue.push(task);
-    return true;
+    return { success: true };
   }
 
   update(deltaSeconds: number): void {
+    if (this.currentTask && this.currentTask.status === "blocked") {
+      const cleared = this.attemptPendingDelivery(this.currentTask);
+      if (cleared) {
+        this.completeCurrentTask();
+      } else {
+        return;
+      }
+    }
+
     if (!this.currentTask) {
       this.currentTask = this.queue.shift() ?? null;
       if (this.currentTask) {
@@ -95,24 +111,7 @@ export class CraftingStation {
     this.currentTask.remainingSeconds = Math.max(0, this.currentTask.remainingSeconds - deltaSeconds);
 
     if (this.currentTask.remainingSeconds <= 0) {
-      this.currentTask.status = "completed";
-      const output = this.currentTask.recipe.output;
-      const added = this.outputInventory.add({
-        itemId: output.item,
-        quantity: output.qty,
-        condition: output.condition,
-        rotation: 0
-      });
-
-      if (!added) {
-        console.warn(`Output inventory full for ${output.item}. Item dropped.`);
-      }
-
-      this.completed.push(this.currentTask);
-      if (this.completed.length > 10) {
-        this.completed.shift();
-      }
-      this.currentTask = null;
+      this.handleTaskCompletion(this.currentTask);
     }
   }
 
@@ -131,7 +130,62 @@ export class CraftingStation {
       remainingSeconds: task.remainingSeconds,
       totalSeconds: task.totalSeconds,
       status: task.status,
-      assignedCrafter: task.assignedCrafter
+      assignedCrafter: task.assignedCrafter,
+      blockedReason: task.blockedReason
     }));
+  }
+
+  private handleTaskCompletion(task: InternalTask): void {
+    const stack: ItemStack = {
+      itemId: task.recipe.output.item,
+      quantity: task.recipe.output.qty,
+      condition: task.recipe.output.condition ?? 100,
+      rotation: 0
+    };
+    const result = this.outputInventory.add({ ...stack });
+    if (!result.success) {
+      const remaining = Math.max(0, result.remainder);
+      if (remaining > 0) {
+        task.pendingOutput = { ...stack, quantity: remaining };
+        task.status = "blocked";
+        task.blockedReason = "Output storage full";
+        return;
+      }
+    }
+    this.completeCurrentTask();
+  }
+
+  private attemptPendingDelivery(task: InternalTask): boolean {
+    if (!task.pendingOutput) {
+      return true;
+    }
+    const attempt = { ...task.pendingOutput };
+    const result = this.outputInventory.add(attempt);
+    if (result.accepted <= 0) {
+      task.blockedReason = "Output storage full";
+      return false;
+    }
+    if (result.remainder > 0) {
+      task.pendingOutput.quantity = result.remainder;
+      task.blockedReason = "Output storage full";
+      return false;
+    }
+    task.pendingOutput = undefined;
+    task.blockedReason = undefined;
+    return true;
+  }
+
+  private completeCurrentTask(): void {
+    if (!this.currentTask) {
+      return;
+    }
+    this.currentTask.status = "completed";
+    this.currentTask.blockedReason = undefined;
+    this.currentTask.pendingOutput = undefined;
+    this.completed.push(this.currentTask);
+    if (this.completed.length > 10) {
+      this.completed.shift();
+    }
+    this.currentTask = null;
   }
 }

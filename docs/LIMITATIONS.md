@@ -24,7 +24,7 @@
 - Persistence exists only as a single-slot quick-save; there is no slot management, survivor mission logging, or chunk-level delta streaming yet.
 - UI overlays are DOM-based; controller support and accessibility testing remain TODO.
 - Crafting assumes the player inventory doubles as both input and output storage; dedicated workstation inventories and survivor job hand-offs are still TODO.
-- Crafting output currently fails silently into the void when inventories are full; hook up ground drops or station storage in the next sprint.
+- Crafting queues now pause instead of deleting results when the backpack is full, but there is still no dedicated output bin or survivor courier to free space automatically.
 - Facility production does not yet consume upkeep/fuel or respect blueprint gating beyond tier data; integrate blueprint unlocks and survivor fatigue in a future pass.
 - Base building placements are instantaneous; survivor construction jobs, build timers, and structural integrity checks are deferred.
 - Survivor morale events are manual triggers only for now; tie them to gameplay events (sieges, loot runs, deaths) during combat/AI integration.

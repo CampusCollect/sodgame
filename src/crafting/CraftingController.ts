@@ -112,9 +112,9 @@ export class CraftingController {
       return { success: false, reason: "Skill level too low" };
     }
 
-    const succeeded = station.enqueue(recipe, crafter);
-    if (!succeeded) {
-      return { success: false, reason: "Missing ingredients or storage" };
+    const enqueueResult = station.enqueue(recipe, crafter);
+    if (!enqueueResult.success) {
+      return { success: false, reason: enqueueResult.reason ?? "Missing ingredients or storage" };
     }
 
     this.refreshPanel();

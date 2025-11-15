@@ -183,9 +183,16 @@ export class CraftingPanel {
     for (const task of queue) {
       const row = document.createElement("div");
       row.className = "crafting-panel__queue-item";
-      const progress = 1 - task.remainingSeconds / task.totalSeconds;
-      const pct = Math.round(progress * 100);
-      row.innerHTML = `<strong>${task.recipeName}</strong><span>${task.status} – ${pct}%</span>`;
+      const progress = task.status === "completed" ? 1 : 1 - task.remainingSeconds / task.totalSeconds;
+      const pct = Math.max(0, Math.min(100, Math.round(progress * 100)));
+      let statusLabel = task.status;
+      if (task.status === "blocked") {
+        statusLabel = task.blockedReason ?? "Blocked";
+        row.dataset.status = "blocked";
+      } else {
+        row.dataset.status = task.status;
+      }
+      row.innerHTML = `<strong>${task.recipeName}</strong><span>${statusLabel} – ${pct}%</span>`;
       this.queueList.append(row);
     }
   }
