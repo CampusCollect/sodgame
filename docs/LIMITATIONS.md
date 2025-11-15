@@ -32,7 +32,7 @@
 - Raid planner/convoy ambushes are simulated via button presses – no physical convoy spawns or combat loops yet.
 - Weapons now fire projectiles and damage zombies; the player can take melee damage but bullets still ignore cover, weapons never jam, and zombie attacks lack knockback animations.
 - Grenade simulation is limited to zombie damage + HUD cues; there is no terrain destruction, friendly-fire, or fire propagation yet and explosions do not affect faction AI beyond noise.
-- Containers spawn per POI template but still open instantly and lack lockpicking/search time mechanics.
+- Lockpicking/search timers now gate containers, but there is still no dedicated minigame, survivor skill bonus, or lockpick durability/failure state and forced entry emits a single generic noise event.
 - Alarm HUD + stealth tools exist, but reinforcements, power cuts, and POI ownership changes are deferred for the faction combat milestone.
 - POI templates do not yet include collision tiles, barricades, or faction NPC spawns; they currently place loot containers only.
 - Road network does not yet constrain vehicle physics or convoy routing; it is a navigational overlay only.

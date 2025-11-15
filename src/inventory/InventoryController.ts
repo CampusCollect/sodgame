@@ -33,6 +33,7 @@ export class InventoryController {
     this.inventory.add(createStack("item_mod_reflex", 1));
     this.inventory.add(createStack("item_mod_suppressor", 1));
     this.inventory.add(createStack("item_mod_extmag", 1));
+    this.inventory.add(createStack("tool_lockpick", 2));
   }
 
   toggle(): void {

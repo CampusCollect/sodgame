@@ -28,7 +28,8 @@
       "items": [
         { "id": "item_tool_kit", "weight": 12, "qty_range": [1, 1] },
         { "id": "item_generator_part", "weight": 14, "qty_range": [1, 2] },
-        { "id": "item_component_circuit", "weight": 10, "qty_range": [1, 4] }
+        { "id": "item_component_circuit", "weight": 10, "qty_range": [1, 4] },
+        { "id": "tool_lockpick", "weight": 8, "qty_range": [1, 3] }
       ]
     }
   ]

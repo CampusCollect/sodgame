@@ -346,6 +346,17 @@
       "description": "Adds rounds at the expense of additional weight and bulk."
     },
     {
+      "id": "tool_lockpick",
+      "name": "Lockpick Kit",
+      "size": [1, 1],
+      "weight_kg": 0.2,
+      "stack_max": 5,
+      "durability_max": 100,
+      "tags": ["tool"],
+      "actions": ["use", "drop"],
+      "description": "Slim jim, torsion wrench, and picks for bypassing locked containers."
+    },
+    {
       "id": "material_gunpowder",
       "name": "Gunpowder",
       "size": [1, 1],

@@ -9,6 +9,7 @@ import { LootGenerator } from "./LootGenerator";
 import type { World } from "../worldgen/World";
 import type { ChunkPoi } from "../worldgen/Chunk";
 import { TILE_SIZE } from "../worldgen/Chunk";
+import type { NoiseBus } from "../stealth/NoiseBus";
 
 interface SpawnedContainer {
   id: string;
@@ -18,6 +19,25 @@ interface SpawnedContainer {
   lootTableId: string;
   respawnSeconds: number;
   respawnTimer: number;
+  searchSeconds: number;
+  searchProgress: number;
+  forceProgress: number;
+  forceSeconds: number;
+  locked: boolean;
+  initialLocked: boolean;
+  lockDifficulty: number;
+  lockpickActive: boolean;
+  lockpickProgress: number;
+  lockpickSeconds: number;
+  isOpen: boolean;
+}
+
+interface ContainerSpawnOverrides {
+  inventory?: SerializedInventory;
+  respawnTimer?: number;
+  locked?: boolean;
+  isOpen?: boolean;
+  initialLocked?: boolean;
 }
 
 export interface PersistedContainerState {
@@ -27,6 +47,8 @@ export interface PersistedContainerState {
   respawnSeconds: number;
   respawnTimer: number;
   inventory: SerializedInventory;
+  locked: boolean;
+  isOpen: boolean;
 }
 
 export interface PersistedPoiState {
@@ -37,6 +59,8 @@ export interface PersistedPoiState {
 const INTERACTION_RANGE = 140;
 const POI_SYNC_RADIUS = 2;
 const SECONDS_PER_IN_GAME_DAY = 60;
+const LOCKPICK_ITEM_ID = "tool_lockpick";
+const FORCE_NOISE_CLASS = "noise_container_force";
 
 let nextContainerId = 0;
 
@@ -49,13 +73,16 @@ export class WorldContainerManager {
   private readonly poiStates = new Map<string, PersistedPoiState>();
   private readonly containerToPoi = new Map<string, string>();
   private readonly templates: PoiTemplateDefinition[] = content.poi_templates;
+  private readonly noise?: NoiseBus;
 
   constructor(
     private readonly player: Player,
     private readonly input: InputManager,
     private readonly viewport: { width: number; height: number },
-    private readonly world: World
+    private readonly world: World,
+    noise?: NoiseBus
   ) {
+    this.noise = noise;
     this.hud.setActions([
       {
         label: "Loot All",
@@ -64,25 +91,26 @@ export class WorldContainerManager {
       }
     ]);
     this.input.on("interact", () => this.lootActiveContainer());
+    this.input.on("lockpick", () => this.requestLockpick());
   }
 
   update(deltaTime: number): void {
     this.syncPoiScenes();
     this.containers.forEach(container => this.updateRespawn(container, deltaTime));
-    const previous = this.active?.id;
+    const previousId = this.active?.id;
     this.active = this.findActiveContainer();
+    if (previousId && previousId !== this.active?.id) {
+      this.cancelProgress(previousId);
+    }
+    const holdingInteract = this.input.isKeyPressed("e");
     if (this.active) {
-      if (this.active.id !== previous) {
-        this.syncHud();
-      } else {
-        this.hud.syncFromInventory(this.active.inventory, this.active.definition.name);
-      }
-      const stacks = this.active.inventory.getPlacedItems().length;
-      this.hud.setHint(`E – Loot All (${stacks} stacks remaining)`);
+      this.processActiveContainer(this.active, deltaTime, holdingInteract);
+      this.refreshHud(this.active, holdingInteract);
       this.hud.show();
     } else {
       this.hud.hide();
       this.hud.setHint("");
+      this.hud.setStatus("");
     }
   }
 
@@ -115,8 +143,7 @@ export class WorldContainerManager {
     position: Vector2,
     lootTableId: string,
     respawnSeconds: number,
-    initialInventory?: SerializedInventory,
-    respawnTimerOverride?: number
+    overrides: ContainerSpawnOverrides = {}
   ): SpawnedContainer | null {
     const definition = content.containers.find(container => container.id === definitionId);
     if (!definition) {
@@ -130,6 +157,9 @@ export class WorldContainerManager {
       allowRotation: true,
       label: definition.name
     });
+    const lockDifficulty = definition.lock_difficulty ?? 1;
+    const searchSeconds = definition.search_seconds ?? 0;
+    const initialLocked = overrides.initialLocked ?? definition.locked ?? false;
     const container: SpawnedContainer = {
       id: `world_container_${nextContainerId += 1}`,
       definition,
@@ -137,11 +167,24 @@ export class WorldContainerManager {
       position,
       lootTableId,
       respawnSeconds,
-      respawnTimer: respawnTimerOverride ?? respawnSeconds
+      respawnTimer: overrides.respawnTimer ?? respawnSeconds,
+      searchSeconds,
+      searchProgress: 0,
+      forceProgress: 0,
+      forceSeconds: 2.5 + lockDifficulty * 1.5,
+      locked: overrides.locked ?? initialLocked,
+      initialLocked,
+      lockDifficulty,
+      lockpickActive: false,
+      lockpickProgress: 0,
+      lockpickSeconds: 1.5 + lockDifficulty * 0.75,
+      isOpen: false
     };
     this.containers.push(container);
-    if (initialInventory) {
-      container.inventory.load(initialInventory);
+    if (overrides.inventory) {
+      container.inventory.load(overrides.inventory);
+      container.locked = overrides.locked ?? container.locked;
+      container.isOpen = overrides.isOpen ?? (!container.locked && container.searchSeconds <= 0);
     } else {
       this.refill(container);
     }
@@ -164,8 +207,173 @@ export class WorldContainerManager {
     return closest;
   }
 
+  private cancelProgress(containerId: string): void {
+    const container = this.containers.find(entry => entry.id === containerId);
+    if (!container) return;
+    container.forceProgress = 0;
+    if (!container.locked) {
+      container.searchProgress = 0;
+    }
+    if (container.lockpickActive) {
+      container.lockpickActive = false;
+      container.lockpickProgress = 0;
+    }
+  }
+
+  private processActiveContainer(
+    container: SpawnedContainer,
+    deltaTime: number,
+    holdingInteract: boolean
+  ): void {
+    let stateChanged = false;
+    if (container.locked) {
+      if (container.lockpickActive) {
+        container.lockpickProgress += deltaTime;
+        if (container.lockpickProgress >= container.lockpickSeconds) {
+          container.lockpickActive = false;
+          container.lockpickProgress = 0;
+          container.locked = false;
+          if (container.searchSeconds <= 0) {
+            container.isOpen = true;
+          } else {
+            container.searchProgress = 0;
+          }
+          stateChanged = true;
+        }
+      } else if (holdingInteract) {
+        container.forceProgress += deltaTime;
+        if (container.forceProgress >= container.forceSeconds) {
+          container.forceProgress = 0;
+          container.locked = false;
+          if (container.searchSeconds <= 0) {
+            container.isOpen = true;
+          } else {
+            container.searchProgress = 0;
+          }
+          this.emitForceNoise(container);
+          stateChanged = true;
+        }
+      } else {
+        container.forceProgress = 0;
+      }
+    } else if (!container.isOpen && container.searchSeconds > 0) {
+      if (holdingInteract) {
+        container.searchProgress += deltaTime;
+        if (container.searchProgress >= container.searchSeconds) {
+          container.isOpen = true;
+          container.searchProgress = 0;
+          stateChanged = true;
+        }
+      } else {
+        container.searchProgress = 0;
+      }
+    }
+
+    if (stateChanged) {
+      this.persistContainerState(container);
+    }
+  }
+
+  private refreshHud(container: SpawnedContainer, holdingInteract: boolean): void {
+    const [cols, rows] = container.definition.grid;
+    if (!container.isOpen) {
+      if (container.locked) {
+        const lockpickPct = this.formatPercent(container.lockpickProgress, container.lockpickSeconds);
+        const forcePct = this.formatPercent(container.forceProgress, container.forceSeconds);
+        const placeholderText = container.lockpickActive
+          ? `Lockpicking ${lockpickPct}%`
+          : container.forceProgress > 0
+            ? `Forcing Entry ${forcePct}%`
+            : "Locked";
+        this.hud.showPlaceholder(cols, rows, placeholderText);
+        const hasKit = this.hasLockpickKit();
+        if (container.lockpickActive) {
+          this.hud.setHint("Lockpick in progress – stay nearby");
+        } else if (holdingInteract) {
+          this.hud.setHint("Forcing lock – release to cancel (loud)");
+        } else {
+          this.hud.setHint(
+            hasKit
+              ? "Press L to lockpick or hold E to force"
+              : "Needs Lockpick Kit · hold E to force (loud)"
+          );
+        }
+        this.hud.setStatus(`Lock difficulty ${container.lockDifficulty}`);
+        return;
+      }
+      const searchPct = this.formatPercent(container.searchProgress, container.searchSeconds);
+      const placeholderText = container.searchProgress > 0
+        ? `Searching ${searchPct}%`
+        : "Hold E to search";
+      this.hud.showPlaceholder(cols, rows, placeholderText);
+      this.hud.setHint(
+        container.searchProgress > 0
+          ? "Keep holding E to finish searching"
+          : "Hold E to rummage through the stash"
+      );
+      this.hud.setStatus("Searching");
+      return;
+    }
+
+    this.hud.syncFromInventory(container.inventory, container.definition.name);
+    const stacks = container.inventory.getPlacedItems().length;
+    this.hud.setStatus(`Open · ${stacks} stacks`);
+    this.hud.setHint(`E – Loot All (${stacks} stacks remaining)`);
+  }
+
+  private requestLockpick(): void {
+    if (!this.active || !this.active.locked || this.active.lockpickActive) {
+      return;
+    }
+    if (!this.hasLockpickKit()) {
+      this.hud.setHint("Need a Lockpick Kit in your backpack");
+      return;
+    }
+    this.active.lockpickActive = true;
+    this.active.lockpickProgress = 0;
+    this.hud.setHint("Lockpicking… stay within range");
+  }
+
+  private hasLockpickKit(): boolean {
+    return this.player.inventory.getQuantity(LOCKPICK_ITEM_ID) > 0;
+  }
+
+  private persistContainerState(container: SpawnedContainer): void {
+    const poiId = this.containerToPoi.get(container.id);
+    if (poiId) {
+      this.capturePoiState(poiId);
+    }
+  }
+
+  private resetContainerState(container: SpawnedContainer): void {
+    container.locked = container.initialLocked;
+    container.isOpen = !container.locked && container.searchSeconds <= 0;
+    container.searchProgress = 0;
+    container.forceProgress = 0;
+    container.lockpickActive = false;
+    container.lockpickProgress = 0;
+  }
+
+  private emitForceNoise(container: SpawnedContainer): void {
+    if (!this.noise) return;
+    this.noise.emit(FORCE_NOISE_CLASS, { ...container.position });
+  }
+
+  private formatPercent(progress: number, total: number): number {
+    if (total <= 0) return 100;
+    return Math.min(100, Math.round((progress / total) * 100));
+  }
+
   private lootActiveContainer(): void {
     if (!this.active) {
+      return;
+    }
+    if (!this.active.isOpen) {
+      this.hud.setHint(
+        this.active.locked
+          ? "Locked – pick the lock (L) or force with E"
+          : "Hold E to finish searching before looting"
+      );
       return;
     }
     const stacks = [...this.active.inventory.getPlacedItems()];
@@ -186,18 +394,11 @@ export class WorldContainerManager {
     } else {
       this.hud.setHint(`Transferred ${moved} stacks · Press E again if space remains`);
     }
-    this.syncHud();
+    this.refreshHud(this.active, this.input.isKeyPressed("e"));
     const poiId = this.active ? this.containerToPoi.get(this.active.id) : null;
     if (poiId) {
       this.capturePoiState(poiId);
     }
-  }
-
-  private syncHud(): void {
-    if (!this.active) {
-      return;
-    }
-    this.hud.syncFromInventory(this.active.inventory, this.active.definition.name);
   }
 
   private updateRespawn(container: SpawnedContainer, deltaTime: number): void {
@@ -212,6 +413,7 @@ export class WorldContainerManager {
   }
 
   private refill(container: SpawnedContainer): void {
+    this.resetContainerState(container);
     const stacks = this.loot.roll(container.lootTableId, { rolls: 4 });
     stacks.forEach(stack => {
       const success = container.inventory.add({ ...stack });
@@ -241,7 +443,9 @@ export class WorldContainerManager {
         lootTableId: container.lootTableId,
         respawnSeconds: container.respawnSeconds,
         respawnTimer: container.respawnTimer,
-        inventory: container.inventory.serialize()
+        inventory: container.inventory.serialize(),
+        locked: container.locked,
+        isOpen: container.isOpen
       }));
     if (containers.length > 0) {
       this.poiStates.set(poiId, { poiId, containers });
@@ -278,8 +482,12 @@ export class WorldContainerManager {
           containerState.position,
           containerState.lootTableId,
           containerState.respawnSeconds,
-          containerState.inventory,
-          containerState.respawnTimer
+          {
+            inventory: containerState.inventory,
+            respawnTimer: containerState.respawnTimer,
+            locked: containerState.locked,
+            isOpen: containerState.isOpen
+          }
         );
         if (container) {
           spawnedIds.push(container.id);
@@ -288,11 +496,17 @@ export class WorldContainerManager {
     } else if (template) {
       template.containers.forEach(placement => {
         const position = this.offsetToWorld(poi, placement.offset);
+        const overrides: ContainerSpawnOverrides = {};
+        if (typeof placement.locked === "boolean") {
+          overrides.initialLocked = placement.locked;
+          overrides.locked = placement.locked;
+        }
         const container = this.spawnContainer(
           placement.container_id,
           position,
           placement.loot_table ?? poi.lootTable,
-          respawnSeconds
+          respawnSeconds,
+          overrides
         );
         if (container) {
           spawnedIds.push(container.id);
@@ -374,7 +588,9 @@ export class WorldContainerManager {
         lootTableId: container.lootTableId,
         respawnSeconds: container.respawnSeconds,
         respawnTimer: container.respawnTimer,
-        inventory: this.cloneInventory(container.inventory)
+        inventory: this.cloneInventory(container.inventory),
+        locked: container.locked,
+        isOpen: container.isOpen
       }))
     }));
   }
@@ -391,7 +607,9 @@ export class WorldContainerManager {
           lootTableId: container.lootTableId,
           respawnSeconds: container.respawnSeconds,
           respawnTimer: container.respawnTimer,
-          inventory: this.cloneInventory(container.inventory)
+          inventory: this.cloneInventory(container.inventory),
+          locked: container.locked,
+          isOpen: container.isOpen
         }))
       });
     });

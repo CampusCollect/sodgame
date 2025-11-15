@@ -1,5 +1,10 @@
 # WORKLOG
 
+# 2024-05-28 – Lockpicking & Search Flow
+- Extended `WorldContainerManager` with hold-to-search timers, lockpick progress, forced-entry noise, and persistence so lockers actually require kits (or loud brute force) before the transparent HUD exposes loot.
+- Added the **L** binding + Lockpick Kit item, seeded the demo loadout, piped forced-entry noise into the stealth bus, and updated POI templates/data so only specific placements spawn locked lockers.
+- Updated the transparent HUD with status/placeholder states, refreshed README/testing/limitations to cover the workflow, and logged the new noise class + QA expectations.
+
 # 2024-05-27 – Movement Lock Stack & Freeze Fixes
 - Refactored the player controller to track movement locks per subsystem (vehicles, weapon mods, vitals, etc.) so overlapping overlays no longer leave the character frozen, and added a clear-on-load fallback so quick-loads always regain control.
 - Updated VehicleDirector, PlayerVitals, and WeaponModController to pass named lock reasons plus documented the new QA step and README highlight so testers know to validate the failsafe.

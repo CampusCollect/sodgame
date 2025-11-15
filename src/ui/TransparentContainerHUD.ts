@@ -7,6 +7,7 @@ export class TransparentContainerHUD {
   private readonly title: HTMLHeadingElement;
   private readonly actions: HTMLDivElement;
   private readonly hint: HTMLParagraphElement;
+  private readonly status: HTMLParagraphElement;
 
   constructor(label: string) {
     this.element = document.createElement("div");
@@ -17,6 +18,10 @@ export class TransparentContainerHUD {
     this.title = document.createElement("h2");
     this.title.innerText = label;
     this.title.className = "transparent-container__title";
+
+    this.status = document.createElement("p");
+    this.status.className = "transparent-container__status";
+    this.status.style.display = "none";
 
     this.grid = document.createElement("div");
     this.grid.className = "transparent-container__grid";
@@ -29,7 +34,7 @@ export class TransparentContainerHUD {
     this.hint.className = "transparent-container__hint";
     this.hint.style.display = "none";
 
-    this.element.append(this.title, this.grid, this.actions, this.hint);
+    this.element.append(this.title, this.status, this.grid, this.actions, this.hint);
     document.body.append(this.element);
     this.hide();
   }
@@ -71,6 +76,18 @@ export class TransparentContainerHUD {
     }
   }
 
+  showPlaceholder(columns: number, rows: number, text: string): void {
+    this.grid.style.setProperty("--columns", columns.toString());
+    this.grid.style.setProperty("--rows", rows.toString());
+    this.grid.innerHTML = "";
+    const placeholder = document.createElement("div");
+    placeholder.className = "transparent-container__placeholder";
+    placeholder.style.gridColumn = `1 / span ${columns}`;
+    placeholder.style.gridRow = `1 / span ${rows}`;
+    placeholder.innerText = text;
+    this.grid.append(placeholder);
+  }
+
   setHint(text?: string): void {
     if (!text) {
       this.hint.style.display = "none";
@@ -79,6 +96,16 @@ export class TransparentContainerHUD {
     }
     this.hint.style.display = "block";
     this.hint.innerText = text;
+  }
+
+  setStatus(text?: string): void {
+    if (!text) {
+      this.status.style.display = "none";
+      this.status.innerText = "";
+      return;
+    }
+    this.status.style.display = "block";
+    this.status.innerText = text;
   }
 
   setActions(actions: { label: string; onClick: () => void; title?: string }[]): void {

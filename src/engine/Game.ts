@@ -82,7 +82,8 @@ export class Game {
         width: options.width,
         height: options.height
       },
-      this.world
+      this.world,
+      this.stealth.getNoise()
     );
     this.progression = new ProgressionController(
       this.player,

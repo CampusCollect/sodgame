@@ -101,6 +101,7 @@ export interface PoiTemplateContainerPlacement {
   container_id: string;
   offset: [number, number];
   loot_table?: string;
+  locked?: boolean;
 }
 
 export interface PoiTemplateDefinition {
@@ -117,6 +118,9 @@ export interface ContainerDefinition {
   weight_limit_kg: number;
   nested_allowed: boolean;
   type: string;
+  search_seconds?: number;
+  locked?: boolean;
+  lock_difficulty?: number;
 }
 
 export interface RecipeDefinition {

@@ -18,7 +18,8 @@ type InputEventName =
   | "quick-heal"
   | "quick-save"
   | "quick-load"
-  | "mouse-move";
+  | "mouse-move"
+  | "lockpick";
 
 type InputListener = () => void;
 
@@ -58,7 +59,9 @@ const KEY_BINDINGS: Record<string, InputEventName> = {
   T: "toggle-weapon-mods",
   "1": "cycle-weapon",
   F5: "quick-save",
-  F9: "quick-load"
+  F9: "quick-load",
+  l: "lockpick",
+  L: "lockpick"
 };
 
 export class InputManager {
