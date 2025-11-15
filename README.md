@@ -36,6 +36,7 @@ The development server will auto-open the canvas demo. Use **WASD** to move, **S
 - Single-slot quick-save/quick-load loop (**F5/F9**) that serializes the player inventory, placed structures, POI loot scenes, and progression state so QA can hop between builds without losing progress.
 - Weapon/combat layer with JSON-defined firearms/melee stats, projectile simulation, ammo + reload management, melee arcs, attachment-aware stat tweaks, grenade throwing/cycling, stealth-aware muzzle noise, and HUD readouts for ammo/reserve/reload progress.
 - Player vitals + zombie melee damage pass that tracks HP/stamina/bleed/infection, feeds the new HUD vitals card, lets zombies chip the player down in melee, and exposes an **H** quick-heal action that burns bandages/medkits.
+- Player movement locking is now source-aware (vehicles, weapon mods, downed state, etc.) so overlays can no longer leave the character frozen; each subsystem releases only its own lock and a fresh load clears stragglers automatically.
 - Facility + stockpile management (**N**) that lets you queue hydro farms/workshops/infirmaries, tracks power draw and survivor staffing, auto-produces food/meds/parts into a persistent base stockpile, and surfaces totals on the HUD/progression heat model.
 
 ## Next Steps

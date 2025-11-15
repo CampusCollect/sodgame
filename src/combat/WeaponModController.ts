@@ -59,7 +59,7 @@ export class WeaponModController {
 
   private open(): void {
     this.isOpen = true;
-    this.player.lockMovement();
+    this.player.lockMovement("weapon-mods");
     this.panel.show();
     this.update();
     this.panel.setMessage("Select an attachment slot to install or detach mods.");
@@ -70,7 +70,7 @@ export class WeaponModController {
       return;
     }
     this.isOpen = false;
-    this.player.unlockMovement();
+    this.player.unlockMovement("weapon-mods");
     this.panel.hide();
   }
 

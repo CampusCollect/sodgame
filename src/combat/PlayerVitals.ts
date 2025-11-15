@@ -99,11 +99,11 @@ export class PlayerVitals {
 
     if (this.health <= 0 && !this.downed) {
       this.downed = true;
-      this.player.lockMovement();
+      this.player.lockMovement("player-vitals");
       this.pushStatus("You succumbed to injuries – reload or heal before death", 6);
     } else if (this.downed && this.health > 0) {
       this.downed = false;
-      this.player.unlockMovement();
+      this.player.unlockMovement("player-vitals");
     }
   }
 
@@ -182,9 +182,9 @@ export class PlayerVitals {
     this.trauma = clamp(snapshot.trauma, 0, 100);
     this.downed = snapshot.downed;
     if (this.downed) {
-      this.player.lockMovement();
+      this.player.lockMovement("player-vitals");
     } else {
-      this.player.unlockMovement();
+      this.player.unlockMovement("player-vitals");
     }
   }
 

@@ -29,14 +29,14 @@ export class Player {
   private movementIntensity = 0;
   private crouching = false;
   private sprinting = false;
-  private movementLocked = false;
+  private readonly movementLocks = new Set<string>();
 
   constructor({ x, y }: PlayerOptions) {
     this.position = { x, y };
   }
 
   update(deltaTime: number, input: InputManager, world: World): void {
-    if (this.movementLocked) {
+    if (this.isMovementLocked()) {
       this.movementIntensity = 0;
       return;
     }
@@ -92,13 +92,21 @@ export class Player {
     return "walk";
   }
 
-  lockMovement(): void {
-    this.movementLocked = true;
+  lockMovement(reason = "default"): void {
+    this.movementLocks.add(reason);
     this.movementIntensity = 0;
   }
 
-  unlockMovement(): void {
-    this.movementLocked = false;
+  unlockMovement(reason = "default"): void {
+    this.movementLocks.delete(reason);
+  }
+
+  isMovementLocked(): boolean {
+    return this.movementLocks.size > 0;
+  }
+
+  clearMovementLocks(): void {
+    this.movementLocks.clear();
   }
 
   syncToVehicle(position: Vector2): void {
@@ -115,5 +123,6 @@ export class Player {
   load(state: PlayerStateSnapshot): void {
     this.position = { ...state.position };
     this.inventory.load(state.inventory);
+    this.clearMovementLocks();
   }
 }

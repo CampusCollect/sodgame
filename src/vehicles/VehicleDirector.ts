@@ -161,7 +161,7 @@ export class VehicleDirector {
     }
     this.activeVehicle = vehicle;
     vehicle.driver = "player";
-    this.player.lockMovement();
+    this.player.lockMovement("vehicle");
     this.player.syncToVehicle(vehicle.position);
     this.setHint(`Driving ${vehicle.definition.name} – E to exit · V for cargo`);
   }
@@ -172,7 +172,7 @@ export class VehicleDirector {
     }
     this.activeVehicle.driver = null;
     this.activeVehicle.speed = 0;
-    this.player.unlockMovement();
+    this.player.unlockMovement("vehicle");
     this.player.syncToVehicle({ ...this.activeVehicle.position });
     this.activeVehicle = null;
     this.closeCargoOverlay();

@@ -1,5 +1,10 @@
 # WORKLOG
 
+# 2024-05-27 – Movement Lock Stack & Freeze Fixes
+- Refactored the player controller to track movement locks per subsystem (vehicles, weapon mods, vitals, etc.) so overlapping overlays no longer leave the character frozen, and added a clear-on-load fallback so quick-loads always regain control.
+- Updated VehicleDirector, PlayerVitals, and WeaponModController to pass named lock reasons plus documented the new QA step and README highlight so testers know to validate the failsafe.
+- Added a manual smoke step covering lock/unlock behaviour (panels, vehicles, quick-save/load) to prevent regressions during the upcoming convoy/AI work.
+
 # 2024-05-26 – Raid Planner Polish & Hotkey Guard
 - Hardened the input layer so keyboard shortcuts ignore focused text/selection fields (raid search, survivor notes, etc.), preventing panels from closing or actions firing while QA types.
 - Rebuilt the raid planner overlay with faction filters, a search bar, convoy tracking badges, tooltips for blocked ambushes, and refreshed CSS so intel clicks always provide feedback.
