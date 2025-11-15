@@ -131,8 +131,12 @@ export class WeaponModController {
     }
     const attachmentId = weapon.stack.attachments[slot];
     const added = this.player.inventory.add(createStack(attachmentId, 1));
-    if (!added) {
+    if (added.accepted === 0) {
       this.panel.setMessage("Backpack full – make space first");
+      return;
+    }
+    if (!added.success) {
+      this.panel.setMessage("Partial space available – attachment remained installed");
       return;
     }
     delete weapon.stack.attachments[slot];

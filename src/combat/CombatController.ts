@@ -533,12 +533,22 @@ export class CombatController {
     if (!removed) {
       return false;
     }
+    const salvageIssues: string[] = [];
     weapon.definition.disassembly_yield.forEach(entry => {
-      this.player.inventory.add(createStack(entry.item, entry.qty));
+      const result = this.player.inventory.add(createStack(entry.item, entry.qty));
+      if (result.accepted === 0) {
+        salvageIssues.push(`${entry.item} (no space)`);
+      } else if (!result.success) {
+        salvageIssues.push(`${entry.item} (partial)`);
+      }
     });
     this.magazineState.delete(weapon.id);
     this.activeWeaponIndex = 0;
-    this.setStatusMessage("Weapon disassembled");
+    if (salvageIssues.length) {
+      this.setStatusMessage(`Weapon disassembled – free space for ${salvageIssues.join(", ")}`);
+    } else {
+      this.setStatusMessage("Weapon disassembled");
+    }
     return true;
   }
 

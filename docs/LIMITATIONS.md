@@ -23,7 +23,6 @@
 - Asset pipeline (sprites, audio) not wired; demo uses simple vector rendering.
 - Persistence exists only as a single-slot quick-save; there is no slot management, survivor mission logging, or chunk-level delta streaming yet.
 - UI overlays are DOM-based; controller support and accessibility testing remain TODO.
-- Inventory weight checks currently reject entire stacks when capacity is exceeded rather than splitting or queuing overflow.
 - Crafting assumes the player inventory doubles as both input and output storage; dedicated workstation inventories and survivor job hand-offs are still TODO.
 - Crafting output currently fails silently into the void when inventories are full; hook up ground drops or station storage in the next sprint.
 - Facility production does not yet consume upkeep/fuel or respect blueprint gating beyond tier data; integrate blueprint unlocks and survivor fatigue in a future pass.

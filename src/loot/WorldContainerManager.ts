@@ -377,22 +377,37 @@ export class WorldContainerManager {
       return;
     }
     const stacks = [...this.active.inventory.getPlacedItems()];
-    let moved = 0;
+    let movedQuantity = 0;
+    let partialTransfer = false;
     stacks.forEach(item => {
       const copy: ItemStack = {
         ...item.stack,
         attachments: item.stack.attachments ? { ...item.stack.attachments } : undefined
       };
-      const added = this.player.inventory.add({ ...copy });
-      if (added) {
+      const result = this.player.inventory.add({ ...copy });
+      if (result.accepted > 0) {
         this.active?.inventory.removePlacedItem(item.id);
-        moved += 1;
+        movedQuantity += result.accepted;
+        if (result.remainder > 0) {
+          partialTransfer = true;
+          const leftover: ItemStack = {
+            ...copy,
+            quantity: result.remainder
+          };
+          if (this.active) {
+            const restore = this.active.inventory.add(leftover);
+            if (restore.accepted === 0) {
+              console.warn(`Failed to restore leftover stack (${copy.itemId}) to container ${this.active.id}`);
+            }
+          }
+        }
       }
     });
-    if (moved === 0) {
+    if (movedQuantity === 0) {
       this.hud.setHint("Backpack full – free space to loot");
     } else {
-      this.hud.setHint(`Transferred ${moved} stacks · Press E again if space remains`);
+      const suffix = partialTransfer ? " · Some stacks remain due to weight limits" : "";
+      this.hud.setHint(`Transferred ${movedQuantity} items${suffix}`);
     }
     this.refreshHud(this.active, this.input.isKeyPressed("e"));
     const poiId = this.active ? this.containerToPoi.get(this.active.id) : null;
@@ -416,10 +431,11 @@ export class WorldContainerManager {
     this.resetContainerState(container);
     const stacks = this.loot.roll(container.lootTableId, { rolls: 4 });
     stacks.forEach(stack => {
-      const success = container.inventory.add({ ...stack });
-      if (!success) {
-        // If the inventory is full, drop the remaining loot.
+      const result = container.inventory.add({ ...stack });
+      if (result.accepted === 0) {
         console.warn(`Container ${container.id} out of space for ${stack.itemId}`);
+      } else if (!result.success) {
+        console.warn(`Container ${container.id} trimmed ${result.remainder}x ${stack.itemId} due to space limits`);
       }
     });
     container.respawnTimer = container.respawnSeconds;

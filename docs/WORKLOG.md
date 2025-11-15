@@ -1,5 +1,13 @@
 # WORKLOG
 
+# 2024-05-29 – Weight-Aware Loot Transfers
+- Reworked `Inventory.add` to return structured results (accepted quantity + remainder) and auto-split stacks against the
+  backpack weight limit so overweight pickups no longer reject the entire stack.
+- Updated the transparent container HUD + `WorldContainerManager` to leave excess items in-place, refreshed HUD hints, and
+  added demo loadout safeguards so partial inserts log warnings instead of silently duplicating loot.
+- Propagated the new return signature through weapon modding, weapon disassembly, and persistence-aware container refills
+  while documenting the QA step + README highlight.
+
 # 2024-05-28 – Lockpicking & Search Flow
 - Extended `WorldContainerManager` with hold-to-search timers, lockpick progress, forced-entry noise, and persistence so lockers actually require kits (or loud brute force) before the transparent HUD exposes loot.
 - Added the **L** binding + Lockpick Kit item, seeded the demo loadout, piped forced-entry noise into the stealth bus, and updated POI templates/data so only specific placements spawn locked lockers.
@@ -109,7 +117,7 @@ later.
 ## 2024-05-11 – Inventory Grid Upgrade
 - Replaced the placeholder slot list with a grid-aware inventory model that respects item sizes, rotation, and weight caps.
 - Implemented shared rendering helpers so player and transparent container HUDs now visualize multi-cell items accurately.
-- Added lightweight weight-tracking UI; soft limitation: partial acceptance when overweight is deferred (`ASSUMPTION: weight overfill currently blocks the full stack rather than splitting`).
+- Added lightweight weight-tracking UI; the original assumption about overweight stacks being rejected outright was cleared on 2024-05-29 when inventory spillover handling landed.
 
 ## 2024-11-12 – Roadmap Initialization
 - Documented a phased execution roadmap that slices the mega-spec into Git-friendly milestones.

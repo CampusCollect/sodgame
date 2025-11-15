@@ -17,23 +17,29 @@ export class InventoryController {
     this.container.append(this.header, this.grid);
     document.body.append(this.container);
 
+    const seedStack = (id: string, qty: number): void => {
+      const result = this.inventory.add(createStack(id, qty));
+      if (!result.success) {
+        console.warn(`Demo loadout item ${id} only partially loaded (accepted ${result.accepted})`);
+      }
+    };
     // demo loadout
-    this.inventory.add(createStack("item_canned_food", 2));
-    this.inventory.add(createStack("item_bandage", 1));
-    this.inventory.add(createStack("material_wood", 12));
-    this.inventory.add(createStack("material_metal", 10));
-    this.inventory.add(createStack("material_steel", 8));
-    this.inventory.add(createStack("item_component_circuit", 2));
-    this.inventory.add(createStack("item_pistol_9mm", 1));
-    this.inventory.add(createStack("item_melee_bat", 1));
-    this.inventory.add(createStack("item_ammo_9mm", 60));
-    this.inventory.add(createStack("item_ammo_762", 60));
-    this.inventory.add(createStack("item_grenade_frag", 2));
-    this.inventory.add(createStack("item_grenade_molotov", 1));
-    this.inventory.add(createStack("item_mod_reflex", 1));
-    this.inventory.add(createStack("item_mod_suppressor", 1));
-    this.inventory.add(createStack("item_mod_extmag", 1));
-    this.inventory.add(createStack("tool_lockpick", 2));
+    seedStack("item_canned_food", 2);
+    seedStack("item_bandage", 1);
+    seedStack("material_wood", 12);
+    seedStack("material_metal", 10);
+    seedStack("material_steel", 8);
+    seedStack("item_component_circuit", 2);
+    seedStack("item_pistol_9mm", 1);
+    seedStack("item_melee_bat", 1);
+    seedStack("item_ammo_9mm", 60);
+    seedStack("item_ammo_762", 60);
+    seedStack("item_grenade_frag", 2);
+    seedStack("item_grenade_molotov", 1);
+    seedStack("item_mod_reflex", 1);
+    seedStack("item_mod_suppressor", 1);
+    seedStack("item_mod_extmag", 1);
+    seedStack("tool_lockpick", 2);
   }
 
   toggle(): void {

@@ -24,6 +24,12 @@ export interface SerializedInventory {
   items: SerializedInventoryItem[];
 }
 
+export interface AddStackResult {
+  success: boolean;
+  accepted: number;
+  remainder: number;
+}
+
 const DEFAULT_OPTIONS: InventoryOptions = {
   columns: 6,
   rows: 8,
@@ -47,17 +53,34 @@ export class Inventory {
     this.label = config.label ?? DEFAULT_OPTIONS.label;
   }
 
-  add(stack: ItemStack): boolean {
+  add(stack: ItemStack): AddStackResult {
     const definition = resolveItemDefinition(stack.itemId);
-    if (!this.hasCapacityFor(definition.weight_kg * stack.quantity)) {
-      return false;
+    const perUnitWeight = definition.weight_kg;
+    const remainingCapacity = this.getRemainingCapacity();
+    let allowedQuantity = stack.quantity;
+
+    if (perUnitWeight > 0) {
+      const maxByWeight = Math.floor(remainingCapacity / perUnitWeight);
+      allowedQuantity = Math.min(stack.quantity, Math.max(0, maxByWeight));
     }
+
+    if (allowedQuantity <= 0) {
+      return { success: false, accepted: 0, remainder: stack.quantity };
+    }
+
     const clone: ItemStack = { ...stack };
+    clone.quantity = allowedQuantity;
+    const beforeCount = this.grid.countItemQuantity(stack.itemId);
     const placed = this.grid.addStack(clone, this.allowRotation);
-    if (!placed) {
-      return false;
+    const afterCount = this.grid.countItemQuantity(stack.itemId);
+    const accepted = Math.max(0, afterCount - beforeCount);
+
+    if (!placed && accepted === 0) {
+      return { success: false, accepted: 0, remainder: stack.quantity };
     }
-    return true;
+
+    const remainder = Math.max(0, stack.quantity - accepted);
+    return { success: remainder === 0, accepted, remainder };
   }
 
   removeAt(position: { x: number; y: number }): PlacedItem | null {
@@ -143,9 +166,6 @@ export class Inventory {
     });
   }
 
-  private hasCapacityFor(weight: number): boolean {
-    return this.getCurrentWeight() + weight <= this.weightLimitKg;
-  }
 }
 
 export type InventoryRenderState = GridRenderState;
