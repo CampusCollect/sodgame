@@ -1,0 +1,70 @@
+{
+  "containers": [
+    {
+      "id": "container_player_backpack_basic",
+      "name": "Basic Backpack",
+      "grid": [6, 8],
+      "weight_limit_kg": 50,
+      "nested_allowed": true,
+      "type": "player",
+      "search_seconds": 0
+    },
+    {
+      "id": "container_player_backpack_advanced",
+      "name": "Tactical Rucksack",
+      "grid": [8, 10],
+      "weight_limit_kg": 75,
+      "nested_allowed": true,
+      "type": "player",
+      "search_seconds": 0
+    },
+    {
+      "id": "container_vehicle_trunk_sedan",
+      "name": "Sedan Trunk",
+      "grid": [5, 4],
+      "weight_limit_kg": 300,
+      "nested_allowed": true,
+      "type": "vehicle",
+      "search_seconds": 0
+    },
+    {
+      "id": "container_world_crate_large",
+      "name": "Large Supply Crate",
+      "grid": [8, 6],
+      "weight_limit_kg": 500,
+      "nested_allowed": true,
+      "type": "world",
+      "search_seconds": 1.5,
+      "lock_difficulty": 1
+    },
+    {
+      "id": "container_world_fridge",
+      "name": "Kitchen Fridge",
+      "grid": [4, 4],
+      "weight_limit_kg": 120,
+      "nested_allowed": true,
+      "type": "world",
+      "search_seconds": 1.2
+    },
+    {
+      "id": "container_world_locker",
+      "name": "Steel Locker",
+      "grid": [5, 6],
+      "weight_limit_kg": 350,
+      "nested_allowed": true,
+      "type": "world",
+      "search_seconds": 2.5,
+      "locked": true,
+      "lock_difficulty": 2
+    },
+    {
+      "id": "container_world_duffle",
+      "name": "Stuffed Duffle Bag",
+      "grid": [6, 4],
+      "weight_limit_kg": 180,
+      "nested_allowed": true,
+      "type": "world",
+      "search_seconds": 1.8
+    }
+  ]
+}

@@ -1,0 +1,1098 @@
+{
+  "items": [
+    {
+      "id": "item_bandage",
+      "name": "Bandage",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.1,
+      "stack_max": 5,
+      "durability_max": 1,
+      "tags": [
+        "medical",
+        "consumable"
+      ],
+      "actions": [
+        "consume",
+        "drop",
+        "split"
+      ],
+      "description": "Stops light bleeding and restores minor health.",
+      "icon": "\ud83e\ude79"
+    },
+    {
+      "id": "item_canned_food",
+      "name": "Canned Beans",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.6,
+      "stack_max": 4,
+      "durability_max": 100,
+      "tags": [
+        "food"
+      ],
+      "freshness_hours": 336,
+      "actions": [
+        "consume",
+        "drop"
+      ],
+      "description": "Shelf-stable calories; morale bonus when shared.",
+      "icon": "\ud83e\udd6b"
+    },
+    {
+      "id": "item_melee_bat",
+      "name": "Aluminum Bat",
+      "size": [
+        1,
+        4
+      ],
+      "weight_kg": 2.4,
+      "stack_max": 1,
+      "durability_max": 80,
+      "tags": [
+        "weapon",
+        "melee"
+      ],
+      "actions": [
+        "equip",
+        "drop",
+        "repair"
+      ],
+      "description": "Reliable melee weapon with moderate knockback.",
+      "icon": "\ud83c\udfcf",
+      "weapon": {
+        "category": "melee",
+        "damage": 35,
+        "range": 65,
+        "attack_cooldown_s": 0.9,
+        "swing_arc_deg": 90,
+        "swing_time_s": 0.35,
+        "noise_class": "noise_melee_hit"
+      },
+      "disassembly_yield": [
+        {
+          "item": "material_metal",
+          "qty": 2
+        },
+        {
+          "item": "material_wood",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "item_rifle_ak47",
+      "name": "AK-47",
+      "size": [
+        2,
+        4
+      ],
+      "weight_kg": 3.5,
+      "stack_max": 1,
+      "durability_max": 100,
+      "attachments": [
+        "optic",
+        "magazine",
+        "suppressor"
+      ],
+      "tags": [
+        "weapon",
+        "firearm",
+        "loud"
+      ],
+      "actions": [
+        "equip",
+        "drop",
+        "inspect"
+      ],
+      "description": "Rugged 7.62mm rifle with high noise signature.",
+      "icon": "\ud83d\udd2b",
+      "weapon": {
+        "category": "firearm",
+        "damage": 45,
+        "range": 850,
+        "attack_cooldown_s": 0.12,
+        "magazine_size": 30,
+        "ammo_type": "item_ammo_762",
+        "reload_seconds": 2.8,
+        "projectile_speed": 1100,
+        "projectile_spread_deg": 2,
+        "fire_mode": "auto",
+        "noise_class": "noise_gunshot_unsuppressed"
+      },
+      "disassembly_yield": [
+        {
+          "item": "material_metal",
+          "qty": 6
+        },
+        {
+          "item": "material_steel",
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": "item_ammo_762",
+      "name": "7.62mm Rounds",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.02,
+      "stack_max": 60,
+      "durability_max": 100,
+      "tags": [
+        "ammo"
+      ],
+      "actions": [
+        "combine",
+        "split",
+        "drop"
+      ],
+      "description": "Standard rifle ammunition compatible with AK platform.",
+      "icon": "\ud83d\udfeb"
+    },
+    {
+      "id": "item_pistol_9mm",
+      "name": "Service Pistol",
+      "size": [
+        2,
+        2
+      ],
+      "weight_kg": 1.1,
+      "stack_max": 1,
+      "durability_max": 90,
+      "tags": [
+        "weapon",
+        "firearm"
+      ],
+      "actions": [
+        "equip",
+        "drop",
+        "inspect"
+      ],
+      "description": "Reliable sidearm with quick handling and lower noise.",
+      "icon": "\ud83d\udd2b",
+      "weapon": {
+        "category": "firearm",
+        "damage": 28,
+        "range": 450,
+        "attack_cooldown_s": 0.22,
+        "magazine_size": 15,
+        "ammo_type": "item_ammo_9mm",
+        "reload_seconds": 1.6,
+        "projectile_speed": 750,
+        "projectile_spread_deg": 4,
+        "fire_mode": "semi",
+        "noise_class": "noise_gunshot_suppressed"
+      },
+      "disassembly_yield": [
+        {
+          "item": "material_metal",
+          "qty": 3
+        },
+        {
+          "item": "item_component_circuit",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "item_ammo_9mm",
+      "name": "9mm FMJ",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.015,
+      "stack_max": 80,
+      "durability_max": 100,
+      "tags": [
+        "ammo"
+      ],
+      "actions": [
+        "combine",
+        "split",
+        "drop"
+      ],
+      "description": "Common pistol ammunition for sidearms and SMGs.",
+      "icon": "\ud83d\udfe6"
+    },
+    {
+      "id": "item_shotgun_pump",
+      "name": "Pump Shotgun",
+      "size": [
+        2,
+        4
+      ],
+      "weight_kg": 3.8,
+      "stack_max": 1,
+      "durability_max": 95,
+      "tags": [
+        "weapon",
+        "firearm",
+        "loud"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Close-range monster; devastating but loud and slow to cycle.",
+      "icon": "\ud83d\udd38",
+      "weapon": {
+        "category": "firearm",
+        "damage": 18,
+        "range": 350,
+        "attack_cooldown_s": 0.9,
+        "magazine_size": 6,
+        "ammo_type": "item_ammo_shell",
+        "reload_seconds": 0.8,
+        "projectile_speed": 600,
+        "projectile_spread_deg": 12,
+        "projectile_count": 8,
+        "fire_mode": "semi",
+        "noise_class": "noise_shotgun"
+      },
+      "disassembly_yield": [
+        {
+          "item": "material_metal",
+          "qty": 5
+        },
+        {
+          "item": "material_wood",
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": "item_ammo_shell",
+      "name": "12g Shells",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.035,
+      "stack_max": 32,
+      "durability_max": 100,
+      "tags": [
+        "ammo"
+      ],
+      "actions": [
+        "combine",
+        "split",
+        "drop"
+      ],
+      "description": "12-gauge buckshot rounds for pump and semi-auto shotguns.",
+      "icon": "\ud83d\udfe5"
+    },
+    {
+      "id": "item_grenade_frag",
+      "name": "Frag Grenade",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.4,
+      "stack_max": 3,
+      "durability_max": 1,
+      "tags": [
+        "grenade",
+        "explosive"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Timed explosive; devastates tight zombie clusters.",
+      "icon": "\ud83d\udca3",
+      "grenade": {
+        "damage": 160,
+        "radius": 120,
+        "fuse_seconds": 1.2,
+        "throw_speed": 420,
+        "noise_class": "noise_explosion"
+      }
+    },
+    {
+      "id": "item_grenade_molotov",
+      "name": "Molotov Cocktail",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.3,
+      "stack_max": 4,
+      "durability_max": 1,
+      "tags": [
+        "grenade",
+        "fire"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Creates a fireball that lingers and damages the undead.",
+      "icon": "\ud83d\udd25",
+      "grenade": {
+        "damage": 110,
+        "radius": 140,
+        "fuse_seconds": 0.6,
+        "throw_speed": 360,
+        "noise_class": "noise_explosion",
+        "status_effect": "burn"
+      }
+    },
+    {
+      "id": "item_grenade_flash",
+      "name": "Flashbang",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.25,
+      "stack_max": 4,
+      "durability_max": 1,
+      "tags": [
+        "grenade",
+        "utility"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Stuns zombies and alerts factions with a bright flash.",
+      "grenade": {
+        "damage": 30,
+        "radius": 160,
+        "fuse_seconds": 0.8,
+        "throw_speed": 400,
+        "noise_class": "noise_explosion"
+      }
+    },
+    {
+      "id": "item_rucksack_food",
+      "name": "Food Rucksack",
+      "size": [
+        2,
+        2
+      ],
+      "weight_kg": 12,
+      "stack_max": 1,
+      "durability_max": 100,
+      "tags": [
+        "rucksack",
+        "bulk"
+      ],
+      "actions": [
+        "deposit",
+        "drop"
+      ],
+      "description": "Bulk food haul for base stockpile; heavy when carried."
+    },
+    {
+      "id": "item_tool_kit",
+      "name": "Mechanic Tool Kit",
+      "size": [
+        2,
+        2
+      ],
+      "weight_kg": 5,
+      "stack_max": 1,
+      "durability_max": 100,
+      "tags": [
+        "tool",
+        "repair"
+      ],
+      "actions": [
+        "equip",
+        "drop",
+        "inspect"
+      ],
+      "description": "Required for vehicle repairs and crafting recipes."
+    },
+    {
+      "id": "item_generator_part",
+      "name": "Generator Part",
+      "size": [
+        1,
+        2
+      ],
+      "weight_kg": 4,
+      "stack_max": 3,
+      "durability_max": 100,
+      "tags": [
+        "component",
+        "power"
+      ],
+      "actions": [
+        "deposit",
+        "drop"
+      ],
+      "description": "Spare parts needed for generator upkeep."
+    },
+    {
+      "id": "item_blueprint_turret",
+      "name": "Turret Blueprint",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.1,
+      "stack_max": 1,
+      "durability_max": 1,
+      "tags": [
+        "blueprint"
+      ],
+      "actions": [
+        "research",
+        "drop"
+      ],
+      "description": "Unlocks automated turret crafting at electronics bench."
+    },
+    {
+      "id": "item_medkit",
+      "name": "Field Medkit",
+      "size": [
+        2,
+        2
+      ],
+      "weight_kg": 1.2,
+      "stack_max": 2,
+      "durability_max": 1,
+      "tags": [
+        "medical",
+        "consumable"
+      ],
+      "actions": [
+        "consume",
+        "drop"
+      ],
+      "description": "Heals significant injuries; best used out of combat."
+    },
+    {
+      "id": "item_fuel_can",
+      "name": "Fuel Can (20L)",
+      "size": [
+        2,
+        3
+      ],
+      "weight_kg": 18,
+      "stack_max": 1,
+      "durability_max": 1,
+      "tags": [
+        "fuel"
+      ],
+      "actions": [
+        "refuel",
+        "drop"
+      ],
+      "description": "Portable gasoline; refills vehicles and generators."
+    },
+    {
+      "id": "item_component_circuit",
+      "name": "Circuit Board",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.2,
+      "stack_max": 10,
+      "durability_max": 100,
+      "tags": [
+        "component",
+        "electronics"
+      ],
+      "actions": [
+        "deposit",
+        "drop"
+      ],
+      "description": "Core ingredient for advanced crafting recipes."
+    },
+    {
+      "id": "item_cloth_scrap",
+      "name": "Cloth Scrap",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.05,
+      "stack_max": 20,
+      "durability_max": 100,
+      "tags": [
+        "material",
+        "fabric"
+      ],
+      "actions": [
+        "combine",
+        "drop"
+      ],
+      "description": "Basic fabric harvested from clothing; used for bandages."
+    },
+    {
+      "id": "item_mod_reflex",
+      "name": "Reflex Sight",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.3,
+      "stack_max": 2,
+      "durability_max": 100,
+      "tags": [
+        "attachment",
+        "optic"
+      ],
+      "attachment_slot": "optic",
+      "actions": [
+        "install",
+        "drop"
+      ],
+      "description": "Tactical optic that tightens spread and boosts range."
+    },
+    {
+      "id": "item_mod_suppressor",
+      "name": "Rifle Suppressor",
+      "size": [
+        1,
+        2
+      ],
+      "weight_kg": 0.5,
+      "stack_max": 2,
+      "durability_max": 100,
+      "tags": [
+        "attachment",
+        "suppressor"
+      ],
+      "attachment_slot": "suppressor",
+      "actions": [
+        "install",
+        "drop"
+      ],
+      "description": "Reduces muzzle report at the cost of a slight damage loss."
+    },
+    {
+      "id": "item_mod_extmag",
+      "name": "Extended Magazine",
+      "size": [
+        1,
+        2
+      ],
+      "weight_kg": 0.6,
+      "stack_max": 2,
+      "durability_max": 100,
+      "tags": [
+        "attachment",
+        "magazine"
+      ],
+      "attachment_slot": "magazine",
+      "actions": [
+        "install",
+        "drop"
+      ],
+      "description": "Adds rounds at the expense of additional weight and bulk."
+    },
+    {
+      "id": "tool_lockpick",
+      "name": "Lockpick Kit",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.2,
+      "stack_max": 5,
+      "durability_max": 100,
+      "tags": [
+        "tool"
+      ],
+      "actions": [
+        "use",
+        "drop"
+      ],
+      "description": "Slim jim, torsion wrench, and picks for bypassing locked containers."
+    },
+    {
+      "id": "material_gunpowder",
+      "name": "Gunpowder",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.05,
+      "stack_max": 30,
+      "durability_max": 100,
+      "tags": [
+        "material",
+        "explosive"
+      ],
+      "actions": [
+        "combine",
+        "drop"
+      ],
+      "description": "Propellant required for ammunition crafting."
+    },
+    {
+      "id": "material_brass",
+      "name": "Brass Casings",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.1,
+      "stack_max": 30,
+      "durability_max": 100,
+      "tags": [
+        "material",
+        "metal"
+      ],
+      "actions": [
+        "combine",
+        "drop"
+      ],
+      "description": "Spent casings reworked into new ammunition shells."
+    },
+    {
+      "id": "material_lead",
+      "name": "Lead Ingots",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.2,
+      "stack_max": 20,
+      "durability_max": 100,
+      "tags": [
+        "material",
+        "metal"
+      ],
+      "actions": [
+        "combine",
+        "drop"
+      ],
+      "description": "Raw lead smelted for bullet tips."
+    },
+    {
+      "id": "material_steel",
+      "name": "Steel Plates",
+      "size": [
+        1,
+        2
+      ],
+      "weight_kg": 3,
+      "stack_max": 10,
+      "durability_max": 100,
+      "tags": [
+        "material",
+        "metal"
+      ],
+      "actions": [
+        "combine",
+        "drop"
+      ],
+      "description": "Structural component for advanced crafting."
+    },
+    {
+      "id": "material_wood",
+      "name": "Lumber Stack",
+      "size": [
+        1,
+        2
+      ],
+      "weight_kg": 2,
+      "stack_max": 15,
+      "durability_max": 100,
+      "tags": [
+        "material",
+        "wood"
+      ],
+      "actions": [
+        "combine",
+        "drop"
+      ],
+      "description": "Base building material for T1 structures."
+    },
+    {
+      "id": "material_metal",
+      "name": "Metal Scrap",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 1,
+      "stack_max": 20,
+      "durability_max": 100,
+      "tags": [
+        "material",
+        "metal"
+      ],
+      "actions": [
+        "combine",
+        "drop"
+      ],
+      "description": "General purpose scrap used in facility upgrades."
+    },
+    {
+      "id": "material_seed",
+      "name": "Seed Packet",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.2,
+      "stack_max": 15,
+      "durability_max": 100,
+      "tags": [
+        "material",
+        "agriculture"
+      ],
+      "actions": [
+        "deposit",
+        "drop"
+      ],
+      "description": "Mixed heirloom seeds required to spin up farm facilities."
+    },
+    {
+      "id": "material_electronics",
+      "name": "Electronics Crate",
+      "size": [
+        1,
+        2
+      ],
+      "weight_kg": 1.5,
+      "stack_max": 8,
+      "durability_max": 100,
+      "tags": [
+        "material",
+        "electronics"
+      ],
+      "actions": [
+        "deposit",
+        "drop"
+      ],
+      "description": "Bundled circuits, capacitors, and fuses used by radio towers and garages."
+    },
+    {
+      "id": "item_pack_basic",
+      "name": "Canvas Backpack",
+      "size": [
+        2,
+        3
+      ],
+      "weight_kg": 1.8,
+      "stack_max": 1,
+      "durability_max": 80,
+      "tags": [
+        "gear"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Adds a modest grid expansion for new survivors.",
+      "icon": "\ud83c\udf92",
+      "equipment": {
+        "slot": "backpack",
+        "capacity_bonus": {
+          "columns": 1,
+          "rows": 1
+        },
+        "weight_bonus_kg": 10
+      }
+    },
+    {
+      "id": "item_pack_ranger",
+      "name": "Ranger Rucksack",
+      "size": [
+        2,
+        4
+      ],
+      "weight_kg": 2.4,
+      "stack_max": 1,
+      "durability_max": 110,
+      "tags": [
+        "gear"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "High-end pack that expands both width and height.",
+      "icon": "\ud83c\udf92",
+      "equipment": {
+        "slot": "backpack",
+        "capacity_bonus": {
+          "columns": 2,
+          "rows": 2
+        },
+        "weight_bonus_kg": 25
+      }
+    },
+    {
+      "id": "item_vest_tactical",
+      "name": "Tactical Chest Rig",
+      "size": [
+        2,
+        2
+      ],
+      "weight_kg": 1.6,
+      "stack_max": 1,
+      "durability_max": 120,
+      "tags": [
+        "gear"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Adds quick-access slots and modest armor plating.",
+      "icon": "\ud83e\uddba",
+      "equipment": {
+        "slot": "vest",
+        "capacity_bonus": {
+          "columns": 1
+        },
+        "weight_bonus_kg": 5,
+        "armor_bonus": 0.08
+      }
+    },
+    {
+      "id": "item_armor_plate",
+      "name": "Composite Plate Carrier",
+      "size": [
+        2,
+        3
+      ],
+      "weight_kg": 5,
+      "stack_max": 1,
+      "durability_max": 140,
+      "tags": [
+        "gear",
+        "armor"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Heavy protection that slows you slightly but shrugs bullets.",
+      "icon": "\ud83d\udee1\ufe0f",
+      "equipment": {
+        "slot": "armor",
+        "armor_bonus": 0.25,
+        "weight_bonus_kg": 5
+      }
+    },
+    {
+      "id": "item_helmet_ballistic",
+      "name": "Ballistic Helmet",
+      "size": [
+        2,
+        2
+      ],
+      "weight_kg": 2.2,
+      "stack_max": 1,
+      "durability_max": 100,
+      "tags": [
+        "gear",
+        "armor"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Head protection that mitigates trauma and infection.",
+      "icon": "\u26d1\ufe0f",
+      "equipment": {
+        "slot": "helmet",
+        "armor_bonus": 0.12
+      }
+    },
+    {
+      "id": "item_hat_field",
+      "name": "Field Cap",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.2,
+      "stack_max": 1,
+      "durability_max": 60,
+      "tags": [
+        "gear"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Lightweight cap with no armor but morale flair.",
+      "icon": "\ud83e\udde2",
+      "equipment": {
+        "slot": "helmet"
+      }
+    },
+    {
+      "id": "item_ammo_556",
+      "name": "5.56 NATO",
+      "size": [
+        1,
+        1
+      ],
+      "weight_kg": 0.018,
+      "stack_max": 80,
+      "durability_max": 100,
+      "tags": [
+        "ammo"
+      ],
+      "actions": [
+        "combine",
+        "split",
+        "drop"
+      ],
+      "description": "Intermediate cartridge for carbines and designated rifles.",
+      "icon": "\ud83d\udfe7"
+    },
+    {
+      "id": "item_rifle_hunting",
+      "name": "Frontier Carbine",
+      "size": [
+        2,
+        4
+      ],
+      "weight_kg": 3.2,
+      "stack_max": 1,
+      "durability_max": 95,
+      "tags": [
+        "weapon",
+        "firearm"
+      ],
+      "actions": [
+        "equip",
+        "drop",
+        "inspect"
+      ],
+      "description": "Semi-auto 5.56 rifle ideal for mid-tier raids.",
+      "icon": "\ud83d\udd36",
+      "weapon": {
+        "category": "firearm",
+        "damage": 36,
+        "range": 700,
+        "attack_cooldown_s": 0.18,
+        "magazine_size": 20,
+        "ammo_type": "item_ammo_556",
+        "reload_seconds": 2.2,
+        "projectile_speed": 950,
+        "projectile_spread_deg": 1.4,
+        "fire_mode": "semi",
+        "noise_class": "noise_gunshot_unsuppressed"
+      }
+    },
+    {
+      "id": "item_smg_vector",
+      "name": "Vector SMG",
+      "size": [
+        2,
+        3
+      ],
+      "weight_kg": 2.6,
+      "stack_max": 1,
+      "durability_max": 85,
+      "tags": [
+        "weapon",
+        "firearm"
+      ],
+      "actions": [
+        "equip",
+        "drop"
+      ],
+      "description": "Rapid-fire SMG fed by 9mm, controllable recoil.",
+      "icon": "\ud83d\udd3b",
+      "weapon": {
+        "category": "firearm",
+        "damage": 24,
+        "range": 400,
+        "attack_cooldown_s": 0.09,
+        "magazine_size": 30,
+        "ammo_type": "item_ammo_9mm",
+        "reload_seconds": 1.8,
+        "projectile_speed": 700,
+        "projectile_spread_deg": 4,
+        "fire_mode": "auto",
+        "noise_class": "noise_gunshot_unsuppressed"
+      }
+    },
+    {
+      "id": "item_rifle_mk14",
+      "name": "Marksman MK14",
+      "size": [
+        2,
+        4
+      ],
+      "weight_kg": 4.5,
+      "stack_max": 1,
+      "durability_max": 120,
+      "tags": [
+        "weapon",
+        "firearm",
+        "rare"
+      ],
+      "actions": [
+        "equip",
+        "drop",
+        "inspect"
+      ],
+      "description": "Designated marksman rifle prized by T5 hunters.",
+      "icon": "\ud83c\udfaf",
+      "weapon": {
+        "category": "firearm",
+        "damage": 60,
+        "range": 1100,
+        "attack_cooldown_s": 0.28,
+        "magazine_size": 20,
+        "ammo_type": "item_ammo_762",
+        "reload_seconds": 2.6,
+        "projectile_speed": 1200,
+        "projectile_spread_deg": 0.8,
+        "fire_mode": "semi",
+        "noise_class": "noise_gunshot_unsuppressed"
+      }
+    },
+    {
+      "id": "item_rifle_gauss",
+      "name": "Experimental Gauss Rifle",
+      "size": [
+        2,
+        5
+      ],
+      "weight_kg": 5.6,
+      "stack_max": 1,
+      "durability_max": 150,
+      "tags": [
+        "weapon",
+        "firearm",
+        "legendary"
+      ],
+      "actions": [
+        "equip",
+        "drop",
+        "inspect"
+      ],
+      "description": "Electromagnetic slug launcher ripped from a black-site.",
+      "icon": "\u26a1",
+      "weapon": {
+        "category": "firearm",
+        "damage": 90,
+        "range": 1500,
+        "attack_cooldown_s": 0.4,
+        "magazine_size": 10,
+        "ammo_type": "item_ammo_762",
+        "reload_seconds": 3.2,
+        "projectile_speed": 1600,
+        "projectile_spread_deg": 0.4,
+        "fire_mode": "semi",
+        "noise_class": "noise_gunshot_suppressed"
+      }
+    }
+  ]
+}
