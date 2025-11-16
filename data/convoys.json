@@ -5,9 +5,6 @@
       "faction": "faction_military",
       "route": ["poi_airbase", "poi_research_lab"],
       "cargo": ["item_blueprint_turret", "item_component_circuit", "item_ammo_762"],
-      "guards": 6,
-      "escort_vehicles": 2,
-      "interval_hours": 8
     },
     {
       "id": "convoy_union_supply",
