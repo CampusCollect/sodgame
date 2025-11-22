@@ -3,6 +3,7 @@ import type { Inventory } from "../inventory/Inventory";
 import { RecipeBook, type StationId } from "./RecipeBook";
 import { CraftingStation, type CrafterProfile, type CraftingTaskState } from "./CraftingStation";
 import { CraftingPanel } from "../ui/CraftingPanel";
+import { UnifiedOverlay } from "../ui/UnifiedOverlay";
 
 export class CraftingController {
   private readonly recipeBook = new RecipeBook();
@@ -10,7 +11,7 @@ export class CraftingController {
   private readonly panel: CraftingPanel;
   private readonly defaultCrafter: CrafterProfile;
 
-  constructor(playerInventory: Inventory, input: InputManager) {
+  constructor(playerInventory: Inventory, _input: InputManager, overlay: UnifiedOverlay) {
     this.panel = new CraftingPanel({
       onRequestEnqueue: recipeId => this.enqueue(recipeId),
       onToggle: isOpen => {
@@ -51,11 +52,17 @@ export class CraftingController {
       output: playerInventory
     });
 
-    input.on("toggle-crafting", () => {
-      this.panel.toggle();
-      if (this.panel.isOpen()) {
+    overlay.registerTab({
+      id: "crafting",
+      label: "Crafting",
+      icon: "🛠️",
+      hotkeys: ["toggle-crafting"],
+      element: this.panel.getElement(),
+      onOpen: () => {
+        this.panel.open();
         this.refreshPanel();
-      }
+      },
+      onClose: () => this.panel.close()
     });
 
     this.refreshPanel();

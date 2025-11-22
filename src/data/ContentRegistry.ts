@@ -49,6 +49,15 @@ export interface GrenadeDefinition {
   status_effect?: string;
 }
 
+export type EquipmentSlot = "backpack" | "vest" | "armor" | "helmet";
+
+export interface EquipmentMetadata {
+  slot: EquipmentSlot;
+  capacity_bonus?: { columns?: number; rows?: number };
+  weight_bonus_kg?: number;
+  armor_bonus?: number;
+}
+
 export interface ItemDefinition {
   id: string;
   name: string;
@@ -59,12 +68,14 @@ export interface ItemDefinition {
   tags: string[];
   actions: string[];
   description: string;
+  icon?: string;
   attachments?: string[];
   attachment_slot?: string;
   freshness_hours?: number;
   weapon?: WeaponDefinition;
   grenade?: GrenadeDefinition;
   disassembly_yield?: { item: string; qty: number }[];
+  equipment?: EquipmentMetadata;
 }
 
 export interface BiomeDefinition {

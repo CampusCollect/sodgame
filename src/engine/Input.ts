@@ -1,10 +1,11 @@
-type InputEventName =
+export type InputEventName =
   | "toggle-inventory"
   | "toggle-crafting"
   | "toggle-building"
   | "toggle-facilities"
   | "toggle-survivors"
   | "toggle-raids"
+  | "toggle-map"
   | "interact"
   | "toggle-vehicle-cargo"
   | "use-stealth-tool"
@@ -41,6 +42,8 @@ const KEY_BINDINGS: Record<string, InputEventName> = {
   J: "toggle-survivors",
   r: "toggle-raids",
   R: "toggle-raids",
+  p: "toggle-map",
+  P: "toggle-map",
   e: "interact",
   E: "interact",
   v: "toggle-vehicle-cargo",

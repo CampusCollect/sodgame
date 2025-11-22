@@ -2,6 +2,7 @@ import type { Player } from "../entities/Player";
 import type { InputManager } from "../engine/Input";
 import { TILE_SIZE } from "../worldgen/Chunk";
 import { BuildingManager, type PlacedStructure, type SerializedStructurePlacement } from "./BuildingManager";
+import { UnifiedOverlay } from "../ui/UnifiedOverlay";
 
 interface GhostState {
   tile: { x: number; y: number } | null;
@@ -26,7 +27,8 @@ export class BuildingController {
     private readonly player: Player,
     private readonly input: InputManager,
     private readonly canvas: HTMLCanvasElement,
-    private readonly viewport: { width: number; height: number }
+    private readonly viewport: { width: number; height: number },
+    overlay: UnifiedOverlay
   ) {
     this.panel = document.createElement("div");
     this.panel.className = "build-panel hidden";
@@ -44,25 +46,39 @@ export class BuildingController {
     this.placedList.className = "build-panel__placed";
 
     this.panel.append(this.header, this.structuresList, this.status, this.placedList);
-    document.body.append(this.panel);
 
-    this.input.on("toggle-building", () => this.toggle());
+    overlay.registerTab({
+      id: "building",
+      label: "Build",
+      icon: "🏗️",
+      hotkeys: ["toggle-building"],
+      element: this.panel,
+      onOpen: () => this.openPanel(),
+      onClose: () => this.closePanel()
+    });
     this.canvas.addEventListener("click", event => this.handleCanvasClick(event));
 
     this.render();
   }
 
-  toggle(): void {
-    this.open = !this.open;
+  private openPanel(): void {
     if (this.open) {
-      this.panel.classList.remove("hidden");
-      this.render();
-    } else {
-      this.panel.classList.add("hidden");
-      this.lastMessage = null;
-      this.status.className = "build-panel__status";
-      this.status.textContent = "";
+      return;
     }
+    this.open = true;
+    this.panel.classList.remove("hidden");
+    this.render();
+  }
+
+  private closePanel(): void {
+    if (!this.open) {
+      return;
+    }
+    this.open = false;
+    this.panel.classList.add("hidden");
+    this.lastMessage = null;
+    this.status.className = "build-panel__status";
+    this.status.textContent = "";
   }
 
   update(): void {

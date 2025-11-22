@@ -17,12 +17,15 @@
 | Progression/heat scoring uses heuristic proxies (inventory weight + structure HP) | Medium | Medium | Heat model now ingests the base stockpile value + defense score | Tie sieges/reinforcements directly to resource categories and facility uptime |
 | Chunk streaming currently lives only in-memory | High | Medium | Deterministic seeds keep POIs/roads reproducible | Add save/load of chunk deltas + async IO |
 | Road network is visual-only | Medium | Medium | Display spline-like overlays for navigation cues | Hook roads into convoy AI, collisions, and barricade gameplay |
+| Unified overlay lacks controller navigation/focus traps | Medium | Medium | Shared tab chrome + hotkey guards keep DOM consistent | Add focus trapping, roving tabindex, and controller bindings |
 
 ## Known Gaps
 - Mega-spec mechanics (crafting, advanced AI, factions, etc.) are not yet ported – this milestone focuses on architecture reset.
 - Asset pipeline (sprites, audio) not wired; demo uses simple vector rendering.
 - Persistence exists only as a single-slot quick-save; there is no slot management, survivor mission logging, or chunk-level delta streaming yet.
 - UI overlays are DOM-based; controller support and accessibility testing remain TODO.
+- Map intel panel is text-only – there is no fog-of-war, zoomed rendering, or waypoint placement yet.
+- Map intel panel is text-only – there is no fog-of-war, zoomed view, or waypoint placement yet.
 - Crafting assumes the player inventory doubles as both input and output storage; dedicated workstation inventories and survivor job hand-offs are still TODO.
 - Crafting queues now pause instead of deleting results when the backpack is full, but there is still no dedicated output bin or survivor courier to free space automatically.
 - Facility production does not yet consume upkeep/fuel or respect blueprint gating beyond tier data; integrate blueprint unlocks and survivor fatigue in a future pass.

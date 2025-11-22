@@ -44,7 +44,10 @@ export class FacilityPanel {
     this.message.className = "facility-panel__message";
 
     this.root.append(this.header, this.stockpileSection, this.availableSection, this.facilitySection, this.message);
-    document.body.append(this.root);
+  }
+
+  getElement(): HTMLDivElement {
+    return this.root;
   }
 
   show(): void {

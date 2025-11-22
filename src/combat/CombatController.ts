@@ -43,6 +43,14 @@ const FIST_STATS: WeaponDefinition = {
   noise_class: "noise_melee_hit"
 };
 
+export interface WeaponSlotHud {
+  id: string;
+  name: string;
+  icon?: string;
+  ammoLabel: string;
+  active: boolean;
+}
+
 export interface WeaponHudStatus {
   name: string;
   ammoInMag?: number;
@@ -54,6 +62,7 @@ export interface WeaponHudStatus {
   isMelee: boolean;
   message?: string;
   grenadeStatus?: string;
+  slots: WeaponSlotHud[];
 }
 
 interface ReloadState {
@@ -136,7 +145,7 @@ export class CombatController {
 
     this.updateProjectiles(delta);
     this.updateGrenades(delta);
-    this.updateHudStatus(equipped);
+    this.updateHudStatus(equipped, weapons);
   }
 
   draw(ctx: CanvasRenderingContext2D, playerPosition: Vector2, viewport: Pick<GameOptions, "width" | "height">): void {
@@ -196,6 +205,10 @@ export class CombatController {
 
   getWeaponStatus(): WeaponHudStatus | null {
     return this.hudStatus;
+  }
+
+  manualReload(): void {
+    this.requestReload();
   }
 
   private collectWeapons(): PlacedItem[] {
@@ -617,7 +630,7 @@ export class CombatController {
     return stats;
   }
 
-  private updateHudStatus(weapon: PlacedItem | null): void {
+  private updateHudStatus(weapon: PlacedItem | null, roster: PlacedItem[]): void {
     if (!weapon || !weapon.definition.weapon) {
       this.hudStatus = null;
       return;
@@ -630,6 +643,21 @@ export class CombatController {
     const ammoInMag = stats.category === "firearm" ? this.ensureMagazineState(weapon, stats) : undefined;
     const ammoReserve = stats.category === "firearm" && stats.ammo_type ? this.player.inventory.getQuantity(stats.ammo_type) : undefined;
 
+    const slots: WeaponSlotHud[] = roster.slice(0, 3).map((slotWeapon, index) => {
+      const slotStats = slotWeapon.definition.weapon;
+      const isFirearm = slotStats?.category === "firearm";
+      const ammoLabel = isFirearm
+        ? `${this.ensureMagazineState(slotWeapon, slotStats!)} / ${slotStats?.magazine_size ?? 0}`
+        : "Ready";
+      return {
+        id: slotWeapon.id,
+        name: slotWeapon.definition.name,
+        icon: slotWeapon.definition.icon,
+        ammoLabel,
+        active: slotWeapon.id === weapon.id && index === this.activeWeaponIndex
+      } satisfies WeaponSlotHud;
+    });
+
     this.hudStatus = {
       name: weapon.definition.name,
       ammoInMag,
@@ -640,7 +668,8 @@ export class CombatController {
       reloadProgress,
       isMelee: stats.category === "melee",
       message: this.statusMessage ?? undefined,
-      grenadeStatus: this.describeGrenadeStatus() ?? undefined
+      grenadeStatus: this.describeGrenadeStatus() ?? undefined,
+      slots
     };
   }
 

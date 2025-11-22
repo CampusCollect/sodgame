@@ -8,6 +8,7 @@ import type { InputManager } from "../engine/Input";
 import type { PlayerVitals, PlayerVitalsSnapshot } from "../combat/PlayerVitals";
 import type { FacilityPersistenceState } from "../building/FacilityManager";
 import type { VehicleDirector, VehicleSaveState } from "../vehicles/VehicleDirector";
+import type { EquipmentManager, EquipmentSnapshot } from "../inventory/EquipmentManager";
 
 interface SavePayload {
   version: number;
@@ -19,6 +20,7 @@ interface SavePayload {
   progression: ProgressionPersistenceState;
   vitals?: PlayerVitalsSnapshot;
   vehicles?: VehicleSaveState[];
+  equipment?: EquipmentSnapshot;
 }
 
 const STORAGE_KEY = "sodgame.save.v1";
@@ -33,6 +35,7 @@ interface SaveManagerDeps {
   input: InputManager;
   vitals: PlayerVitals;
   vehicles: VehicleDirector;
+  equipment: EquipmentManager;
 }
 
 export class SaveManager {
@@ -90,7 +93,8 @@ export class SaveManager {
         containers: this.deps.containers.exportState(),
         progression: this.deps.progression.exportState(),
         vitals: this.deps.vitals.serialize(),
-        vehicles: this.deps.vehicles.exportState()
+        vehicles: this.deps.vehicles.exportState(),
+        equipment: this.deps.equipment.serialize()
       };
     } catch (error) {
       console.error("Failed to capture save payload", error);
@@ -110,6 +114,7 @@ export class SaveManager {
     if (payload.vehicles) {
       this.deps.vehicles.importState(payload.vehicles);
     }
+    this.deps.equipment.load(payload.equipment);
   }
 
   private write(payload: SavePayload): void {

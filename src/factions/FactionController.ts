@@ -6,6 +6,7 @@ import { ConvoyScheduler } from "./ConvoyScheduler";
 import { RaidPlanner } from "./RaidPlanner";
 import { RaidPlanningUI } from "../ui/RaidPlanningUI";
 import { createStack, resolveItemDefinition, type ItemStack } from "../inventory/Item";
+import { UnifiedOverlay } from "../ui/UnifiedOverlay";
 
 export class FactionController {
   private readonly factions = new FactionManager();
@@ -14,13 +15,29 @@ export class FactionController {
   private readonly panel: RaidPlanningUI;
   private syncCooldown = 0;
 
-  constructor(private readonly input: InputManager, private readonly player: Player, private readonly containers: WorldContainerManager) {
+  constructor(
+    _input: InputManager,
+    private readonly player: Player,
+    private readonly containers: WorldContainerManager,
+    overlay: UnifiedOverlay
+  ) {
     this.panel = new RaidPlanningUI({
       onAmbush: convoyId => this.handleAmbush(convoyId),
       onTrack: convoyId => this.handleTrack(convoyId)
     });
 
-    this.input.on("toggle-raids", () => this.toggle());
+    overlay.registerTab({
+      id: "raids",
+      label: "Raids",
+      icon: "🎯",
+      hotkeys: ["toggle-raids"],
+      element: this.panel.getElement(),
+      onOpen: () => {
+        this.panel.show();
+        this.syncPanel();
+      },
+      onClose: () => this.panel.hide()
+    });
   }
 
   update(deltaSeconds: number): void {
@@ -29,16 +46,6 @@ export class FactionController {
     if (this.panel.isOpen() && this.syncCooldown <= 0) {
       this.syncPanel();
       this.syncCooldown = 0.5;
-    }
-  }
-
-  toggle(force?: boolean): void {
-    const shouldOpen = force ?? !this.panel.isOpen();
-    if (shouldOpen) {
-      this.syncPanel();
-      this.panel.show();
-    } else {
-      this.panel.hide();
     }
   }
 

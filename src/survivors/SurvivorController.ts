@@ -3,6 +3,7 @@ import { SurvivorManager, type SurvivorSummary } from "./SurvivorManager";
 import { SurvivorPanel } from "../ui/SurvivorPanel";
 import type { MoraleEventType } from "./MoraleSystem";
 import type { JobStatMap } from "../types/JobStats";
+import { UnifiedOverlay } from "../ui/UnifiedOverlay";
 
 const HOURS_PER_SECOND = 1 / 60; // 1 in-game hour per real-time minute
 
@@ -11,7 +12,7 @@ export class SurvivorController {
   private readonly panel: SurvivorPanel;
   private accumulator = 0;
 
-  constructor(private readonly input: InputManager) {
+  constructor(_input: InputManager, overlay: UnifiedOverlay) {
     this.panel = new SurvivorPanel({
       onAssignJob: (survivorId, jobId) => {
         this.manager.assignJob(survivorId, jobId);
@@ -22,7 +23,18 @@ export class SurvivorController {
       }
     });
 
-    this.input.on("toggle-survivors", () => this.toggle());
+    overlay.registerTab({
+      id: "survivors",
+      label: "Survivors",
+      icon: "🧍",
+      hotkeys: ["toggle-survivors"],
+      element: this.panel.getElement(),
+      onOpen: () => {
+        this.panel.show();
+        this.syncPanel();
+      },
+      onClose: () => this.panel.hide()
+    });
   }
 
   update(deltaSeconds: number): void {
@@ -34,16 +46,6 @@ export class SurvivorController {
       if (this.panel.isOpen()) {
         this.syncPanel();
       }
-    }
-  }
-
-  toggle(force?: boolean): void {
-    const shouldOpen = force ?? !this.panel.isOpen();
-    if (shouldOpen) {
-      this.syncPanel();
-      this.panel.show();
-    } else {
-      this.panel.hide();
     }
   }
 

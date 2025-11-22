@@ -1,10 +1,10 @@
-import type { InputManager } from "../engine/Input";
 import type { Player } from "../entities/Player";
 import type { BuildingController } from "./BuildingController";
 import type { SurvivorController } from "../survivors/SurvivorController";
 import type { FacilityPersistenceState, FacilityView } from "./FacilityManager";
 import { FacilityManager } from "./FacilityManager";
 import { FacilityPanel } from "../ui/FacilityPanel";
+import { UnifiedOverlay } from "../ui/UnifiedOverlay";
 
 const UPDATE_INTERVAL = 1; // seconds
 
@@ -18,7 +18,7 @@ export class FacilityController {
     private readonly player: Player,
     private readonly building: BuildingController,
     private readonly survivors: SurvivorController,
-    private readonly input: InputManager
+    overlay: UnifiedOverlay
   ) {
     this.manager = new FacilityManager(this.building.getManager(), this.player.inventory);
     this.panel = new FacilityPanel({
@@ -26,7 +26,18 @@ export class FacilityController {
       onUpgrade: facilityId => this.handleUpgrade(facilityId)
     });
 
-    this.input.on("toggle-facilities", () => this.toggle());
+    overlay.registerTab({
+      id: "facilities",
+      label: "Facilities",
+      icon: "🏭",
+      hotkeys: ["toggle-facilities"],
+      element: this.panel.getElement(),
+      onOpen: () => {
+        this.panel.show();
+        this.syncPanel();
+      },
+      onClose: () => this.panel.hide()
+    });
   }
 
   update(deltaSeconds: number): void {
@@ -39,16 +50,6 @@ export class FacilityController {
     this.accumulator = 0;
     if (this.panel.isOpen()) {
       this.syncPanel();
-    }
-  }
-
-  toggle(force?: boolean): void {
-    const shouldOpen = force ?? !this.panel.isOpen();
-    if (shouldOpen) {
-      this.syncPanel();
-      this.panel.show();
-    } else {
-      this.panel.hide();
     }
   }
 

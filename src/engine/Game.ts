@@ -17,6 +17,9 @@ import { SaveManager } from "../persistence/SaveManager";
 import { CombatController } from "../combat/CombatController";
 import { WeaponModController } from "../combat/WeaponModController";
 import { PlayerVitals } from "../combat/PlayerVitals";
+import { UnifiedOverlay } from "../ui/UnifiedOverlay";
+import { EquipmentManager } from "../inventory/EquipmentManager";
+import { MapPanel } from "../ui/MapPanel";
 
 export interface GameOptions {
   canvas: HTMLCanvasElement;
@@ -29,6 +32,7 @@ export class Game {
   readonly world: World;
   readonly player: Player;
   readonly input: InputManager;
+  readonly overlay: UnifiedOverlay;
   readonly hud: Hud;
   readonly inventory: InventoryController;
   readonly stealth: StealthController;
@@ -45,6 +49,8 @@ export class Game {
   readonly combat: CombatController;
   readonly weaponMods: WeaponModController;
   readonly vitals: PlayerVitals;
+  readonly equipment: EquipmentManager;
+  readonly mapPanel: MapPanel;
 
   private lastFrame = performance.now();
   private animationHandle: number | null = null;
@@ -61,19 +67,24 @@ export class Game {
     this.world = new World();
     this.player = new Player({ x: 0, y: 0 });
     this.input = new InputManager(options.canvas);
-    this.inventory = new InventoryController(this.player.inventory, this.input);
-    this.hud = new Hud(this.player, this.inventory);
-    this.vitals = new PlayerVitals(this.player, this.player.inventory, this.input);
+    this.overlay = new UnifiedOverlay(this.input);
+    this.equipment = new EquipmentManager(this.player.inventory);
+    this.vitals = new PlayerVitals(this.player, this.player.inventory, this.input, this.equipment);
     this.stealth = new StealthController(this.player, this.input);
     this.zombies = new ZombieDirector(this.vitals, this.stealth.getNoise());
-    this.vehicles = new VehicleDirector(this.player, this.input, this.stealth.getNoise());
-    this.crafting = new CraftingController(this.player.inventory, this.input);
+    this.combat = new CombatController(this.player, this.input, this.zombies, this.stealth);
+    this.inventory = new InventoryController(this.player.inventory, this.input, this.overlay, this.equipment, {
+      onReloadRequest: () => this.combat.manualReload()
+    });
+    this.hud = new Hud(this.player, this.inventory);
+    this.vehicles = new VehicleDirector(this.player, this.input, this.overlay, this.stealth.getNoise());
+    this.crafting = new CraftingController(this.player.inventory, this.input, this.overlay);
     this.building = new BuildingController(this.player, this.input, options.canvas, {
       width: options.width,
       height: options.height
-    });
-    this.survivors = new SurvivorController(this.input);
-    this.facilities = new FacilityController(this.player, this.building, this.survivors, this.input);
+    }, this.overlay);
+    this.survivors = new SurvivorController(this.input, this.overlay);
+    this.facilities = new FacilityController(this.player, this.building, this.survivors, this.overlay);
     this.containers = new WorldContainerManager(
       this.player,
       this.input,
@@ -84,7 +95,7 @@ export class Game {
       this.world,
       this.stealth.getNoise()
     );
-    this.factions = new FactionController(this.input, this.player, this.containers);
+    this.factions = new FactionController(this.input, this.player, this.containers, this.overlay);
     this.progression = new ProgressionController(
       this.player,
       this.building,
@@ -92,6 +103,16 @@ export class Game {
       this.zombies,
       this.facilities
     );
+    this.mapPanel = new MapPanel();
+    this.overlay.registerTab({
+      id: "map",
+      label: "Map",
+      icon: "\uD83D\uDDFA\uFE0F",
+      hotkeys: ["toggle-map"],
+      element: this.mapPanel.getElement(),
+      onOpen: () => this.mapPanel.open(),
+      onClose: () => this.mapPanel.close()
+    });
     this.saves = new SaveManager({
       player: this.player,
       building: this.building,
@@ -100,19 +121,11 @@ export class Game {
       progression: this.progression,
       input: this.input,
       vitals: this.vitals,
-      vehicles: this.vehicles
+      vehicles: this.vehicles,
+      equipment: this.equipment
     });
-    this.combat = new CombatController(this.player, this.input, this.zombies, this.stealth);
-    this.weaponMods = new WeaponModController(this.player, this.input, this.combat);
-
-    this.configureInput();
+    this.weaponMods = new WeaponModController(this.player, this.combat, this.overlay);
     this.saves.tryResume();
-  }
-
-  private configureInput(): void {
-    this.input.on("toggle-inventory", () => {
-      this.inventory.toggle();
-    });
   }
 
   start(): void {
@@ -151,6 +164,11 @@ export class Game {
     this.combat.update(deltaTime, { width: this.options.width, height: this.options.height });
     this.weaponMods.update();
     const progressionSummary = this.progression.update(deltaTime);
+    this.mapPanel.setData({
+      position: { ...this.player.position },
+      pois: this.world.getPoisNear(this.player.position, 2),
+      progression: progressionSummary
+    });
     this.hud.update(
       deltaTime,
       progressionSummary,

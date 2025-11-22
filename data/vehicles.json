@@ -31,7 +31,7 @@
       "id": "vehicle_semi_tractor",
       "name": "Semi Tractor",
       "seats": 2,
-      "cargo_kg": 40,
+      "cargo_kg": 200,
       "fuel_l": 200,
       "speed_ms": 10,
       "noise_idle": 30,

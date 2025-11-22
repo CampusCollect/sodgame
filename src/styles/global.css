@@ -1435,3 +1435,342 @@ select {
   font-size: 0.85rem;
   color: #fcd34d;
 }
+
+.hidden {
+  display: none !important;
+}
+
+.unified-overlay {
+  position: fixed;
+  top: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1100px, 92vw);
+  max-height: 84vh;
+  background: rgba(10, 15, 25, 0.95);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 18px;
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 30px 80px rgba(2, 6, 23, 0.65);
+  backdrop-filter: blur(14px);
+  z-index: 90;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.unified-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -24px);
+}
+
+.unified-overlay__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.unified-overlay__tab {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.8);
+  color: #e2e8f0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.unified-overlay__tab.is-active {
+  border-color: rgba(59, 130, 246, 0.75);
+  color: #bfdbfe;
+  background: rgba(30, 41, 59, 0.85);
+}
+
+.unified-overlay__tab-icon {
+  font-size: 14px;
+}
+
+.unified-overlay__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 4px 0;
+}
+
+.unified-overlay__panel {
+  width: 100%;
+  max-height: 100%;
+}
+
+.unified-overlay__panel.hidden {
+  display: none !important;
+}
+
+.unified-overlay__close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.unified-overlay__panel.inventory-panel,
+.unified-overlay__panel.crafting-panel,
+.unified-overlay__panel.build-panel,
+.unified-overlay__panel.facility-panel,
+.unified-overlay__panel.survivor-panel,
+.unified-overlay__panel.weapon-mod-panel,
+.unified-overlay__panel.maintenance-ui,
+.unified-overlay__panel.map-panel,
+.unified-overlay__panel.raid-panel {
+  position: static;
+  top: auto;
+  right: auto;
+  left: auto;
+  transform: none;
+  width: 100%;
+  max-height: none;
+  border-radius: 14px;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: none;
+  padding: 16px;
+}
+
+.inventory-panel,
+.crafting-panel,
+.build-panel,
+.facility-panel,
+.survivor-panel,
+.weapon-mod-panel,
+.maintenance-ui,
+.map-panel,
+.raid-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: none;
+}
+
+.inventory-panel__equipment {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inventory-panel__gear-summary {
+  font-size: 12px;
+  color: #cbd5f5;
+}
+
+.inventory-panel__gear-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.inventory-panel__gear-card {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.7);
+}
+
+.inventory-panel__gear-icon {
+  font-size: 20px;
+}
+
+.inventory-panel__gear-card button {
+  margin-left: auto;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: #bfdbfe;
+  border-radius: 999px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.inventory-cell__icon {
+  font-size: 20px;
+  display: block;
+}
+
+.inventory-cell__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inventory-drag {
+  position: fixed;
+  pointer-events: none;
+  padding: 6px 10px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  border-radius: 8px;
+  font-size: 12px;
+  color: #f8fafc;
+  z-index: 200;
+}
+
+.inventory-context {
+  position: fixed;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(59, 130, 246, 0.45);
+  border-radius: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  min-width: 180px;
+  z-index: 210;
+}
+
+.inventory-context__item {
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.inventory-context__item strong {
+  font-size: 13px;
+}
+
+.inventory-context__item span {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.inventory-context__item:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.inventory-context__item[data-disabled="true"] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.map-panel__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #cbd5f5;
+}
+
+.map-panel__summary {
+  font-size: 13px;
+  color: #f8fafc;
+}
+
+.map-panel__pois {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.map-panel__poi {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.7);
+}
+
+.map-panel__poi strong {
+  display: block;
+  font-size: 13px;
+  color: #f1f5f9;
+}
+
+.map-panel__poi span {
+  font-size: 11px;
+  color: #cbd5f5;
+}
+
+.map-panel__poi code {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: #f8fafc;
+}
+
+.map-panel__poi--empty {
+  justify-content: center;
+  color: #94a3b8;
+}
+
+.map-panel__footer {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.hud-weapon {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.hud-weapon__slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 6px;
+}
+
+.hud-weapon__slot {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.hud-weapon__slot[data-active="true"] {
+  border-color: rgba(59, 130, 246, 0.7);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4);
+}
+
+.hud-weapon__slot-icon {
+  font-size: 16px;
+}
+
+.hud-weapon__slot strong {
+  display: block;
+  font-size: 12px;
+  color: #f8fafc;
+}
+
+.hud-weapon__slot span {
+  font-size: 11px;
+  color: #cbd5f5;
+}
+
+.hud-weapon__slot--empty {
+  justify-content: center;
+  text-align: center;
+  color: #94a3b8;
+}

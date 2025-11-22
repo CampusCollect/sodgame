@@ -25,7 +25,7 @@ export class CraftingPanel {
   private readonly recipeList: HTMLDivElement;
   private readonly queueList: HTMLDivElement;
   private readonly statusLine: HTMLDivElement;
-  private open = false;
+  private panelOpen = false;
   private currentStation: StationId | null = null;
   private lastSync: CraftingPanelSyncState | null = null;
 
@@ -54,22 +54,29 @@ export class CraftingPanel {
     this.statusLine.className = "crafting-panel__status";
 
     this.root.append(header, this.stationSelect, this.recipeList, this.queueList, this.statusLine);
-    document.body.append(this.root);
+  }
+
+  getElement(): HTMLDivElement {
+    return this.root;
+  }
+
+  open(): void {
+    this.setOpen(true);
+  }
+
+  close(): void {
+    this.setOpen(false);
   }
 
   isOpen(): boolean {
-    return this.open;
-  }
-
-  toggle(): void {
-    this.setOpen(!this.open);
+    return this.panelOpen;
   }
 
   private setOpen(next: boolean): void {
-    this.open = next;
+    this.panelOpen = next;
     this.root.classList.toggle("hidden", !next);
-    this.options.onToggle?.(this.open);
-    if (this.open) {
+    this.options.onToggle?.(this.panelOpen);
+    if (this.panelOpen) {
       this.statusLine.textContent = "";
       this.statusLine.classList.remove("crafting-panel__status--error");
     }
@@ -83,7 +90,7 @@ export class CraftingPanel {
     if (!this.currentStation && state.stations.length > 0) {
       this.currentStation = state.stations[0].id;
     }
-    if (this.open) {
+    if (this.panelOpen) {
       this.render();
     }
   }

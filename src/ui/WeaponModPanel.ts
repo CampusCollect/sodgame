@@ -53,15 +53,10 @@ export class WeaponModPanel {
     this.message = document.createElement("p");
     this.message.className = "weapon-mod-panel__message";
     this.container.append(this.header, this.slotContainer, this.footer, this.message);
-    document.body.append(this.container);
   }
 
-  show(): void {
-    this.container.classList.remove("hidden");
-  }
-
-  hide(): void {
-    this.container.classList.add("hidden");
+  getElement(): HTMLDivElement {
+    return this.container;
   }
 
   render(state: WeaponModPanelState): void {

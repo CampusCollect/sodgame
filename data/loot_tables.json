@@ -12,6 +12,18 @@
       ]
     },
     {
+      "id": "loot_commercial_t2",
+      "tier": 2,
+      "items": [
+        { "id": "item_pack_basic", "weight": 12, "condition_range": [60, 100] },
+        { "id": "item_vest_tactical", "weight": 10, "condition_range": [55, 100] },
+        { "id": "item_rifle_hunting", "weight": 6, "condition_range": [50, 95] },
+        { "id": "item_smg_vector", "weight": 5, "condition_range": [45, 95] },
+        { "id": "item_ammo_556", "weight": 20, "qty_range": [20, 60] },
+        { "id": "item_helmet_ballistic", "weight": 8, "condition_range": [50, 100] }
+      ]
+    },
+    {
       "id": "loot_military_t4",
       "tier": 4,
       "items": [
@@ -19,6 +31,19 @@
         { "id": "item_ammo_762", "weight": 20, "qty_range": [20, 60] },
         { "id": "item_shotgun_pump", "weight": 5, "condition_range": [50, 95] },
         { "id": "item_ammo_shell", "weight": 15, "qty_range": [6, 18] },
+        { "id": "item_blueprint_turret", "weight": 3, "qty_range": [1, 1] }
+      ]
+    },
+    {
+      "id": "loot_special_t5",
+      "tier": 5,
+      "items": [
+        { "id": "item_rifle_mk14", "weight": 6, "condition_range": [65, 100] },
+        { "id": "item_rifle_gauss", "weight": 4, "condition_range": [70, 100] },
+        { "id": "item_pack_ranger", "weight": 6, "condition_range": [70, 100] },
+        { "id": "item_armor_plate", "weight": 8, "condition_range": [70, 100] },
+        { "id": "item_helmet_ballistic", "weight": 6, "condition_range": [65, 100] },
+        { "id": "item_ammo_762", "weight": 18, "qty_range": [30, 90] },
         { "id": "item_blueprint_turret", "weight": 3, "qty_range": [1, 1] }
       ]
     },

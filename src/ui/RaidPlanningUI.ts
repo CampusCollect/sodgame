@@ -96,7 +96,10 @@ export class RaidPlanningUI {
 
     logWrapper.append(logHeading, this.logList);
     this.root.append(title, this.status, this.hint, this.buildSplitColumns(), logWrapper);
-    document.body.append(this.root);
+  }
+
+  getElement(): HTMLDivElement {
+    return this.root;
   }
 
   isOpen(): boolean {

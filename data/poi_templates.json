@@ -24,9 +24,9 @@
       "applies_to": ["poi_commercial_mart"],
       "label": "Strip Mall Loot Layout",
       "containers": [
-        {"id": "mall_backroom_crate", "container_id": "container_world_crate_large", "offset": [1.0, 0.6], "loot_table": "loot_residential_t1"},
-        {"id": "mall_locker", "container_id": "container_world_locker", "offset": [2.4, 1.7], "loot_table": "loot_industrial_t3", "locked": true},
-        {"id": "mall_duffle", "container_id": "container_world_duffle", "offset": [0.5, 1.8], "loot_table": "loot_residential_t1"}
+        {"id": "mall_backroom_crate", "container_id": "container_world_crate_large", "offset": [1.0, 0.6], "loot_table": "loot_commercial_t2"},
+        {"id": "mall_locker", "container_id": "container_world_locker", "offset": [2.4, 1.7], "loot_table": "loot_commercial_t2", "locked": true},
+        {"id": "mall_duffle", "container_id": "container_world_duffle", "offset": [0.5, 1.8], "loot_table": "loot_commercial_t2"}
       ]
     },
     {
@@ -45,7 +45,7 @@
       "label": "Checkpoint Loot Layout",
       "containers": [
         {"id": "checkpoint_weapon_locker", "container_id": "container_world_locker", "offset": [0.8, 0.6], "loot_table": "loot_military_t4", "locked": true},
-        {"id": "checkpoint_crate", "container_id": "container_world_crate_large", "offset": [1.8, 0.9], "loot_table": "loot_military_t4"}
+        {"id": "checkpoint_crate", "container_id": "container_world_crate_large", "offset": [1.8, 0.9], "loot_table": "loot_special_t5"}
       ]
     },
     {
@@ -53,8 +53,8 @@
       "applies_to": ["poi_highway_convoy"],
       "label": "Convoy Wreck Loot Layout",
       "containers": [
-        {"id": "convoy_crate", "container_id": "container_world_crate_large", "offset": [0.9, 0.6], "loot_table": "loot_military_t4"},
-        {"id": "convoy_duffle", "container_id": "container_world_duffle", "offset": [0.4, 1.5], "loot_table": "loot_industrial_t3"}
+        {"id": "convoy_crate", "container_id": "container_world_crate_large", "offset": [0.9, 0.6], "loot_table": "loot_special_t5"},
+        {"id": "convoy_duffle", "container_id": "container_world_duffle", "offset": [0.4, 1.5], "loot_table": "loot_commercial_t2"}
       ]
     },
     {
@@ -62,8 +62,8 @@
       "applies_to": ["poi_faction_outpost"],
       "label": "Faction Outpost Loot Layout",
       "containers": [
-        {"id": "outpost_locker", "container_id": "container_world_locker", "offset": [0.6, 0.6], "loot_table": "loot_industrial_t3", "locked": true},
-        {"id": "outpost_crate", "container_id": "container_world_crate_large", "offset": [1.8, 1.4], "loot_table": "loot_military_t4"},
+        {"id": "outpost_locker", "container_id": "container_world_locker", "offset": [0.6, 0.6], "loot_table": "loot_commercial_t2", "locked": true},
+        {"id": "outpost_crate", "container_id": "container_world_crate_large", "offset": [1.8, 1.4], "loot_table": "loot_special_t5"},
         {"id": "outpost_duffle", "container_id": "container_world_duffle", "offset": [2.2, 0.5], "loot_table": "loot_industrial_t3"}
       ]
     }

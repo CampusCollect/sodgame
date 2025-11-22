@@ -8,6 +8,7 @@ import type { InputManager } from "../engine/Input";
 import { TransparentCargoHUD } from "../ui/TransparentCargoHUD";
 import { MaintenanceUI } from "./MaintenanceUI";
 import type { NoiseBus } from "../stealth/NoiseBus";
+import { UnifiedOverlay } from "../ui/UnifiedOverlay";
 
 export interface VehicleSaveState {
   id: string;
@@ -55,7 +56,12 @@ export class VehicleDirector {
   private cargoVisible = false;
   private maintenanceVisible = false;
 
-  constructor(private readonly player: Player, private readonly input: InputManager, private readonly noise?: NoiseBus) {
+  constructor(
+    private readonly player: Player,
+    private readonly input: InputManager,
+    overlay: UnifiedOverlay,
+    private readonly noise?: NoiseBus
+  ) {
     const spawnPoints: Vector2[] = [
       { x: 180, y: -120 },
       { x: -220, y: 200 },
@@ -89,13 +95,28 @@ export class VehicleDirector {
 
     this.input.on("interact", () => this.handleInteract());
     this.input.on("toggle-vehicle-cargo", () => this.toggleCargoOverlay());
-    this.input.on("toggle-maintenance", () => this.toggleMaintenance());
     this.input.on("refuel-vehicle", () => this.tryRefuel());
 
     this.hint = document.createElement("div");
     this.hint.className = "vehicle-hint";
     document.body.append(this.hint);
     this.setHint("");
+
+    overlay.registerTab({
+      id: "maintenance",
+      label: "Maintenance",
+      icon: "🧰",
+      hotkeys: ["toggle-maintenance"],
+      element: this.maintenance.getElement(),
+      onOpen: () => {
+        this.maintenanceVisible = true;
+        this.updateMaintenancePanel(true);
+      },
+      onClose: () => {
+        this.maintenanceVisible = false;
+        this.maintenance.hide();
+      }
+    });
   }
 
   update(deltaTime: number, _world: World, _player: Player): void {
@@ -113,9 +134,6 @@ export class VehicleDirector {
     };
 
     this.vehicles.forEach(vehicle => {
-      const def = content.vehicles.find(v => v.id === vehicle.definitionId);
-      if (!def) return;
-
       ctx.save();
       ctx.translate(vehicle.position.x - offset.x, vehicle.position.y - offset.y);
       ctx.rotate(vehicle.facing);
@@ -338,19 +356,6 @@ export class VehicleDirector {
       return;
     }
     this.setHint("");
-  }
-
-  private toggleMaintenance(): void {
-    if (this.maintenanceVisible) {
-      this.closeMaintenance();
-      return;
-    }
-    if (!this.activeVehicle) {
-      this.setHint("Enter a vehicle before opening maintenance");
-      return;
-    }
-    this.maintenanceVisible = true;
-    this.updateMaintenancePanel(true);
   }
 
   private updateMaintenancePanel(force = false): void {

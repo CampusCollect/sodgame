@@ -1,8 +1,8 @@
 import type { Player } from "../entities/Player";
-import type { InputManager } from "../engine/Input";
 import { resolveItemDefinition, createStack } from "../inventory/Item";
 import { WeaponModPanel } from "../ui/WeaponModPanel";
 import { CombatController } from "./CombatController";
+import { UnifiedOverlay } from "../ui/UnifiedOverlay";
 
 export class WeaponModController {
   private readonly panel: WeaponModPanel;
@@ -10,8 +10,8 @@ export class WeaponModController {
 
   constructor(
     private readonly player: Player,
-    private readonly input: InputManager,
-    private readonly combat: CombatController
+    private readonly combat: CombatController,
+    private readonly overlay: UnifiedOverlay
   ) {
     this.panel = new WeaponModPanel({
       onAttach: (slot, attachmentId) => this.installAttachment(slot, attachmentId),
@@ -19,7 +19,16 @@ export class WeaponModController {
       onDisassemble: () => this.handleDisassemble(),
       onClose: () => this.close()
     });
-    this.input.on("toggle-weapon-mods", () => this.toggle());
+
+    this.overlay.registerTab({
+      id: "weapons",
+      label: "Weapons",
+      icon: "\uD83D\uDD2B",
+      hotkeys: ["toggle-weapon-mods"],
+      element: this.panel.getElement(),
+      onOpen: () => this.open(),
+      onClose: () => this.close(true)
+    });
   }
 
   update(): void {
@@ -49,29 +58,22 @@ export class WeaponModController {
     });
   }
 
-  private toggle(): void {
-    if (this.isOpen) {
-      this.close();
-    } else {
-      this.open();
-    }
-  }
-
   private open(): void {
     this.isOpen = true;
     this.player.lockMovement("weapon-mods");
-    this.panel.show();
     this.update();
     this.panel.setMessage("Select an attachment slot to install or detach mods.");
   }
 
-  private close(): void {
+  private close(triggeredByOverlay = false): void {
     if (!this.isOpen) {
       return;
     }
     this.isOpen = false;
     this.player.unlockMovement("weapon-mods");
-    this.panel.hide();
+    if (!triggeredByOverlay) {
+      this.overlay.hide();
+    }
   }
 
   private getAttachmentOptions(slot: string): { itemId: string; label: string }[] {

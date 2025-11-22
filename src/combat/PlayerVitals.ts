@@ -1,6 +1,7 @@
 import type { Player } from "../entities/Player";
 import type { Inventory } from "../inventory/Inventory";
 import type { InputManager } from "../engine/Input";
+import type { EquipmentManager } from "../inventory/EquipmentManager";
 
 export interface PlayerVitalsSnapshot {
   health: number;
@@ -16,6 +17,7 @@ export interface PlayerVitalsSnapshot {
 export interface PlayerVitalsHudState extends PlayerVitalsSnapshot {
   statusMessage: string | null;
   statuses: string[];
+  armor: number;
 }
 
 interface DamageOptions {
@@ -60,7 +62,8 @@ export class PlayerVitals {
   constructor(
     private readonly player: Player,
     private readonly inventory: Inventory,
-    input: InputManager
+    input: InputManager,
+    private readonly equipment?: EquipmentManager
   ) {
     input.on("quick-heal", () => this.requestHeal());
   }
@@ -111,7 +114,9 @@ export class PlayerVitals {
     if (amount <= 0) {
       return;
     }
-    this.applyRawDamage(amount, options.cause ?? "Hit");
+    const mitigation = this.equipment ? Math.min(0.8, this.equipment.getArmorRating()) : 0;
+    const mitigatedAmount = amount * (1 - mitigation);
+    this.applyRawDamage(mitigatedAmount, options.cause ?? "Hit");
     if (options.bleed) {
       this.bleed = clamp(this.bleed + options.bleed, 0, 100);
     }
@@ -154,7 +159,8 @@ export class PlayerVitals {
       trauma: this.trauma,
       downed: this.downed,
       statusMessage: this.statusMessage,
-      statuses
+      statuses,
+      armor: this.equipment?.getArmorRating() ?? 0
     };
   }
 

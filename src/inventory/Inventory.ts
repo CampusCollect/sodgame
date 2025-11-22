@@ -39,8 +39,8 @@ const DEFAULT_OPTIONS: InventoryOptions = {
 };
 
 export class Inventory {
-  readonly grid: GridInventory;
-  readonly weightLimitKg: number;
+  grid: GridInventory;
+  weightLimitKg: number;
   readonly allowRotation: boolean;
   readonly label: string;
   isOpen = false;
@@ -126,6 +126,30 @@ export class Inventory {
 
   getRenderState(): GridRenderState {
     return this.grid.getRenderState();
+  }
+
+  resize(columns: number, rows: number): { success: boolean; reason?: string } {
+    if (columns === this.grid.columns && rows === this.grid.rows) {
+      return { success: true };
+    }
+    const snapshot = this.serialize();
+    const newGrid = new GridInventory(columns, rows);
+    for (const item of snapshot.items) {
+      const stack: ItemStack = {
+        ...item.stack,
+        attachments: item.stack.attachments ? { ...item.stack.attachments } : undefined
+      };
+      const ok = newGrid.restoreStack(stack, item.position, item.rotated);
+      if (!ok) {
+        return { success: false, reason: "Items do not fit in new layout" };
+      }
+    }
+    this.grid = newGrid;
+    return { success: true };
+  }
+
+  setWeightLimit(limitKg: number): void {
+    this.weightLimitKg = limitKg;
   }
 
   serialize(): SerializedInventory {

@@ -23,8 +23,11 @@ export class MaintenanceUI {
     this.list.className = "maintenance-ui__list";
 
     this.element.append(title, this.list);
-    document.body.append(this.element);
     this.hide();
+  }
+
+  getElement(): HTMLDivElement {
+    return this.element;
   }
 
   show(vehicle: VehicleDefinition, statuses: MaintenanceStatus[]): void {

@@ -1,5 +1,12 @@
 # WORKLOG
 
+## 2024-05-30 – Unified Overlay, Equipment & Loot Tier Pass
+- Wired every management UI (Inventory, Crafting, Build, Facilities, Survivors, Raids, Weapon Mods, Maintenance, Map) into the new `UnifiedOverlay`, added tab buttons/hotkeys, and hardened the input guard so typing inside filters no longer triggers gameplay bindings.
+- Introduced the `EquipmentManager` plus right-click context menu actions so backpacks/vests/armor/helmets resize the grid, raise weight caps, and feed a live armor percentage into the HUD; inventory cells gained icons, drag ghosts, and status lines for clearer spatial packing.
+- Added the intel-focused Map tab (**P** hotkey) that lists nearby POIs with distance/loot/alarm metadata, refreshed the HUD weapon block with slot cards + grenade status, and updated the stylesheet to share consistent overlay chrome.
+- Seeded new T2 (`loot_commercial_t2`) and T5 (`loot_special_t5`) loot tables, expanded the item catalog with backpacks/armor/advanced weapons, and retargeted Strip Malls/Checkpoints/Convoys/Outposts so higher-tier POIs now drop the requested gear.
+- Updated README, TESTING, and LIMITATIONS with the unified overlay workflow, equipment effects, new QA steps, and the remaining risks (controller navigation + map visualization gaps).
+
 ## 2024-05-15 – Vehicle Maintenance + Raid Loot Pass
 - Added persistent vehicle state (fuel, condition, maintenance overlay) plus new **M**/**Y** bindings so testers can inspect health and refuel with fuel cans while the stealth noise bus now reflects engine activity.
 - Wired the SaveManager and content seeders to capture vehicle fuel/condition + added Maintenance UI hints so quick-loads resume the same wear/fuel levels.

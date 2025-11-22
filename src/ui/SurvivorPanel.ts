@@ -47,7 +47,10 @@ export class SurvivorPanel {
 
     body.append(this.list, this.detail);
     this.root.append(header, body);
-    document.body.append(this.root);
+  }
+
+  getElement(): HTMLDivElement {
+    return this.root;
   }
 
   show(): void {

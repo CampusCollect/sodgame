@@ -231,6 +231,14 @@ export class GridInventory {
     return { columns: this.columns, rows: this.rows, cells };
   }
 
+  getItemAt(position: GridPosition): PlacedItem | null {
+    if (position.x < 0 || position.y < 0 || position.x >= this.columns || position.y >= this.rows) {
+      return null;
+    }
+    const index = this.index(position.x, position.y);
+    return this.cells[index].occupant;
+  }
+
   private placeStack(
     stack: ItemStack,
     definition: ItemDefinition,
